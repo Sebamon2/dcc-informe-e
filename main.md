@@ -6,6 +6,10 @@ departamento: "Departamento de Ciencias de la Computación"
 memoria: "Ingeniero/a Civil en Computación"
 toc: false
 anho: 2025
+link-citations: true
+link-bibliography: true
+urlcolor: purple
+citecolor: purple
 ---
 
 # Introducción
@@ -140,9 +144,15 @@ a_2x + b_2y + c_2z = d_2 \\
 a_3x + b_3y + c_3z = d_3
 \end{cases}$$
 
-## Algoritmos
+## Código
 
-Puedes utilizar código:
+Para incluir código se utilizan las _backticks_ o `` ` ``. Para tener código en una línea, encierras el código en apóstrofes reversos simples. Lo que luce `hola("mundo")` se escribe así:
+
+```
+`hola("mundo")`
+```
+
+Y para escribir código en su propio bloque debes iniciar una línea con tres apóstrofes reversos ` ``` `, poner tu código debajo, y después de la última línea poner tres apóstrofes de nuevo. El código se ve así:
 
 ```
 # Algoritmo K-means
