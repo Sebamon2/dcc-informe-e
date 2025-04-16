@@ -84,6 +84,8 @@ No es fácil escribir. Tampoco es fácil programar. Menos lo es diseñar e imple
 
 La sección anterior define lo que harás en términos de *tareas*. Esta sección define cuándo ejecutarás cada una y cuánto tiempo debería tomar. Lo expresas a través de una tabla Gantt que cubra todo el semestre del F (aprox. 16 semanas).
 
+Table: Carta Gantt
+
 | Tarea                                                                    | Mes 1  | Mes 2  | Mes 3  | Mes 4  |
 | ------------------------------------------------------------------------ | ------ | ------ | ------ | ------ |
 | Una tarea                                                                | `XXXX` |        |        |        |
@@ -104,3 +106,69 @@ Esta sección debe ir en el informe final del E, pero no es necesaria en el prim
 \section*{Bibliografía}
 
 La bibliografía se genera automáticamente a partir de las citas que pusiste en el documento con formato `[@llave-de-referencia]`. Debes poner cada entrada en el archivo `referencias.bib` siguiendo el formato de _BiBTeX_.
+
+<div id="refs"></div>
+
+\appendix
+
+# Apéndice
+
+Aquí hay ejemplos de ecuaciones y código. En general, el código de tu proyecto no debiese ir en el cuerpo central a menos que sea relevante para explicar cómo implementaste algo.
+
+## Uso de fórmulas matemáticas
+
+En tu informe, frecuentemente necesitarás expresar conceptos mediante fórmulas matemáticas:
+
+* Ecuaciones en línea: Si quieres expresar algo como la media aritmética $\bar{x} = \frac{1}{n}\sum_{i=1}^{n}x_i$ dentro de un párrafo, utiliza símbolos `$` alrededor de la ecuación.
+* Ecuaciones destacadas: Para fórmulas más complejas que merecen su propio espacio, usa `$$`:
+$$F(x) = \int_{a}^{b} f(t) \, dt$$
+
+Un ejemplo: en un modelo de regresión lineal múltiple, podríamos expresar la relación entre variables como:
+$$y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_p x_{ip} + \varepsilon_i,$$
+donde:
+
+- $y_i$ es la variable dependiente
+- $x_{ij}$ son las variables independientes
+- $\beta_j$ son los coeficientes de regresión
+- $\varepsilon_i$ es el término de error aleatorio.
+
+También puedes presentar sistemas de ecuaciones:
+
+$$\begin{cases}
+a_1x + b_1y + c_1z = d_1 \\
+a_2x + b_2y + c_2z = d_2 \\
+a_3x + b_3y + c_3z = d_3
+\end{cases}$$
+
+## Algoritmos
+
+Puedes utilizar código:
+
+```
+# Algoritmo K-means
+# Input: K (número de clusters), D (conjunto de datos)
+# Output: Asignación de clusters
+
+centroides = inicializar_aleatorio(K, D)
+
+while not converge:
+    # Asignar cada punto al cluster más cercano
+    clusters = {}
+    for x_i in D:
+        cluster_mas_cercano = min(range(K), 
+            key=lambda j: distancia(x_i, centroides[j]))
+        clusters.setdefault(cluster_mas_cercano, []).append(x_i)
+    
+    # Actualizar centroides
+    for j in range(K):
+        if j in clusters:
+            centroides[j] = calcular_media(clusters[j])
+    
+    # Verificar convergencia
+    if cambio_en_centroides <= umbral:
+        break
+
+return clusters
+```
+
+Como utilizamos la tipografía _Fira Code_, hay elementos que se ven de manera especial, como `<=`.
