@@ -124,6 +124,12 @@ Este código lo obtuve desde un compilador en Javascript de archivos `.dot`^[Dis
 
 Nota que al ingresar una imagen en Markdown el identificador de la figura es el primer atributo (en este caso: `#fig:diagrama`), pero al referenciarla no utilizamos el carácter `#` (que la define) sino el carácter `@` (que la referencia). Además, la encerramos en llaves `{@referencia-a-figura}` para que quede claro en el texto cuándo es la referencia y cuándo es texto.
 
+El archivo `sandwich.dot` contiene otro diagrama (Figura {@fig:sandwich}), que ejemplifica el proceso de hacer un pan con queso derretido^[Gracias a Michele Tobias por la idea: <https://bsky.app/profile/micheletobias.bsky.social/post/3ln24iiqijk2p>.]. Este es un buen ejemplo de cómo documentar un proceso: tiene las entradas, los pasos intermedios, y el resultado final.
+
+![Proceso para hacer un pan con queso derretido.](sandwich.png){#fig:sandwich width=100%}
+
+Lee el archivo `Makefile` para ver cómo convertir los archivos `.dot` en imágenes (en este caso, `.png`).
+
 ## Plan de trabajo
 
 La sección anterior define lo que harás en términos de *tareas*. Esta sección define cuándo ejecutarás cada una y cuánto tiempo debería tomar. Lo expresas a través de una tabla Gantt que cubra todo el semestre del F (aprox. 16 semanas). La Tabla {@tbl:gantt} tiene un ejemplo.
