@@ -84,11 +84,51 @@ Aprovecharé que aquí podemos extendernos para darte algunos conceptos de escri
 
 No es fácil escribir. Tampoco es fácil programar. Menos lo es diseñar e implementar sistemas: recuerda que tu trabajo como ingeniero, ingeniera o ingeniere es diseñar, implementar y comunicar. 
 
+También es buena idea esquematizar de manera gráfica. Ayuda a entender tanto a quien lee el informe como a quien lo está escribiendo `;)`. La Figura {@fig:diagrama} contiene un diagrama _random_ pero que muestra el estilo de esquema que me parece adecuado para un proyecto. Fue generado con el programa `dot` de la suite Graphviz [@ellson2002graphviz].
+
+![Un diagrama generado a partir de un archivo `.dot`.](diagram.png){#fig:diagrama width=30%}
+
+Lo interesante es que `dot` es también un lenguaje, es decir, tú _escribes_ el diagrama. La Figura {@fig:diagrama} utiliza el siguiente código fuente:
+
+```
+digraph G {
+
+  subgraph cluster_0 {
+    style=filled;
+    color=lightgrey;
+    node [style=filled,color=white];
+    a0 -> a1 -> a2 -> a3;
+    label = "process #1";
+  }
+
+  subgraph cluster_1 {
+    node [style=filled];
+    b0 -> b1 -> b2 -> b3;
+    label = "process #2";
+    color=blue
+  }
+  start -> a0;
+  start -> b0;
+  a1 -> b3;
+  b2 -> a3;
+  a3 -> a0;
+  a3 -> end;
+  b3 -> end;
+
+  start [shape=Mdiamond];
+  end [shape=Msquare];
+}
+```
+
+Este código lo obtuve desde un compilador en Javascript de archivos `.dot`^[Disponible aquí: <https://dreampuf.github.io/GraphvizOnline/>. También me sirve este texto para mostrarte cómo se agregan notas al pie.].
+
+Nota que al ingresar una imagen en Markdown el identificador de la figura es el primer atributo (en este caso: `#fig:diagrama`), pero al referenciarla no utilizamos el carácter `#` (que la define) sino el carácter `@` (que la referencia). Además, la encerramos en llaves `{@referencia-a-figura}` para que quede claro en el texto cuándo es la referencia y cuándo es texto.
+
 ## Plan de trabajo
 
-La sección anterior define lo que harás en términos de *tareas*. Esta sección define cuándo ejecutarás cada una y cuánto tiempo debería tomar. Lo expresas a través de una tabla Gantt que cubra todo el semestre del F (aprox. 16 semanas).
+La sección anterior define lo que harás en términos de *tareas*. Esta sección define cuándo ejecutarás cada una y cuánto tiempo debería tomar. Lo expresas a través de una tabla Gantt que cubra todo el semestre del F (aprox. 16 semanas). La Tabla {@tbl:gantt} tiene un ejemplo.
 
-Table: Carta Gantt
+Table: Carta Gantt. {#tbl:gantt}
 
 | Tarea                                                                    | Mes 1  | Mes 2  | Mes 3  | Mes 4  |
 | ------------------------------------------------------------------------ | ------ | ------ | ------ | ------ |
