@@ -1,0 +1,41 @@
+digraph GNN_RNN_Model {
+  rankdir=LR;
+  node [shape=box, style=filled, fillcolor=lightgray, fontname="Helvetica"];
+
+  // Datos de Entrada
+  subgraph cluster_input {
+    label="1. Datos de Entrada";
+    style=dashed;
+    input1 [label="Matriz de Adyacencia\n(Estructura de la red)"];
+    input2 [label="Series Temporales\n(Demanda histórica)"];
+    input3 [label="Variables Exógenas\n(Clima, eventos, etc.)"];
+  }
+
+  // Capa de GNN
+  subgraph cluster_gnn {
+    label="2. Capa de GNN";
+    style=dashed;
+    gnn [label="Extracción de Características\nEspaciales (GNN)"];
+  }
+
+  // Capa de RNN
+  subgraph cluster_rnn {
+    label="3. Capa de RNN";
+    style=dashed;
+    rnn [label="Modelación Temporal\n(RNN: LSTM/GRU)"];
+  }
+
+  // Capa de Salida
+  subgraph cluster_output {
+    label="4. Capa de Salida";
+    style=dashed;
+    output [label="Predicción de Demanda\nFutura por Nodo"];
+  }
+
+  // Flujo de datos
+  input1 -> gnn;
+  input2 -> rnn;
+  input3 -> rnn;
+  gnn -> rnn;
+  rnn -> output;
+}
