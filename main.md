@@ -153,9 +153,10 @@ Modelar la red de transporte público de Santiago de Chile permitiendo hacer cam
 
 
 1. Disponer de datos actualizados sobre el uso de transporte publico, como frecuencias e itinerarios y los destinos/origenes de los usuarios, como también, a de ser posible, de flujos de transporte.
-2. Modelar la red de transporte publico en alguna estructura de datos.
-3. Crear un modelo de ML capaz de predecir el comportamiento de los usuarios y compararlo con datos reales de uso de transporte
-4. Simular cambios en la red de transporte y analizar como cambia el comportamiento.
+2. Modelar la red de transporte publico en un grafo o hipergrafo de ser necesario, que permita representar la topología de la red de transporte y las combinaciones de ellas. 
+3. Modelar la demanda en sus dos aspectos, espacial y temporal. Para ello, se utilizará un GNN para capturar la topología de la red y una RNN para capturar la temporalidad de los datos. Se espera que el modelo sea capaz de predecir la demanda en función de los factores anteriormente mencionados.
+4. Cambiar la topología de la red y observar cómo cambia la demanda . Cambiar la topología involucrará cambios de infraestructura (agregar, quitar o modificar rutas existentes) como también cambios en la frecuencia de los buses.
+5. Analizar los datos de la nueva demanda.
 
 
 
@@ -173,8 +174,10 @@ Cada objetivo se verificaría de la siguiente manera:
 
 La solución propuesta se basa en la creación de un sistema de simulación del transporte público que combine estructuras de grafos y técnicas de aprendizaje automático. El enfoque contempla los siguientes componentes:
 
+0. En cuanto al tech stack, junto con bibliotecas de python para 
+
 1. Modelado de la red como grafo:
-La red de transporte será representada como un grafo, donde los nodos corresponden a paradas o estaciones, y las aristas a tramos recorridos. Esta representación permitirá modelar recorridos compartidos (por ejemplo, buses distintos que recorren el mismo tramo), y considerar distintas características de cada servicio como atributos de las aristas: frecuencia, tiempo estimado, comodidad, etc.
+La red de transporte será representada como un grafo, donde los nodos corresponden a paradas o estaciones, y las aristas a tramos recorridos. Esta representación permitirá modelar recorridos compartidos (por ejemplo, buses distintos que recorren el mismo tramo), y considerar distintas características de cada servicio como atributos de las aristas: frecuencia, tiempo estimado, comodidad, etc. Los datos para esto se obtendrán de datos de RED y sus recorridos.
 
 También se va a explorar la creación del hipergrafo peatonal, ya que no todas las estaciones combinan (por ejemplo, caminar dos cuadras para ir de un lugar a otro).
 
