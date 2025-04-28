@@ -19,12 +19,11 @@ citecolor: purple
 El sistema de transporte público en Santiago de Chile es un componente esencial para el funcionamiento de la ciudad. Cambios en su oferta —sean planificados o inesperados— pueden generar impactos significativos en la movilidad de las zonas aledañas, tanto a corto como a largo plazo. Las motivaciones para estudiar estos cambios son diversas: desde promover un uso más eficiente de los recursos públicos al construir nuevas líneas de metro, hasta anticipar qué recorridos de buses podrían saturarse ante la suspensión parcial del servicio subterráneo. Comprender cómo estos eventos redistribuyen la carga dentro del sistema es clave para una planificación urbana más informada.
 
 Una exploración bibliográfica sugiere que el campo de la predicción de la demanda usando técnicas de Machine Learning / Inteligencia Artificial (entendiendo que la segunda contiene a la primera) ha crecido notablemente. Un trabajo muy importante que ayudo mucho a la creación de este informe es el de Torrepadula et al. [@diTorrepadula2024], quienes recopilaron cientos de  papers de investigación resolviendo el problema de la demanda, resumiendo muy bien el enfoque de la solución, la fuente de sus datasets, la solución per sé, y conclusiones de los desempeños de las soluciones. 
-Torrepadula menciona que el problema de la demanda es de tipo pronóstico de series de tiempo. En ese sentido, se abren varias soluciones, como el uso de RNN (Redes Neuronales Recurrentes), CNN (Redes Neuronales Convolucionales), SVR (Regresión de vectores de soporte), SVM (Máquinas de vectores de soporte), ELM (Máquinas de aprendizaje extremo) AE (Autoencoders) y Transformers, usados generalmente para lenguaje natural igual encontraron su uso en predicción de demanda. Lo mas interesante para mi, y en lo que basaré mi trabajo probablemente es en la solución usando Redes Neuronales de Grafos (GNNs) o en su forma convolucional, con RNN para capturar correlaciones temporales y espaciales.
+Torrepadula menciona que el problema de la demanda es de tipo pronóstico de series de tiempo. En ese sentido, se abren varias soluciones, como el uso de RNN (Redes Neuronales Recurrentes), CNN (Redes Neuronales Convolucionales), SVR (Regresión de vectores de soporte), SVM (Máquinas de vectores de soporte), ELM (Máquinas de aprendizaje extremo) AE (Autoencoders) y Transformers, usados generalmente para lenguaje natural igual encontraron su uso en predicción de demanda. Lo mas interesante para mi, y en lo que basará este trabajo es en la solución usando Redes Neuronales de Grafos (GNNs) o en su forma convolucional, con RNN para capturar correlaciones temporales y espaciales.
 
 Actualmente, algunos de los estudios que abordan esta problemática desde Chile lo hacen desde enfoques estadísticos y/o a nivel macro. Estos suelen analizar el antes y el después de una intervención, sin capacidad real de predicción. Otros modelos tienen una orientación más predictiva, pero se encuentran desactualizados y no reflejan adecuadamente las dinámicas actuales del transporte urbano. También existen enfoques centrados en el transporte privado, que estudian cómo factores como la infraestructura, las tarifas o las políticas públicas afectan la movilidad general. Sin embargo, estos trabajos no se enfocan en cambios estructurales de la red de transporte público, sino que operan sobre la oferta ya existente.
 
-
-Estas limitaciones, sumadas al avance de nuevas tecnologías como la inteligencia artificial y al creciente acceso a datos relevantes —como las validaciones con tarjeta Bip!, el CENSO 2024 y registros de movilidad provistos por Entel— representan una oportunidad para plantear un nuevo enfoque. Este proyecto propone la creación de un modelo predictivo, transparente y flexible, capaz de emular  la demanda de transporte público a partir de modificaciones en la oferta. El objetivo es anticipar el impacto de intervenciones en la red antes de que ocurran, brindando así una herramienta útil para la planificación y la toma de decisiones.
+Por otro lado, existe el sistema ADATRAP [@adatrap2025], desarrollado por la Universidad de Chile y el Instituto Sistemas Complejos de Ingeniería. ADATRAP es un software que analiza datos y permite planificar y crear estrategias para la priorización en la asignación de servicios públicos de transporte. El software toma en cuenta la distribución de la oferta para los usuarios del servicio en la Región Metropolitana.
 
 La solución propuesta se basa en el uso de técnicas de aprendizaje automático, modelando el sistema de transporte como un grafo en el que se representen recorridos, paradas y transbordos. Este modelo tendrá que aprender a predecir el comportamiento de los usuarios en función de múltiples factores, como la duración del viaje, el número de transbordos y el tiempo de espera. Estos modelos y sus resultados se compararán con datos reales de uso, para afinar el modelo y su precisión.
 Finalmente, se realizarán simulaciones de diferentes escenarios, como la introducción de nuevas líneas o la eliminación de recorridos, para observar cómo estos cambios afectan la demanda y la distribución de usuarios en la red obteniendo datos de la red y su uso modelado usando técnicas de ML y grafos.
@@ -32,8 +31,7 @@ Finalmente, se realizarán simulaciones de diferentes escenarios, como la introd
 
 
 ## Situación actual
-Una gran motivación para este proyecto es la optimización en el uso de los recursos públicos. Modificar dinámicamente la frecuencia de los buses, crear nuevos recorridos o eliminar aquellos que han quedado obsoletos son decisiones que, actualmente, requieren largos procesos de análisis y evaluación. En este contexto, contar con un modelo que permita representar la red de transporte público de Santiago de Chile y simular cambios en su oferta, se vuelve una herramienta valiosa para la toma de decisiones más ágil y fundamentada.
-
+Una gran motivación para este proyecto es la optimización en el uso de los recursos públicos. Modificar dinámicamente la frecuencia de los buses, crear nuevos recorridos o eliminar aquellos que han quedado obsoletos son decisiones que pueden tener un impacto significativo en la calidad del servicio y en la satisfacción de los usuarios. Sin embargo, estas decisiones deben basarse en datos precisos y actualizados sobre el uso del transporte público, así como en una comprensión profunda de cómo los cambios en la red afectan la demanda.
 
 Siguiendo el trabajo de Torrepadula mas a fondo [@diTorrepadula2024] se abren muchas soluciones y consideraciones: 
 La primera , el sujeto de la predicción. 
@@ -41,12 +39,18 @@ La primera , el sujeto de la predicción.
 ### Sujeto de la predicción : 
 Diversos trabajos se enfocan tanto en: 
 
-1. Cantidad de personas en una parada en la ruta.
-2. Cantidad de personas en la ruta.
-3. Cantidad de personas en un vehículo.
-4. Cantidad de personas en un área.
+1. Cantidad de personas en una parada en la ruta. Trabajos como el de Wei et. al [@wei2022nonlinear] usan enfoques no lineales para estimar la demanda en algunas estaciones de metro.
+2. Cantidad de personas en la ruta. El trabajo de Zhao [@zhao] utiliza Prophet para estimar las personas en la ruta 320 de Zhengzhou, China
+3. Cantidad de personas en un vehículo. Algunos trabajos lo predicen , como el de Wang et. al[@li2022deep] con un Support Vector Machine mas un filtro de Kalman.
+4. Cantidad de personas en un área. El trabajo de Wang et al [@wang2021passenger] explora predicciones espacio temporales con un modelo llamado GALLAT (GrAphic preddiction with ALL ATtention), que modela la red como un grafo 
 
 Notar que cada enfoque o sujeto requiere un set de datos distintos, por ejemplo, para saber cuanta gente hay en un momento dado en un vehículo, debemos de usar cámaras o sensores, en cambio, para saber un estimado de gente en la ruta, podemos usar los datos de las validaciones de la tarjeta bip! de la ruta.
+
+Por otro lado, todos los enfoques tienen el objetivo de predecir la demanda, pero cada uno de ellos tiene una filosofía distinta de como hacerlo.
+
+Un dato importante es el de como ADATRAP estima la cantidad de personas en la ruta[@adatrap2025]. ADATRAP tiene un algoritmo estimador de paradas de bajada de los usuarios. En sistemas como RED, el usuario solo valida en su subida al vehículo, por lo que no se sabe donde baja. La predicción se basa en el horario y ubicación de su subida al bus en la ida  y en el horario y ubicación de la vuelta. Se entiende como ida y vuelta como el primer y el último viaje del día.
+
+Una exploración inicial indica que el curso ideal sería contar cuanta gente usa cada ruta, por ello es que la cantidad de personas en la ruta puede ser un buen candidato.
 
 ### Tipo de datos:
 
@@ -60,7 +64,11 @@ El tipo de datos es importante. Algunos ejemplos son:
 
 4. GPS para el flujo de personas en un área.
 
+
+
 Citando a Torrepadula [@diTorrepadula2024] , En general, los datos de validación de la tarjeta , como la bip o sus equivalentes en otros paises son los más utilizados, ya que son fáciles de obtener y tienen una buena cobertura geográfica. Sin embargo, también tienen limitaciones, como la falta de información sobre el origen y destino de los viajes. Los datos de sensores y cámaras son más precisos, pero son más difíciles de obtener y tienen una cobertura geográfica limitada. Los datos de GPS son muy precisos, pero también son difíciles de obtener y tienen una cobertura geográfica limitada.
+
+Trabajos como los de Ye [@ye2022adaptive], Jian [@jiang2022gmm], Li [@li2021forecast] y Yang et.al utilizan datasets provenientes de tarjetas de validación con tecnología similar o idéntica a la de la tarjeta Bip!.
 
 
 ### Factores 
@@ -92,34 +100,38 @@ Los factores que afectan la demanda son diversos y pueden variar según el conte
 
 ### Modo de transporte
 
-En distintos trabajos, se exploró la predicción de distintos métodos de transporte. Por ejemplo, de todos los papers analizados, la mayoría se enfocó en el Metro (por su cantidad de datos disponibles probablemente) y le seguía el bus.
+En distintos trabajos, se exploró la predicción de distintos métodos de transporte. Entre ellos están el Metro, buses, trenes y tranvías.
 
-### Preprocesado de datos.
 
-En este mismo paper, se habla de muchas formas de preprocesado. Entre ellas, crear una matriz o grafo para la red, Ingeniería de Características, normalización de datos, etc.
+### Técnicas de preprocesado de datos
+
+Transformar los datos en una estructura de datos es un paso importante. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu Et. Al[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o origen y d es el destino de la persona. Predicciones hechas por ADATRAP [@adatrap2025] pueden ser utilizadas para llenar esta matriz de origen-destino. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. 
 
 ### Técnicas de predicción
-Lo mas importante, dada la cantidad de datos y la complejidad del problema, es el uso de técnicas de Machine Learning. En el trabajo de Torrepadula se habla de muchas técnicas, entre ellas:
 
+Mi area de interés está en los trabajos que usan RNN y GNN/GCNN debido a la naturaleza de la creación de grafos y por el auge que DiTorrepadula menciona en su trabajo.
 
-La mayoría de los trabajos analizados usaron técnicas como RNN, GNN/GCNN.
 
 Algunas ventajas y desventajas de las 3 mencionadas son:
 
 - **RNN**: Ventajas: Captura correlaciones temporales, buena para series de tiempo multivariadas. 
-Desventajas: No está diseñada para usarse con correlación espacial, es intensiva en recursos y tiene procesamiento paralelo limitado.
+Desventajas: No está diseñada para usarse con correlación espacial, es intensiva en recursos y tiene procesamiento paralelo limitado. Kang [@kang2020lstm] explora una LSTM para predecir el volumen de personas en líneas de metro en China
 
 - **GNN/GCNN**: Ventajas: Captura correlaciones espaciales, buena para series de tiempo multivariadas.
-Desventajas: No captura correlaciones temporales, es intensiva en recursos, necesita la construcción del grafo.
+Desventajas: No captura correlaciones temporales, es intensiva en recursos, necesita la construcción del grafo. Li [@li2020attention] es uno de los trabajos que explora estos métodos.
 
 Como podemos ver , una es el complemento de la otra. Segun Torrepadula, la mejor solución es usar una combinación de ambas, usando RNN para capturar correlaciones temporales y GNN/GCNN para capturar correlaciones espaciales.
 
-De hecho, algunos autores han explorado hipergrafos, es decir, la topología de la red en un grafo y otro por encima que capture los caminos peatonales. Mas aún, se suelen usar LSTM para el espacio del tiempo.
+De hecho, algunos autores han explorado hipergrafos, es decir, la topología de la red en un grafo y otro por encima que capture los caminos peatonales. Mas aún, se suelen usar LSTM para el espacio del tiempo. Un ejemplo de ello es Wang et. al[@wang2021metro].
 
 
 ### En Chile...
 
 Hoy en día, la red está enfrentando transformaciones importantes. La construcción e implementación de nuevas líneas de metro, como la Línea 7 y la futura Línea 8, tendrá un efecto profundo sobre el uso de ciertos recorridos de buses. Algunos servicios podrían volverse redundantes, mientras que otros —como los recorridos locales tipo [LETRA]-XX— podrían experimentar un aumento significativo en la demanda, al convertirse en alimentadores hacia las nuevas estaciones. Esta situación presenta una oportunidad para replantear frecuencias, redistribuir flotas y mejorar la eficiencia general del sistema.
+
+El mas destacado es ADATRAP, desarrollado por la Universidad de Chile y el Instituto Sistemas Complejos de Ingeniería. Este software permite analizar datos y planificar estrategias para la priorización en la asignación de servicios públicos de transporte. ADATRAP toma en cuenta la distribución de la oferta para los usuarios del servicio en la Región Metropolitana. 
+
+Adatrap [@adatrap2025] es un software que utiliza la información geotemporal referenciada (GPS) en buses de Transantiago, en conjunto con la información que entrega la tarjeta bip!, con el objetivo de estimar desempeño de transporte público, velocidades de traslado, hacinamiento, perfiles de carga, etc. Logra crear perfiles de velocidad por servicio y por tramo de ruta, perfiles de carga por servicio, matrices origen-destino, indicadores de calidad de servicio. El software está registrado a nombre de la Universidad de Chile y transferido mediante acuerdo de licencia a la Subsecretaría de Transportes. Se utiliza diariamente para tomar decisiones tales como la definición semanal de programas de operación, modificación de servicios y decisiones de infraestructura
 
 Estos fenómenos han sido objeto de análisis en trabajos previos. Un ejemplo representativo es el de Ramírez [@tesisanalisismetro], quien estudia el cambio espacial en la demanda de transporte público tras la apertura de una nueva línea de metro, empleando un enfoque estadístico. Si bien su análisis es útil para evaluar efectos pasados, no permite anticipar escenarios futuros ni explorar condiciones hipotéticas. El estudio concluye, entre otros puntos, que la cantidad de transbordos y la demanda por servicios locales aumentan tras la introducción de un servicio estructurante como una línea de metro.
 
@@ -146,7 +158,7 @@ En resumen, los trabajos existentes suelen centrarse en enfoques estadísticos r
 
 ### Objetivo general
 
-Modelar la red de transporte público de Santiago de Chile permitiendo hacer cambios en la oferta y evaluar su impacto en la demanda.
+Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual
 
 ### Objetivos específicos
 
@@ -156,7 +168,7 @@ Modelar la red de transporte público de Santiago de Chile permitiendo hacer cam
 2. Modelar la red de transporte publico en un grafo o hipergrafo de ser necesario, que permita representar la topología de la red de transporte y las combinaciones de ellas. 
 3. Modelar la demanda en sus dos aspectos, espacial y temporal. Para ello, se utilizará un GNN para capturar la topología de la red y una RNN para capturar la temporalidad de los datos. Se espera que el modelo sea capaz de predecir la demanda en función de los factores anteriormente mencionados.
 4. Cambiar la topología de la red y observar cómo cambia la demanda . Cambiar la topología involucrará cambios de infraestructura (agregar, quitar o modificar rutas existentes) como también cambios en la frecuencia de los buses.
-5. Analizar los datos de la nueva demanda.
+5. Analizar los datos de la nueva demanda prestando atención al nuevo número de pasajeros transportados por cada línea.
 
 
 
@@ -174,10 +186,10 @@ Cada objetivo se verificaría de la siguiente manera:
 
 La solución propuesta se basa en la creación de un sistema de simulación del transporte público que combine estructuras de grafos y técnicas de aprendizaje automático. El enfoque contempla los siguientes componentes:
 
-0. En cuanto al tech stack, junto con bibliotecas de python para 
+0. En cuanto al tech stack, se usará Python como lenguaje de programación,  bibliotecas como Tensorflow o Pytorch y sus derivados para crear las LSTM y GNN/CNN. NetworkX puede ser utilizado para trabajar con grafos y numpy, scipy y pandas para analizar y cargar los datos.
 
 1. Modelado de la red como grafo:
-La red de transporte será representada como un grafo, donde los nodos corresponden a paradas o estaciones, y las aristas a tramos recorridos. Esta representación permitirá modelar recorridos compartidos (por ejemplo, buses distintos que recorren el mismo tramo), y considerar distintas características de cada servicio como atributos de las aristas: frecuencia, tiempo estimado, comodidad, etc. Los datos para esto se obtendrán de datos de RED y sus recorridos.
+La red de transporte será representada como un grafo, donde los nodos corresponden a paradas o estaciones, y las aristas a tramos recorridos. Esta representación permitirá modelar recorridos compartidos (por ejemplo, buses distintos que recorren el mismo tramo), y considerar distintas características de cada servicio como atributos de las aristas: frecuencia, tiempo estimado, comodidad, etc. Los datos para esto se obtendrán de datos de RED y sus recorridos. Los datos para crear estos grafos provendrán desde la propia red de transporte RED.
 
 También se va a explorar la creación del hipergrafo peatonal, ya que no todas las estaciones combinan (por ejemplo, caminar dos cuadras para ir de un lugar a otro).
 
