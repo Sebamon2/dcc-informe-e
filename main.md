@@ -232,9 +232,78 @@ Table: Carta Gantt.
 
 
 
-## Trabajo adelantado
+# Trabajo adelantado 
 
-%%
+## Plataforma de desarollo y tech stack
+
+Debido a la mayor disponibilidad de paquetes y herramientas, y la familiaridad del lenguaje, se optó por usar Python commo plataforma de desarrollo. A medida que se mencionarán los pasos seguidos, mas adelante, se darán a conocer los paquetes y herramientas utilizadas.
+
+
+
+## Exploración de datos generados por ADATRAP
+
+ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el siguiente enlace: https://www.dtpm.cl/index.php/documentos/matrices-de-viaje. Cada viaje tiene n etapas, hasta 4 como máximo. 
+
+Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la bip o sus derivados al termino de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Por ejemplo, si un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad. Se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
+
+### Tabla de viajes y etapas
+
+La tabla de viajes contiene la información de los viajes del usuario, registrando hasta 4 etapas o 3 combinaciones. Combinaciones en metro no cuentan, pues no se valida la tarjeta al cambiar de linea. Cada tabla de viajes o de etapas corresponde a un solo día de análisis. Las tablas de viajes y de etapas vienen generalmente en packs de una semana completa. 
+
+#### Código TS y Código Usuario
+Los servicios y paraderos se encuentran codificados en formato TS, esto es, un código interno usado por DTPM para identificar a los recorridos. La mayoría de los recorridos tiene un código TS que coincide con el de usuario. Por ejemplo, el servicio **T507 OOI** codifica al servicio 507 de ida (servicio en sentido ENEA- AV GRECIA). En algunas ocasiones no coincide, esto ocurre mayoritariamente en servicios locales con prefijo alfabético, casos como el servicio con código de usuario **J01** en código TS es en **T521**. Esta es la razón por la cual algunos recorridos nuevos tienen códigos de usuario que no siguen el numerado del usuario, ya que si lo siguieran, habrían colisiones de nombres.
+
+Por otro lado, los códigos de paradero también poseen esta distinción. Ningún código de paradero de usuario coincide con su versión en TS. En el set de datos de tabla de viajes y de etapas ambos códigos, tanto el de paraderos como el de servicios vienen en código TS.
+
+#### Paraderos subida y bajada
+Ambas en código TS, denotan, para las 4 posibles etapas, las subidas y bajadas del usuario. Máximo 8 (2 por cada etapa).
+
+#### Horas de subida y bajada
+Estimados con la velocidad promedio de los buses y los itinerarios, cada etapa tiene un horario de subida y bajada. Máximo 8 (2 por cada etapa).
+
+#### Servicios de las 4 etapas
+En formato TS. Servicio de cada etapa. Máximo 4 (1 por cada etapa).
+
+Hay mas columnas, pero para el análisis posterior no son de relevancia. En Anexos se encuentra un desglose total de todas las columnas.
+
+La tabla de etapas contiene la misma información pero de manera disgregada, es decir, cada fila es una etapa. 
+
+### Consolidado de recorridos
+Para crear el grafo, lógicamente es necesario el trazado de todos los recorridos de RED. Para ello, se descargó desde su página web el trazado activo hasta ahora. Este archivo contiene en sus columnas:
+
+1. Los códigos de los servicios y paraderos en TS y en formato usuario.
+
+2. El nombre del paradero.
+
+3. Excepciones del paradero.
+
+4. Las posiciones X e Y del paradero.(UTGSM)
+
+Cada fila contiene una parada de un trazado de un servicio. 
+
+Con esta información, podemos hacer dos cosas.
+
+1. Crear el grafo de la red (sin aún añadir información de la demanda).
+
+2. Crear un diccionario de TS a Usuario de los paraderos.
+
+
+
+## Exploración de datos
+Usando toda la información disponible de momento, podemos generar algunos histogramas interesantes para familiarizanos con las varias formas de acceder y manipular los datos.
+
+### Subidas a un paradero durante el día.
+![Subidas a un paradero durante el día.](../memoria-repo/plots/subidas_paradero.png){#fig:subidas width=100% placement=H}
+
+Podemos hacer el mismo análisis para paradas del Metro de Santiago, por ejemplo...
+
+
+
+## Creación del grafo
+
+Para tener una idea 
+
+
 
 \section*{Bibliografía}
 
