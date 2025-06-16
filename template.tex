@@ -5,6 +5,7 @@
 \usepackage[mathlines,displaymath]{lineno}
 \usepackage{longtable}
 \usepackage{floatrow}
+\usepackage{float}
 \DeclareFloatFont{tiny}{\small}
 \floatsetup[table]{font=tiny}
 \usepackage{etoolbox}
@@ -19,6 +20,14 @@
 \usepackage{libertinus}
 
 % Fira Code
+\let\origfigure=\figure
+\let\endorigfigure=\endfigure
+\renewenvironment{figure}[1][]{%
+  \origfigure[H]
+}{%
+  \endorigfigure
+}
+
 
 \usepackage{fontspec}
 \setmonofont{Fira Code}[

@@ -290,18 +290,80 @@ Con esta información, podemos hacer dos cosas.
 
 
 ## Exploración de datos
-Usando toda la información disponible de momento, podemos generar algunos histogramas interesantes para familiarizanos con las varias formas de acceder y manipular los datos.
+Usando toda la información disponible de momento, podemos generar algunos histogramas interesantes para familiarizanos con las varias formas de acceder y manipular los datos. La figura \ref{fig:subidas} muestra las subidas de un paradero PJ394 (José Joaquín Pérez con Las Lomas en Cerro Navia)
 
 ### Subidas a un paradero durante el día.
-![Subidas a un paradero durante el día.](../memoria-repo/plots/subidas_paradero.png){#fig:subidas width=100% placement=H}
 
-Podemos hacer el mismo análisis para paradas del Metro de Santiago, por ejemplo...
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/subidas_paradero.png}
+    \caption{Subidas en el paradero PJ394}
+    \label{fig:subidas}
+\end{figure}
 
 
+Podemos hacer el mismo análisis para paradas del Metro de Santiago, por ejemplo, analizar la estación de Metro Tobalaba.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/subidas_tobalaba.png}
+    \caption{Subidas en Tobalaba L1 y L4}
+    \label{fig:subidas_tobalaba}
+\end{figure}
+
+Podemos darnos cuenta claramente de la distribución de la hora peak en el Metro Tobalaba a las 18:00 horas. Algo importante se nos muestra en el grafico anterior. Tenemos que tratar a las paradas de buses igual que a las de Metro, es decir, como un Hub de servicios que pasan por ahí. Alguien puede marcar su pasaje en los torniquetes de la línea 1 y dirigirse automáticamente a la línea 4. 
+
+### Uso de un servicio.
+
+Una métrica clave a comparar cuando se realicen cambios en la oferta del transporte, es el uso de un servicio. Una hipótesis razonable es que si quito un servicio dado, servicios aledaños van a ver su demanda subir. Ejemplos tangibles de ello es cuando la línea 1 colapsa por eventos fortuitos. Servicios de superficie que circulan por el eje Alameda-Providencia se ven saturados. El siguiente gráfico muestra el uso del servicio T507 00R.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/uso_507.png}
+    \caption{Uso del servicio 507 de vuelta (Desde Grecia a ENEA)}
+    \label{fig:uso_507}
+\end{figure}
+
+Algunos viajes no tenían hora de bajada (eran nulls). Cuando esto pasaba, se asumía que la persona se bajaba 30 minutos después de subirse. Es un valor arbitrario, pero razonable.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/uso_l1.png}
+    \caption{Uso de la Línea 1 durante el día}
+    \label{fig:uso_l1}
+\end{figure}
+
+La figura \ref{fig:uso_l1} nos muestra algo interesante. El uso de la Línea 1 no es simétrico en el tiempo como el de la 507.
+
+Igualmente, no se tomó en cuenta los casos en los que las personas validan en torniquetes de la línea 1 y combinan inmediatamente. Es necesario mas cuidado en casos del metro.
 
 ## Creación del grafo
 
-Para tener una idea 
+Un grafo G(E,V) es un conjunto de aristas(E) y vertices(V). Estos pueden ser dirigidos (los vértices tienen dirección bloqueada) o no (ambas direcciones posibles).
+
+
+### Aristas
+
+En nuestro caso, las aristas E son las conexiones entre dos paraderos en un recorrido. Por ejemplo, una arista conecta la estación Los Héroes con Moneda. Una arista, por lo tanto, debe de guardar, al menos, los servicios que la recorren. En este caso, sería la Línea 1 en ambas direcciones, por lo que aquí tenemos dos opciones, o tener dos aristas para ambas direcciones o una arista sin direcciones. 
+
+Otro caso, son los vértices que unen paradas de servicios en superficie. Una arista va a representar la conexión entre dos paraderos consecutivos mediante un servicio.
+
+Podemos dibujar las aristas de dos formas:
+
+1. Cada arista representa solo la conexión dada entre dos paraderos consecutivos recorridos por un servicio. Es mas complicado computacionalmente y hará que el grafo tenga mas aristas, pero es mas completo y permite guardar mas información. Por ejemplo, si un servicio X e Y tienen las mismas paradas consecutivas, pero el recorrido Y pasa por calles distintas al X entre las paradas, es evidente que el tiempo que le toma a ambos servicios recorrer la arista es distinto, pues la geografía es distinta (a pesar de que la topología sea la misma en el grafo). 
+
+
+2. Si varios servicios paran en las mismas paradas consecutivas, podemos unir todos los recorridos en la misma arista. Es mas simple computacionalmente, pero datos como la distancia o tiempo que toma al servicio recorrer la arista (el peso de la arista) no podría ser el mismo. 
+
+En este documento se explora la segunda forma de hacerlo, pero probablemente se tenga que hacer de la primera forma.
+
+Notar que los vértices además de guardar la distancia o tiempo promedio que recorre el servicio correspondiente, guardan el sentido. Lo que no guardan, es la geografía del recorrido. Esa información está implícita en la distancia o tiempo que le toma al servicio recorrer la arista.
+
+### Vértices
+
+Los vértices V son las paradas. Cada parada tiene una coordenada lat, lon que la posiciona en el grafo. Una parada se identifica con el código TS del paradero. Una parada contiene 1 o más servicios. 
+
+### Una primera aproximación...
 
 
 
