@@ -361,9 +361,76 @@ Notar que los vértices además de guardar la distancia o tiempo promedio que re
 
 ### Vértices
 
-Los vértices V son las paradas. Cada parada tiene una coordenada lat, lon que la posiciona en el grafo. Una parada se identifica con el código TS del paradero. Una parada contiene 1 o más servicios. 
+Los vértices V son las paradas. Cada parada tiene un par coordenado (lat, lon) que la posiciona en el grafo. Una parada se identifica con el código TS del paradero. Una parada contiene 1 o más servicios. 
 
-### Una primera aproximación...
+### Algoritmo para crear el grafo agrupado
+
+Una primera aproximación para crear el grafo, consistirá en agrupar a todas las conexiones de dos paraderos consecutivos en una arista en común. Es decir:
+
+1. El servicio X tiene una secuencia de paraderos P~k~ , con k el número de paradero en el recorrido. P~0~ es el paradero inicial y P~N~ es el paradero final del recorrido.
+
+2. Los paraderos se configuran en nodos V. Cada nodo V tiene como llave su código de usuario C,  una lista de servicios S[] y un par coordenado (lat, lon) para ubicarlo geográficamente.
+
+3. La lista de servicios de un paradero depende de la hora. En esta versión del grafo no se implementará esto, pero en futuras versiones, es necesario para identificar paraderos con recorridos no invariantes temporalmente. 
+
+4. Cada servicio tiene una secuencia de nodos que visita en orden. Digamos que la secuencia de paraderos que visita un recorrido X es P[]. Si el set de nodos es V[], podemos hacer una biyección entre P~k~ y V~i~. Siendo k el k-ésimo paradero en orden e i el i-ésimo paradero de toda la red. Obviamente i no tiene por que ser igual a k.
+
+5. Si hay dos servicios, X e Y, que tienen secuencias de paraderos P~k~ y Q~k~ y tienen dos paraderos consecutivos que coinciden, es decir, P~k~ = Q~i~ y P~k+1~= Q~i+1~, luego podemos decir que desde P~k~=Q~i~=V~l~ a P~k+1~=Q~i+1~=V~m~ habrá una arista en esa dirección, con m y l no necesariamente consecutivos.
+
+6. Esta arista direccionada desde V~l~ a V~m~ tendrá como información que los servicios X e Y pasan por ella. 
+
+Siguiendo estas reglas, se crea el grafo con el siguiente pseudocódigo:
+
+1.  Se obtienen todos los servicios únicos en el dataframe polars.
+
+2.  Se crea un diccionario con la información Código Usuario, Variante (PM o Normal), Sentido Servicio (Ida o Regreso).
+
+3. Por cada servicio, se filtran del dataframe todos las filas que corresponden al servicio.
+
+4. Se ordena el dataframe viendo la columna "orden_circ". Esta es la columna que denota el orden de circulación del servicio por los paraderos.
+
+5. Por cada fila (paradero) del dataframe, se crea o actualiza un diccionario que corresponde al paradero, con llave código paradero, con los siguientes datos:
+
+- llave(codigo paradero)
+- lat
+- lon
+- servicios
+- nombre (Por ejemplo, José Joaquín Pérez esq Las Lomas)
+- nombre completo (código del paradero + nombre del paradero)
+- tipo (BUS o Metro)
+
+6. Por cada fila del dataframe, revisamos el parámetro "siguiente_parada" que contiene la siguiente parada desde la que estamos revisando (un puntero básicamente). Creamos una arista E~l~ en un diccionario que une ambas paradas con la siguiente información:
+
+- conexion_id (llave formada por el par codigo_paradero_origen, codigo_paradero_siguiente)
+- servicios 
+- nodo_origen
+- nodo_destino 
+- tipo (Bus o Metro)
+
+Notar que al hacer esto por todos los servicios, se van a agregar a cada arista los servicios que recorren ambos nodos en el mismo orden. 
+
+7. Se realiza el mismo procedimiento para el Metro, pero las aristas son bidireccionales (es decir, por cada conexión, se hace una simétrica pero en sentido inverso).
+
+8. Con NetworkX se crea un grafo dirigido con DiGraph().
+
+9. Se convierten los sets de servicios a listas para que GraphML la pueda procesar.
+
+10. Creamos un nodo por cada paradero.
+
+11. Unimos los nodos con las aristas. 
+
+Con ello, podemos crear un grafo interactivo con Gephi (software open source) que nos permite visualizar el grafo.
+
+De la misma forma, podemos crear un mapa interactivo con toda la red usando Plotly en python. 
+
+Con ello, se crearon:
+
+- 11890 paraderos de bus
+- 126 estaciones de metro
+- 15465 conexiones de bus
+- 272 conexiones de metro
+- 15737 conexiones totales
+
 
 
 
