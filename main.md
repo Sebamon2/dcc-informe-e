@@ -288,7 +288,7 @@ Con esta información, podemos hacer dos cosas.
 2. Crear un diccionario de TS a Usuario de los paraderos.
 
 
-
+Algo importante a notar es la fecha de esta tabla de recorridos. Es válida desde el 31/05/2025 hasta a fin de año (al momento de hacer este informe)
 ## Exploración de datos
 Usando toda la información disponible de momento, podemos generar algunos histogramas interesantes para familiarizanos con las varias formas de acceder y manipular los datos. La figura \ref{fig:subidas} muestra las subidas de un paradero PJ394 (José Joaquín Pérez con Las Lomas en Cerro Navia)
 
@@ -381,7 +381,7 @@ Una primera aproximación para crear el grafo, consistirá en agrupar a todas la
 
 Siguiendo estas reglas, se crea el grafo con el siguiente pseudocódigo:
 
-1.  Se obtienen todos los servicios únicos en el dataframe polars.
+1.  Se obtienen todos los servicios únicos en el dataframe polars (Se eligió Polars en vez de pandas gracias a su rapidez para cargar archivos .csv grandes. Mas información sobre polars en el siguiente enlace: https://pola.rs/).
 
 2.  Se crea un diccionario con la información Código Usuario, Variante (PM o Normal), Sentido Servicio (Ida o Regreso).
 
@@ -419,7 +419,7 @@ Notar que al hacer esto por todos los servicios, se van a agregar a cada arista 
 
 11. Unimos los nodos con las aristas. 
 
-Con ello, podemos crear un grafo interactivo con Gephi (software open source) que nos permite visualizar el grafo.
+Con ello, podemos crear un grafo interactivo con Gephi (software open source) que nos permite visualizar el grafo. Podemos utilizar el par lat, lon para generar un grafo configurado de manera visual con ForceAtlas. 
 
 De la misma forma, podemos crear un mapa interactivo con toda la red usando Plotly en python. 
 
@@ -431,7 +431,13 @@ Con ello, se crearon:
 - 272 conexiones de metro
 - 15737 conexiones totales
 
+### Proximas Iteraciones
 
+1. Decidir sobre la configuración final de las aristas (agrupadas o no). Experimentos serán necesarios para tomar una decisión con fundamentos.
+
+2. Establecer el peso de las aristas en base al tiempo o a la distancia recorrida por el servicio entre ambos nodos.
+
+3. 
 
 
 \section*{Bibliografía}
