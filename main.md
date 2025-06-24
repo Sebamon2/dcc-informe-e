@@ -238,7 +238,9 @@ Table: Carta Gantt.
 
 Debido a la mayor disponibilidad de paquetes y herramientas, y la familiaridad del lenguaje, se optó por usar Python commo plataforma de desarrollo. A medida que se mencionarán los pasos seguidos, mas adelante, se darán a conocer los paquetes y herramientas utilizadas.
 
+## Exploración del repositorio 
 
+Para efectos de visualización y/o inspección de los datos, podemos clonar el repositorio ubicado en https://github.com/Sebamon2/memoria-repo. La plataforma del proyecto es en Python. 
 
 ## Exploración de datos generados por ADATRAP
 
@@ -337,7 +339,7 @@ La figura \ref{fig:uso_l1} nos muestra algo interesante. El uso de la Línea 1 n
 
 Igualmente, no se tomó en cuenta los casos en los que las personas validan en torniquetes de la línea 1 y combinan inmediatamente. Es necesario mas cuidado en casos del metro.
 
-## Creación del grafo
+## Creación del grafo agrupado
 
 Un grafo G(E,V) es un conjunto de aristas(E) y vertices(V). Estos pueden ser dirigidos (los vértices tienen dirección bloqueada) o no (ambas direcciones posibles).
 
@@ -431,13 +433,7 @@ Con ello, se crearon:
 - 272 conexiones de metro
 - 15737 conexiones totales
 
-### Proximas Iteraciones
-
-1. Decidir sobre la configuración final de las aristas (agrupadas o no). Experimentos serán necesarios para tomar una decisión con fundamentos.
-
-2. Establecer el peso de las aristas en base al tiempo o a la distancia recorrida por el servicio entre ambos nodos.
-
-3. 
+ 
 
 
 \section*{Bibliografía}
