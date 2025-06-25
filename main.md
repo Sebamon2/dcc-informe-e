@@ -247,6 +247,12 @@ Para efectos de visualización y/o inspección de los datos, podemos clonar el r
 Este apartado es solo para quienes estén interesados en interactuar con los grafos y mapas generados. No es estrictamente necesario para entender la memoria, pero puede ser usado como una herramienta de exploración. Mas información sobre la instalación se encuentra en el README.md del repositorio mismo el cual está alojado en GitHub. 
 
 
+### Notebooks de exploración
+
+La carpeta notebooks contiene todos los notebooks de jupyter para la exploración de los datos. 
+
+Para la próxima sección, puede ser interesante revisar el notebook llamado 'data_inspection.ipynb'.
+
 
 ## Exploración de datos generados por ADATRAP
 
@@ -347,6 +353,8 @@ La figura \ref{fig:uso_l1} nos muestra algo interesante. El uso de la Línea 1 n
 
 Igualmente, no se tomó en cuenta los casos en los que las personas validan en torniquetes de la línea 1 y combinan inmediatamente. Es necesario mas cuidado en casos del metro.
 
+Una posible métrica interesante, sería obtener el porcentaje de uso de un servicio en un sentido con respecto a la cantidad de vehículos que tiene circulando el servicio en un período de tiempo. Esto permitiría ajustar la oferta de manera dinámica. Para ello habría que estimar la cantidad de personas máxima que cae dentro de un vehículo típico del servicio. Este análisis no se hará en esta fase del informe, pero queda propuesto para el siguiente semestre.
+
 ## Creación del grafo agrupado
 
 La Matriz de adyacencia puede ser construida al mirar la consolidación de recorridos. Por lo tanto, crear el grafo de la red es el paso mas crucial para poder crear esta matriz de adyacencia, que representa la estructura de la red. 
@@ -443,7 +451,7 @@ Con ello, se crearon:
 - 272 conexiones de metro
 - 15737 conexiones totales
 
- 
+Al final de este informe se agregó en formato PDF el grafo, pero si se quiere ver de manera interactiva, el notebook de jupyter llamado 'visualization.ipynb' tiene todos los pasos necesarios para generar el grafo. En el mismo notebook se muestra el mapa de Santiago con toda la red usando Plotly. Si se desea observar el grafo con Gephi, es necesario descargar el software, cargar el grafo y en layout seleccionar Force Atlas. Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
 
 
 \section*{Bibliografía}
