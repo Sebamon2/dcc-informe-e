@@ -242,6 +242,12 @@ Debido a la mayor disponibilidad de paquetes y herramientas, y la familiaridad d
 
 Para efectos de visualización y/o inspección de los datos, podemos clonar el repositorio ubicado en https://github.com/Sebamon2/memoria-repo. La plataforma del proyecto es en Python. 
 
+### Instalación
+
+Este apartado es solo para quienes estén interesados en interactuar con los grafos y mapas generados. No es estrictamente necesario para entender la memoria, pero puede ser usado como una herramienta de exploración. Mas información sobre la instalación se encuentra en el README.md del repositorio mismo el cual está alojado en GitHub. 
+
+
+
 ## Exploración de datos generados por ADATRAP
 
 ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el siguiente enlace: https://www.dtpm.cl/index.php/documentos/matrices-de-viaje. Cada viaje tiene n etapas, hasta 4 como máximo. 
@@ -249,6 +255,8 @@ ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el sigui
 Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la bip o sus derivados al termino de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Por ejemplo, si un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad. Se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
 
 ### Tabla de viajes y etapas
+
+En nuestra solución, las tablas de viajes y etapas serán nuestras demandas históricas. 
 
 La tabla de viajes contiene la información de los viajes del usuario, registrando hasta 4 etapas o 3 combinaciones. Combinaciones en metro no cuentan, pues no se valida la tarjeta al cambiar de linea. Cada tabla de viajes o de etapas corresponde a un solo día de análisis. Las tablas de viajes y de etapas vienen generalmente en packs de una semana completa. 
 
@@ -298,7 +306,7 @@ Usando toda la información disponible de momento, podemos generar algunos histo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/subidas_paradero.png}
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/subidas_paradero.png}
     \caption{Subidas en el paradero PJ394}
     \label{fig:subidas}
 \end{figure}
@@ -308,7 +316,7 @@ Podemos hacer el mismo análisis para paradas del Metro de Santiago, por ejemplo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/subidas_tobalaba.png}
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/subidas_tobalaba.png}
     \caption{Subidas en Tobalaba L1 y L4}
     \label{fig:subidas_tobalaba}
 \end{figure}
@@ -321,7 +329,7 @@ Una métrica clave a comparar cuando se realicen cambios en la oferta del transp
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/uso_507.png}
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/uso_507.png}
     \caption{Uso del servicio 507 de vuelta (Desde Grecia a ENEA)}
     \label{fig:uso_507}
 \end{figure}
@@ -330,7 +338,7 @@ Algunos viajes no tenían hora de bajada (eran nulls). Cuando esto pasaba, se as
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{../memoria-repo/plots/uso_l1.png}
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/uso_l1.png}
     \caption{Uso de la Línea 1 durante el día}
     \label{fig:uso_l1}
 \end{figure}
@@ -340,6 +348,8 @@ La figura \ref{fig:uso_l1} nos muestra algo interesante. El uso de la Línea 1 n
 Igualmente, no se tomó en cuenta los casos en los que las personas validan en torniquetes de la línea 1 y combinan inmediatamente. Es necesario mas cuidado en casos del metro.
 
 ## Creación del grafo agrupado
+
+La Matriz de adyacencia puede ser construida al mirar la consolidación de recorridos. Por lo tanto, crear el grafo de la red es el paso mas crucial para poder crear esta matriz de adyacencia, que representa la estructura de la red. 
 
 Un grafo G(E,V) es un conjunto de aristas(E) y vertices(V). Estos pueden ser dirigidos (los vértices tienen dirección bloqueada) o no (ambas direcciones posibles).
 
