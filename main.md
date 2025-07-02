@@ -305,7 +305,9 @@ Con esta información, podemos hacer dos cosas.
 
 
 Algo importante a notar es la fecha de esta tabla de recorridos. Es válida desde el 31/05/2025 hasta a fin de año (al momento de hacer este informe)
+
 ## Exploración de datos
+
 Usando toda la información disponible de momento, podemos generar algunos histogramas interesantes para familiarizanos con las varias formas de acceder y manipular los datos. La figura \ref{fig:subidas} muestra las subidas de un paradero PJ394 (José Joaquín Pérez con Las Lomas en Cerro Navia)
 
 ### Subidas a un paradero durante el día.
@@ -452,6 +454,172 @@ Con ello, se crearon:
 - 15737 conexiones totales
 
 Al final de este informe se agregó en formato PDF el grafo, pero si se quiere ver de manera interactiva, el notebook de jupyter llamado 'visualization.ipynb' tiene todos los pasos necesarios para generar el grafo. En el mismo notebook se muestra el mapa de Santiago con toda la red usando Plotly. Si se desea observar el grafo con Gephi, es necesario descargar el software, cargar el grafo y en layout seleccionar Force Atlas. Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
+
+### Matriz de Adyacencia
+
+Una forma compacta de representar el grafo, es con una Matriz de Adyacencia. Esto es, una matriz M tal que M~ij~= 1 si hay una arista dirigida desde i a j y 0 si no. A diferencia de un grafo no dirigido, M no es simétrica. 
+
+Si se desea experimentar con la matriz de adyacencia y las conexiones entre nodos, referirse al notebook *adyacence_matrix.ipynb*.
+
+Naturalmente, podemos multiplicar el valor de M~ij~ por el peso de la arista, pero aun no se decide si es necesario el valor del peso de la arista para la GNN. Dicho análisis será llevado a cabo en el futuro. 
+
+
+
+## Métricas de Demanda
+
+La idea de predecir la demanda conlleva saber exactamente la demanda de un par paradero, servicio, hora. 
+
+Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, debemos de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
+
+Haciendo esto, podemos obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado demand_getter.ipynb se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paredero **PJ394** con T~ini~= 8:00 y T~ini~= 10:00 , con el servicio **T507** obtenemos:
+
+
+
+\begin{lstlisting}[language=python, caption={Salida del Programa}]
+El paradero PJ394 en formato TS es: T-11-64-PO-30
+Buscando demanda en T-11-64-PO-30 para T507 00I entre 08:00:00 y 10:00:00...
+Procesando etapa 1...
+Demanda en T-11-64-PO-30 para T507 00I en etapa 1: 20 viajes
+Procesando etapa 2...
+Procesando etapa 3...
+Procesando etapa 4...
+Total de viajes en T-11-64-PO-30 para T507 00I: 20
+
+\end{lstlisting}
+
+Para Tobalaba L4 entre las 17:00 y las 18:00
+
+\begin{lstlisting}[language=python, caption={Salida del Programa}]
+No se encontró el paradero en formato TS.
+ O es un paradero de metro, o no existe el paradero en la base de datos.
+Buscando demanda en TOBALABA para L4 entre 17:00:00 y 18:00:00...
+Procesando etapa 1...
+Demanda en TOBALABA para L4 en etapa 1: 9226 viajes
+Procesando etapa 2...
+Demanda en TOBALABA para L4 en etapa 2: 1191 viajes
+Procesando etapa 3...
+Demanda en TOBALABA para L4 en etapa 3: 16 viajes
+Procesando etapa 4...
+Demanda en TOBALABA para L4 en etapa 4: 3 viajes
+Total de viajes en TOBALABA para L4: 10436
+\end{lstlisting}
+
+
+\clearpage
+
+Algo curioso ocurre para Tobalaba L1
+
+\begin{lstlisting}[language=python, caption={Salida del Programa}]
+No se encontró el paradero en formato TS.
+O es un paradero de metro, o no existe el paradero en la base de datos.
+Buscando demanda en TOBALABA para L1 entre 17:00:00 y 18:00:00...
+Procesando etapa 1...
+Procesando etapa 2...
+Procesando etapa 3...
+Procesando etapa 4...
+Total de viajes en TOBALABA para L1: 0
+\end{lstlisting}
+
+Nuestras sospechas sobre como se guarda el servicio en estaciones de metro fue cierto. Al marcar la Bip en Tobalaba, se marca automaticamente como L4 , nunca como L1. Este problema hay que resolverlo prontamente.
+
+
+Esta data por cada una de las tuplas es la información de entranamiento que tendra la GNN para predecir la demanda.
+
+## GNN
+
+Para comenzar a hablar de las GNN, es pertinente aclarar conceptos de redes neuronales y como nos ayudarán en el futuro a solucionar el problema.
+
+## Redes Neuronales
+Las redes neuronales pueden ser pensadas como una colección de nodos o neuronas conectados por aristas o axones, los cuales tienen pesos. Estos nodos o neuronas se agrupan según su función en capas, las cuales pueden estar encargadas de recibir la información, procesarla o dar la respuesta a la pregunta. Por ejemplo, un clasificador binario tiene una capa de output con sola una neurona. Si la neurona se activa o no depende de la clasificación final. 
+
+El ajuste de los pesos se hace en el entrenamiento, proceso en el cual la red "aprende" en base a fallar una y otra vez en base a datos etiquetados y a funciones de pérdida que el algoritmo debe de minimizar. La forma que tiene la red de ajustar los pesos depende la taza de aprendizaje (learning rate) o la función usada para optimizar o converger a la red (optimizer). 
+
+
+## Redes Neuronales de Grafos
+
+Las redes neuronales tradicionales (MLP, CNN, RNN/LSTM) están preparadas para recibir datos en forma de vectores, rejillas (grafos en forma de grilla, como imágenes) o secuencias temporales (grafos dirigidos en solo una dirección). Es decir, podemos pensar en una GNN como una abstracción o generalización de muchos tipos de redes neuronales. Técnicamente, una GNN puede recibir una imagen, pues una imagen es un grafo cuadriculado. 
+
+Se nos vienen a la cabeza miles de estructuras de datos que pueden aprovechar a las GNN para realizar predicciones. Redes sociales, moléculas, redes de transporte, entre otras. 
+
+### ¿Cómo funcionan las GNN?
+
+La idea de las GNN es la siguiente:
+
+- Cada nodo tiene un vector de características inicial (atributos).
+- Los nodos "envían mensajes" a sus vecinos. 
+- Cada nodo actualiza su representación basado en los mensajes recibidos.
+- Este proceso se repite varias veces (capas de la GNN).
+
+En el caso del transporte público, tenemos:
+
+- Cada parada tiene su información propia (ubicación, servicios, tipo, información relevante del entorno).
+- En la primera iteración, el nodo recibe información de los nodos que están conectados directamente a él.
+- En la segunda, a dos pasos del nodo.
+- Así sucesivamente.
+
+
+### Algunos ejemplos
+
+
+#### STGCN  (Spacio Temporal Graph Convolutional Network)
+
+Trabajo realizado por Jin [@stgcn] uso una combinación de redes convolucionales para la predicción temporal y una Cluster-GCNN para la predicción espacial. El set de datos fue de Metro de Shangai.
+
+#### GNN for Robust Public Transit Demand Prediction usando PGCN
+
+Un trabajo interesante de Li [@pgcn] abordó la partición de la ciudad de Sidney en zonas de acuerdo a su código postal (nodos) y agregó información del uso del suelo a los nodos. Por el lado de las GNN, utilizó una PGCN (Probabilistic Graph Convolutional Network) para predecir la demanda entre los pares (O,D). Esta red se compone de correlaciones espacio temporales mas un módulo de aproximación bayesiana para cuantificar la incertidumbre.
+
+
+
+## Reconstrucción de Demanda sin contexto temporal.
+
+El reconstrucción de demanda, se refiere al proceso en el cual, dado un tiempo T, datos históricos X(T)  y un grafo G(T) con características espaciales concretas, predecir la demanda en ese instante de tiempo. Ese instante puede ser igualmente una ventana de tiempo corta (5 minutos), o un período (hora punta entre las 17:30 y las 19:30). La versatilidad de este enfoque esta en la obtención de una abstracción espacial, que nos permitirá, a priori, cambiar la topología sustancialmente.
+
+Algunas características que podrían tener los nodos, son:
+
+- Servicios.
+- Ubicación.
+- Tipo (metro o bus).
+- Si es combinación.
+- Comuna.
+- Frecuencia de los recorridos. 
+- Uso del suelo cercano.
+- Paraderos cercanos a una distancia X.
+
+Las aristas tendrían...
+
+- Tiempo promedio en recorrerla.
+- Distancia entre nodos.
+- Servicios que la recorren.
+- Tipo (bus o metro)
+
+Con ello, las aristas tendrían PESO, algo importante para detectar que camino utilizarían los usuarios. 
+
+
+Debido a que no tenemos el contexto temporal como input al modelo , es importante entrenar con muchos datos de distintos días y horas. Además, datos del uso de suelo pueden ser claves al detectar por qué una parada es mas usada que otra. Datos de densidad poblacional también lo pueden ser. 
+
+
+### Flujo de trabajo Futuro
+
+- Intentar obtener la mayor cantidad de datos de uso de suelo posibles para enriquecer la información de los nodos. 
+- Agregar datos de tiempo/distancia a las aristas.
+- Entrenar al modelo en instantes de tiempo dados. 
+- Comprobar la eficacia del modelo comparándola con configuraciones topológicas ya existentes.
+- Probar a predecir en configuraciones topológicas artificiales en las que se agregan servicios. 
+- Probar a predecir en configuraciones topológicas artificiales en las que se quitan servicios. 
+
+Notar que la última tarea es mas complicada. Esto porque implica una redistribución de la demanda, en la que los usuarios deben de abandonar el servicio actual y elegir entre muchas opciones que servicios elegir. Esto implica una simulación de agentes. 
+
+
+### ¿Qué pasa si sale mal? GNN con contexto temporal.
+
+Si el trabajo se torna mas complejo de lo que se creía (o no se logra enriquecer a los nodos con la cantidad de datos suficientes para que el  modelo converja), hay otra opción, menos robusta, pero con mucho mas experiencia bibliográfica. Esto es, predecir la demanda en un instante t+1 dado que se sabe la demanda en instantes de tiempo anteriores. Esto requeriría de redes neuronales que sepan trabajar con datos secuenciales. Varios trabajos expuestos en este informe hacen ello. La novedad sería probar a cambiar la topología en el tiempo t+1, es decir, agregar oferta. Tal como se dijo anteriormente, quitar oferta es mas complicado ya que significaría redistribuir la demanda.
+
+La diferencia de ambos enfoques radica en que el primero NO usa datos históricos de demanda como input, si no que son el target del modelo. En cambio, en el segundo enfoque se utilizan como input de un tiempo pasado. 
+
+
+
+
 
 
 \section*{Bibliografía}
