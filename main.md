@@ -441,7 +441,7 @@ Notar que al hacer esto por todos los servicios, se van a agregar a cada arista 
 
 11. Unimos los nodos con las aristas. 
 
-Con ello, podemos crear un grafo interactivo con Gephi (software open source) que nos permite visualizar el grafo. Podemos utilizar el par lat, lon para generar un grafo configurado de manera visual con ForceAtlas. 
+Con ello, podemos crear un grafo interactivo con Gephi (software open source) que nos permite visualizar el grafo. Podemos utilizar el par lat, lon para generar un grafo configurado de manera visual con GeoLayout. 
 
 De la misma forma, podemos crear un mapa interactivo con toda la red usando Plotly en python. 
 
@@ -453,7 +453,7 @@ Con ello, se crearon:
 - 272 conexiones de metro
 - 15737 conexiones totales
 
-Al final de este informe se agregó en formato PDF el grafo, pero si se quiere ver de manera interactiva, el notebook de jupyter llamado 'visualization.ipynb' tiene todos los pasos necesarios para generar el grafo. En el mismo notebook se muestra el mapa de Santiago con toda la red usando Plotly. Si se desea observar el grafo con Gephi, es necesario descargar el software, cargar el grafo y en layout seleccionar Force Atlas. Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
+Al final de este informe se agregó en formato PDF el grafo, pero si se quiere ver de manera interactiva, el notebook de jupyter llamado 'visualization.ipynb' tiene todos los pasos necesarios para generar el grafo. En el mismo notebook se muestra el mapa de Santiago con toda la red usando Plotly. Si se desea observar el grafo con Gephi, es necesario descargar el software, instalarlo,  cargar el grafo (ubicado en data/graphs/grafo.graphml) y en layout seleccionar Geo Layout y colocar la escala en 1E6 (10 a la 6). Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
 
 ### Matriz de Adyacencia
 
@@ -471,7 +471,7 @@ La idea de predecir la demanda conlleva saber exactamente la demanda de un par p
 
 Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, debemos de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
 
-Haciendo esto, podemos obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado demand_getter.ipynb se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paredero **PJ394** con T~ini~= 8:00 y T~ini~= 10:00 , con el servicio **T507** obtenemos:
+Haciendo esto, podemos obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado demand_getter.ipynb se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paredero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
 
 
 
@@ -567,7 +567,7 @@ Trabajo realizado por Jin [@stgcn] uso una combinación de redes convolucionales
 
 #### GNN for Robust Public Transit Demand Prediction usando PGCN
 
-Un trabajo interesante de Li [@pgcn] abordó la partición de la ciudad de Sidney en zonas de acuerdo a su código postal (nodos) y agregó información del uso del suelo a los nodos. Por el lado de las GNN, utilizó una PGCN (Probabilistic Graph Convolutional Network) para predecir la demanda entre los pares (O,D). Esta red se compone de correlaciones espacio temporales mas un módulo de aproximación bayesiana para cuantificar la incertidumbre.
+Un trabajo interesante de Li [@pgcn] abordó la partición de la ciudad de Sidney en zonas de acuerdo a su código postal (nodos) y agregó información del uso del suelo a los nodos (Densidad residencial, Oficinas, Industrias, Zonas Comerciales, etc). Por el lado de las GNN, utilizó una PGCN (Probabilistic Graph Convolutional Network) para predecir la demanda entre los pares (O,D). Esta red se compone de correlaciones espacio temporales mas un módulo de aproximación bayesiana para cuantificar la incertidumbre.
 
 
 
@@ -585,6 +585,7 @@ Algunas características que podrían tener los nodos, son:
 - Frecuencia de los recorridos. 
 - Uso del suelo cercano.
 - Paraderos cercanos a una distancia X.
+- Tiempo actual del grafo (la demanda no es invariante temporalmente)
 
 Las aristas tendrían...
 
@@ -599,7 +600,7 @@ Con ello, las aristas tendrían PESO, algo importante para detectar que camino u
 Debido a que no tenemos el contexto temporal como input al modelo , es importante entrenar con muchos datos de distintos días y horas. Además, datos del uso de suelo pueden ser claves al detectar por qué una parada es mas usada que otra. Datos de densidad poblacional también lo pueden ser. 
 
 
-### Flujo de trabajo Futuro
+### Flujo de trabajo 
 
 - Intentar obtener la mayor cantidad de datos de uso de suelo posibles para enriquecer la información de los nodos. 
 - Agregar datos de tiempo/distancia a las aristas.
@@ -608,20 +609,42 @@ Debido a que no tenemos el contexto temporal como input al modelo , es important
 - Probar a predecir en configuraciones topológicas artificiales en las que se agregan servicios. 
 - Probar a predecir en configuraciones topológicas artificiales en las que se quitan servicios. 
 
-Notar que la última tarea es mas complicada. Esto porque implica una redistribución de la demanda, en la que los usuarios deben de abandonar el servicio actual y elegir entre muchas opciones que servicios elegir. Esto implica una simulación de agentes. 
+
+## GNN con contexto temporal.
+
+Otro enfoque a tomar será el de predecir la demanda del TP usando datos históricos de tiempos anteriores como input al modelo, para predecir el tiempo siguiente. Varios trabajos nombrados en este informe hicieron eso. La diferencia será en que en el tiempo siguiente se cambiará la topología. 
 
 
-### ¿Qué pasa si sale mal? GNN con contexto temporal.
+Luego, el input del modelo sería una secuencia de demandas para un paradero P y servicio S, con D(t~k~,P,S) una secuencia de demandas temporales. Una red neuronal apta para captar correlaciones temporales y series de tiempo tomará esta información y predecirá la demanda para el mismo paradero,servicio pero para un tiempo futuro. 
 
-Si el trabajo se torna mas complejo de lo que se creía (o no se logra enriquecer a los nodos con la cantidad de datos suficientes para que el  modelo converja), hay otra opción, menos robusta, pero con mucho mas experiencia bibliográfica. Esto es, predecir la demanda en un instante t+1 dado que se sabe la demanda en instantes de tiempo anteriores. Esto requeriría de redes neuronales que sepan trabajar con datos secuenciales. Varios trabajos expuestos en este informe hacen ello. La novedad sería probar a cambiar la topología en el tiempo t+1, es decir, agregar oferta. Tal como se dijo anteriormente, quitar oferta es mas complicado ya que significaría redistribuir la demanda.
+### Flujo de trabajo 
 
-La diferencia de ambos enfoques radica en que el primero NO usa datos históricos de demanda como input, si no que son el target del modelo. En cambio, en el segundo enfoque se utilizan como input de un tiempo pasado. 
+- Crear atributos de demanda en cada nodo
+- Validar modelo con datos históricos
+- Con el modelo validado, agregar servicios.
+- Quitar servicios.
+
+Podemos pensar en agregar a los servicios nuevos con demanda vacía o con una demanda base tomando en cuenta servicios parecidos con paraderos parecidos. Luego, dejar evolucionar el modelo en el tiempo. Obviamente, validar en este caso es imposible pues no ha existido tal servicio. Algunas oportunidades se ven a la vista.
+
+
+## Validación del modelo.
+
+### Reconstrucción de Demanda sin contexto temporal
+
+Al momento de escribir este informe, (Finales de Junio/Inicios de Julio de 2025) se han agregado servicios nuevos los cuales aun no registran demanda. Se puede ver mas información de ello en https://www.red.cl/red-comunica/ajuste-en-malla-de-recorridos-de-buses-dos-nuevos-servicios-y-cuatro-extensiones-comienzan-a-funcionar-este-sabado-05-de-julio/ .
+
+Esta es una oportunidad perfecta para agregar el trazado de los recorridos nuevos, calcular la demanda esperada, y cuando red saque los datos de demanda de los nuevos recorridos (las tablas de viaje), podremos contrastar. Otra opción es viajar a atrás en el tiempo, analizar una tabla de datos antigua (anterior a la agregación de nuevos recorridos) y compararla con la actual (con los recorridos ya circulando). 
+
+### GNN con contexto temporal
+
+La validación de este caso es mas sencilla. Simplemente podemos comparar datos históricos en tiempos posteriores. (Por ejemplo, en base a datos históricos del dia miércoles, predecir el día Jueves a las 5 de la tarde). Naturalmente, tenemos los datos de ese día jueves, por lo que solo es necesario comparar.
+
+En ambos casos, al ser valores discretos numéricos muy variados, comparar con variables estadísticas globales como el promedio o la desviación estándar será razonable para establecer la demanda en paraderos. 
 
 
 
 
-
-
+\clearpage
 \section*{Bibliografía}
 
 
