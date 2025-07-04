@@ -218,17 +218,17 @@ En la figura \ref{fig:diagrama} se presenta un diagrama de la solución propuest
 
 Table: Carta Gantt. 
 
-| Tarea                                                                    | Mes 1  | Mes 2  | Mes 3  | Mes 4  |
-| ------------------------------------------------------------------------ | ------ | ------ | ------ | ------ |
-| Obtención y limpieza de datos                                                                | `X___` |        |        |        |
-| Análisis exploratorio de los datos                                                               | `␣X__` |  |        |        |
-| Parseo de datos a grafo                                 |  | `__XX` |        |        |
-| Validación de la estructura de datos.                                           |        | `␣␣XX` |  |        |
-| Crear y optimizar modelo de ML para uso de red                                                  |        |  | `XXX_` | |
-| Comparar modelo de ML de uso con los reales |        |        | `_XXX` |  |
-| Con la red hecha y el modelo de ML validado, experimentar con cambios en la oferta modificando la red |        |        |  | `XX__` |
-| Analizar los cambios de la demanda y ajustar el modelo según resultados |        |        |  | `__XX` |
-| Redactar memoria y preparar defensa.                                           |        |        |  | `XXXX` |
+| Tarea                                                                                                 | Mes 1  | Mes 2  | Mes 3  | Mes 4  |
+| ----------------------------------------------------------------------------------------------------- | ------ | ------ | ------ | ------ |
+| Obtención y limpieza de datos                                                                         | `X___` |        |        |        |
+| Análisis exploratorio de los datos                                                                    | `␣X__` |        |        |        |
+| Parseo de datos a grafo                                                                               |        | `__XX` |        |        |
+| Validación de la estructura de datos.                                                                 |        | `␣␣XX` |        |        |
+| Crear y optimizar modelo de ML para uso de red                                                        |        |        | `XXX_` |        |
+| Comparar modelo de ML de uso con los reales                                                           |        |        | `_XXX` |        |
+| Con la red hecha y el modelo de ML validado, experimentar con cambios en la oferta modificando la red |        |        |        | `XX__` |
+| Analizar los cambios de la demanda y ajustar el modelo según resultados                               |        |        |        | `__XX` |
+| Redactar memoria y preparar defensa.                                                                  |        |        |        | `XXXX` |
 
 
 
@@ -236,7 +236,7 @@ Table: Carta Gantt.
 
 ## Plataforma de desarollo y tech stack
 
-Debido a la mayor disponibilidad de paquetes y herramientas, y la familiaridad del lenguaje, se optó por usar Python commo plataforma de desarrollo. A medida que se mencionarán los pasos seguidos, mas adelante, se darán a conocer los paquetes y herramientas utilizadas.
+Debido a la mayor disponibilidad de paquetes y herramientas, y la familiaridad del lenguaje, se optó por usar Python como plataforma de desarrollo. A medida que se mencionarán los pasos seguidos, mas adelante, se darán a conocer los paquetes y herramientas utilizadas.
 
 ## Exploración del repositorio 
 
@@ -532,7 +532,7 @@ Para comenzar a hablar de las GNN, es pertinente aclarar conceptos de redes neur
 ## Redes Neuronales
 Las redes neuronales pueden ser pensadas como una colección de nodos o neuronas conectados por aristas o axones, los cuales tienen pesos. Estos nodos o neuronas se agrupan según su función en capas, las cuales pueden estar encargadas de recibir la información, procesarla o dar la respuesta a la pregunta. Por ejemplo, un clasificador binario tiene una capa de output con sola una neurona. Si la neurona se activa o no depende de la clasificación final. 
 
-El ajuste de los pesos se hace en el entrenamiento, proceso en el cual la red "aprende" en base a fallar una y otra vez en base a datos etiquetados y a funciones de pérdida que el algoritmo debe de minimizar. La forma que tiene la red de ajustar los pesos depende la taza de aprendizaje (learning rate) o la función usada para optimizar o converger a la red (optimizer). 
+El ajuste de los pesos se hace en el entrenamiento, proceso en el cual la red "aprende" en base a fallar una y otra vez en base a datos etiquetados y a funciones de pérdida que el algoritmo debe de minimizar. La forma que tiene la red de ajustar los pesos depende la tasa de aprendizaje (learning rate) o la función usada para optimizar o converger a la red (optimizer). 
 
 
 ## Redes Neuronales de Grafos
