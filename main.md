@@ -455,6 +455,14 @@ Con ello, se crearon:
 
 Al final de este informe se agregó en formato PDF el grafo, pero si se quiere ver de manera interactiva, el notebook de jupyter llamado 'visualization.ipynb' tiene todos los pasos necesarios para generar el grafo. En el mismo notebook se muestra el mapa de Santiago con toda la red usando Plotly. Si se desea observar el grafo con Gephi, es necesario descargar el software, instalarlo,  cargar el grafo (ubicado en data/graphs/grafo.graphml) y en layout seleccionar Geo Layout y colocar la escala en 1E6 (10 a la 6). Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{mapa_plotly.png}
+    \caption{Mapa en Plotly con zoom a un barrio de Cerro Navia}
+    \label{fig:mapa_plotly}
+\end{figure}
+
 ### Matriz de Adyacencia
 
 Una forma compacta de representar el grafo, es con una Matriz de Adyacencia. Esto es, una matriz M tal que M~ij~= 1 si hay una arista dirigida desde i a j y 0 si no. A diferencia de un grafo no dirigido, M no es simétrica. 
