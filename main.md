@@ -177,7 +177,7 @@ Diseñar e implementar un modelo que prediga demanda de transporte dado un escen
 
 Cada objetivo se verificaría de la siguiente manera:
 
-1. Datos actualizados: Se espera contar con datos de validación de la tarjeta Bip! y registros de movilidad provistos por Entel, así como información censal sobre residencia y lugar de trabajo.
+1. Datos actualizados: Se espera contar con datos de validación de la tarjeta Bip! y registros de uso de suelo de Santiago.
 2. Modelado de la red: Se espera contar con un modelo de la red de transporte público que permita representar recorridos, paradas y transbordos. Para ello, se compara con trabajos previos que han utilizado modelos similares de modelado de las redes.
 3. Modelo de ML para predicción: Se espera contar con un modelo de aprendizaje automático que simule el comportamiento de los usuarios en función de múltiples factores. Este modelo se validará comparando sus predicciones con datos reales de uso de transporte público, como los proporcionados por la tarjeta Bip!.
 4. Al modificar la red, se espera que el modelo de ML pueda predecir cambios en la demanda y la distribución de usuarios en la red. Esto se validará instanciando diferentes escenarios y comparando los resultados con datos reales de uso. (Por ejemplo, red pre/post linea 6)
@@ -196,7 +196,9 @@ También se va a explorar la creación del hipergrafo peatonal si es que es nece
 
 
 2. GNN + RNN:
-Se implementará un modelo de aprendizaje automático para replicar la demanda de uso de transporte público en función de múltiples factores. Este modelo aprenderá a predecir el comportamiento de los usuarios en función de variables como la duración del viaje, el número de transbordos y el tiempo de espera. Se utilizarán técnicas de aprendizaje supervisado para ajustar los parámetros del modelo, utilizando datos históricos de validaciones Bip! y patrones de movilidad. Para ello se utilizará un modelo con GNN + RNN (por ejemplo, una LSTM) . Una GNN procesará la estructura espacial del grafo y la demanda histórica con una LSTM.
+Se implementará un modelo de aprendizaje automático para replicar la demanda de uso de transporte público en función de múltiples factores. Este modelo aprenderá a predecir el comportamiento de los usuarios en función de variables como la duración del viaje, el número de transbordos y el tiempo de espera. Se utilizarán técnicas de aprendizaje supervisado para ajustar los parámetros del modelo, utilizando datos históricos de validaciones Bip!, datos de uso de suelo  y patrones de movilidad. Para ello se utilizará un modelo con GNN + RNN (por ejemplo, una LSTM) . Una GNN procesará la estructura espacial del grafo y la demanda histórica con una LSTM.
+
+Para este paso, se utilizarán dos enfoques, uno con una LSTM mas un grafo (teniendo contexto temporal) y otro en el que se reconstruya la demanda desde cero. 
 
 3. Entrenamiento y ajuste del modelo: 
 Utilizando datos históricos (validaciones Bip!, patrones de movilidad, datos censales), se ajustarán los parámetros del modelo de ML para que el comportamiento simulado refleje lo más fielmente posible la realidad. Esto puede abordarse como un problema de optimización o incluso como un sistema de aprendizaje supervisado.
@@ -209,6 +211,7 @@ Finalmente, se realizará un análisis exhaustivo de los resultados obtenidos: s
 
 En la figura \ref{fig:diagrama} se presenta un diagrama de la solución propuesta, que ilustra los componentes y flujos de información del sistema.
 
+\clearpage
 
 ![Diagrama de solución](solucion.png){#fig:diagrama width=100%}
 
@@ -216,17 +219,20 @@ En la figura \ref{fig:diagrama} se presenta un diagrama de la solución propuest
 ## Plan de trabajo
 
 
+
+Debido al trabajo adelantado hecho en este informe, una reestructuración de la carta Gantt es necesaria para reflejar el progreso.
+
 Table: Carta Gantt. 
 
 | Tarea                                                                                                 | Mes 1  | Mes 2  | Mes 3  | Mes 4  |
 | ----------------------------------------------------------------------------------------------------- | ------ | ------ | ------ | ------ |
-| Obtención y limpieza de datos                                                                         | `X___` |        |        |        |
-| Análisis exploratorio de los datos                                                                    | `␣X__` |        |        |        |
-| Parseo de datos a grafo                                                                               |        | `__XX` |        |        |
-| Validación de la estructura de datos.                                                                 |        | `␣␣XX` |        |        |
-| Crear y optimizar modelo de ML para uso de red                                                        |        |        | `XXX_` |        |
-| Comparar modelo de ML de uso con los reales                                                           |        |        | `_XXX` |        |
-| Con la red hecha y el modelo de ML validado, experimentar con cambios en la oferta modificando la red |        |        |        | `XX__` |
+| Obtención y limpieza de datos de Demanda y Recorridos                                                 | LISTO  |        |        |        |
+| Análisis exploratorio de los datos de Demanda y Recorridos                                            | LISTO  |        |        |        |
+| Usando datos de recorridos, crear grafo                                                               |        | LISTO  |        |        |
+| Validación visual del grafo                                                                           | `XX__` |        |        |        |
+| Crear modelo de GNN (Ambos enfoques)                                                                  | `__XX` | `XXXX` |        |        |
+| Comparar resultados de demanda con los reales (validar modelo)                                        |        |        | `XX__` |        |
+| Con la red hecha y el modelo de ML validado, experimentar con cambios en la oferta modificando la red |        |        | `__XX` | `XX__` |
 | Analizar los cambios de la demanda y ajustar el modelo según resultados                               |        |        |        | `__XX` |
 | Redactar memoria y preparar defensa.                                                                  |        |        |        | `XXXX` |
 

@@ -8,7 +8,6 @@ digraph GNN_RNN_Model {
     style=dashed;
     input1 [label="Matriz de Adyacencia\n(Estructura de la red)"];
     input2 [label="Series Temporales\n(Demanda histórica)"];
-    input3 [label="Variables Exógenas\n(Clima, eventos, etc.)"];
   }
 
   // Capa de GNN
@@ -35,7 +34,6 @@ digraph GNN_RNN_Model {
   // Flujo de datos
   input1 -> gnn;
   input2 -> rnn;
-  input3 -> rnn;
   gnn -> rnn;
   rnn -> output;
 }
