@@ -226,11 +226,13 @@ Table: Carta Gantt.
 
 | Tarea                                                                                                 | Mes 1  | Mes 2  | Mes 3  | Mes 4  |
 | ----------------------------------------------------------------------------------------------------- | ------ | ------ | ------ | ------ |
-| Obtención y limpieza de datos de Demanda y Recorridos                                                 | LISTO  |        |        |        |
+| Obtención de datos de Demanda y Recorridos                                                            | LISTO  |        |        |        |
 | Análisis exploratorio de los datos de Demanda y Recorridos                                            | LISTO  |        |        |        |
 | Usando datos de recorridos, crear grafo                                                               |        | LISTO  |        |        |
-| Validación visual del grafo                                                                           | `XX__` |        |        |        |
-| Crear modelo de GNN (Ambos enfoques)                                                                  | `__XX` | `XXXX` |        |        |
+| Validación visual del grafo                                                                           | `X___` |        |        |        |
+| Limpieza de datos y/o correcciones post-analisis del grafo                                            | `_X__` |        |        |        |
+| Obtención, limpieza y aplicación de datos de uso del suelo                                            | `__XX` |        |        |        |
+| Crear modelo de GNN (Ambos enfoques)                                                                  |        | `XXXX` |        |        |
 | Comparar resultados de demanda con los reales (validar modelo)                                        |        |        | `XX__` |        |
 | Con la red hecha y el modelo de ML validado, experimentar con cambios en la oferta modificando la red |        |        | `__XX` | `XX__` |
 | Analizar los cambios de la demanda y ajustar el modelo según resultados                               |        |        |        | `__XX` |
@@ -460,6 +462,8 @@ Con ello, se crearon:
 - 15737 conexiones totales
 
 Al final de este informe se agregó en formato PDF el grafo, pero si se quiere ver de manera interactiva, el notebook de jupyter llamado 'visualization.ipynb' tiene todos los pasos necesarios para generar el grafo. En el mismo notebook se muestra el mapa de Santiago con toda la red usando Plotly. Si se desea observar el grafo con Gephi, es necesario descargar el software, instalarlo,  cargar el grafo (ubicado en data/graphs/grafo.graphml) y en layout seleccionar Geo Layout y colocar la escala en 1E6 (10 a la 6). Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
+
+En el grafo mostrado al final del informe, las aristas y vértices azules son las designadas a buses. Las rojas son las del metro. Para una próxima versión, será necesario agregar el metro tren .
 
 
 \begin{figure}[H]
