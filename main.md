@@ -671,6 +671,7 @@ En ambos casos, al ser valores discretos numéricos muy variados, comparar con v
 \clearpage
 \section*{Bibliografía}
 
+\section*{Anexos}
 
 <div id="refs"></div>
 
