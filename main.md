@@ -973,9 +973,48 @@ Ejecutar este código a primeras veces fue un dolor de cabeza. Era extremadament
 
 Con ello, una tabla de etapas de un día (300K decisiones) se podía procesar en 2 horas solamente. 
 
+#### Entrenamiento
 
+El entrenamiento dio los siguientes resultados (#TODO: AHONDAR EN COMO FUE EL ENTRENAMIENTO)
 
+Eval Train: {'loglik': nan, 'loglik_null': -178245.6990444304, 'pseudo_r2_mcfadden': nan, 'top1_acc': 0.435096741781741, 'n_decisions': 151279, 'n_alternatives': 701136}
+Eval Val  : {'loglik': nan, 'loglik_null': -44693.38604960674, 'pseudo_r2_mcfadden': nan, 'top1_acc': 0.4328279219920087, 'n_decisions': 37791, 'n_alternatives': 175648}
 
+Esto nos da los coeficientes :
+
+{
+  "col_order": [
+    "intercept",
+    "wait_time",
+    "viajar_cost",
+    "cost_to_go",
+    "zero_onboard",
+    "ASC_metro"
+  ],
+  "coef": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}
+
+Es decir, fallamos. La respuesta a esto está en la figura \ref{fig:hist}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/costs_hist.png}
+    \caption{Histograma de Pesos}
+    \label{fig:hist}
+\end{figure}
+
+La cantidad de 0's en *viajar_cost* y en *cost_to_go* tienen distintas razones.
+
+Para *viajar_cost*, el coste de viajar es 0 cuando el usuario llega a un paradero, y una de las alternativas decide en hacer transbordo a otro paradero, ya que la ruta mas corta comienza en ese paradero. 
+
+Para *cost_to_go* 0, es cuando es necesario solo una etapa para completar el viaje. Esto no es problema que sea 0.
 
 
 
