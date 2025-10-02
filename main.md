@@ -783,10 +783,10 @@ Este grafo tiene toda la información de la OFERTA de transporte. Junto con las 
 
 Recordar que el objetivo es tener un grafo de estado artificial con OFERTA ARTIFICIAL y obtener, en base a tablas de etapas y viajes reales, DEMANDA ARTIFICIAL al tener modelos de elección y de grafos que las generen .
 
-# Modelos de aprendizaje
+# MNL
 
 
-## MNL
+## Marco Teórico
 El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.  
 
 Por ejemplo, si un usuario tiene 3 *alternativas* de servicio, sean S1, S2, Y S3 en un paradero de origen P y un destino Q, el modelo MNL nos permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como decicidoras por el propio ingeniero. 
@@ -824,11 +824,13 @@ En el ámbito de predicción de demanda en transporte público, el modelo MNL se
 
 
 
-### MNL basico sin tener en cuenta el destino. 
 
-#### Dataset de entrenamiento
 
-Un MNL básico fue el primero en tener en cuenta. Este MNL solo tenía en cuenta el primer abordaje, es decir, el primer servicio que tomaba el usuario en su viaje. No importaba si el usuario hacía transbordos o no y hacia donde fuera. 
+## Modelo de Regresión Lineal simple
+
+### Dataset de entrenamiento
+
+Un Modelo de regresión lineal básico fue el primero en tener en cuenta. Este modelo solo tenía en cuenta el primer abordaje, es decir, el primer servicio que tomaba el usuario en su viaje. No importaba si el usuario hacía transbordos o no y hacia donde fuera. 
 
 La receta para construir el dataset de entrenamiento es el mas complicado. El *pipeline* es el siguiente: 
 
@@ -844,7 +846,43 @@ La receta para construir el dataset de entrenamiento es el mas complicado. El *p
 
 4. Entrenar el modelo. 
 
-#### Resultados
+
+### Algoritmo de entrenamiento: 
+
+Realmente, este no es un MNL, sino una regresión lineal.
+
+- Se eliminan valores o filas corruptas (se eliminan las decisiones mal formadas).
+- Se construyen las características. Estas son:
+    - **Tiempo de espera** ($\text{wait\_time}$): 
+      $$
+      \text{wait\_time} = 0.5 \times \left(\frac{30}{\text{freq}_h}\right)
+      $$
+    - **Velocidad** ($\text{speed\_kmh}$): velocidad promedio del servicio en el bin y tipo de día correspondiente (más atractivo).
+- Se limpian infinitos o nulos.
+- Se construyen las matrices $X$ e $y$ con las características y la variable dependiente.
+- Se ajusta un modelo binario con `sklearn.linear_model.LogisticRegression`:
+  $$
+  P(\text{abordar}=1 \mid \text{alternativa}) = \sigma(\beta_0 + \beta_1\,\text{wait\_time} + \beta_2\,\text{speed\_kmh})
+  $$
+  donde $\sigma(z) = \frac{1}{1 + e^{-z}}$.
+- Se reconstruye la utilidad:
+  $$
+  U = \beta_0 + \beta_1\,\text{wait\_time} + \beta_2\,\text{speed\_kmh}
+  $$
+- Se agrupa por $\text{decision\_id}$ y se aplica softmax estable:
+  $$
+  P_i = \frac{\exp(U_i - \max U_{\text{set}})}{\sum_j \exp(U_j - \max U_{\text{set}})}
+  $$
+  (Esto simula un MNL post hoc).
+- **Top-1 accuracy**: porcentaje de decisiones donde la alternativa con mayor $P_i$ coincide con $\text{is\_abordado}=1$.
+- **Log-likelihood**: suma de $\log(P_i)$ de la alternativa elegida.
+- **Modelo nulo**: probabilidad uniforme $1/K_d \Rightarrow \text{loglik}_{\text{null}} = -\sum_d \log(K_d)$.
+- **McFadden pseudo-$R^2$**:
+  $$
+  R^2 = 1 - \frac{\text{LL}}{\text{LL}_{\text{null}}}
+  $$
+
+### Resultados
 
 El modelo se entrenó con 8 millones de decisiones de los 7 días de la semana. Al expandirlo en alternativas, obtenemos 47 millones de decisiones. La figura \ref{fig:mnl_basic_summary} muestra el resumen de los datos de entrenamiento del modelo.
 
@@ -910,10 +948,10 @@ Los resultados se muestran a continuación:
 El modelo, para ser simple, sorprendentemente tiene una accuracy mejor que el azar, teniendo en cuenta que en promedio hay 5 decisiones. Se decide seguir explorando el MNL pero ahora teniendo en cuenta el destino de la persona. Esto debería de subir considerablemente las métricas.
 
 
-### MNL con destino
+## MNL con destino
 
 
-#### Dataset
+### Dataset
 
 Para el modelo MNL con destino, se utilizó la tabla de etapas, ya que ya venía disgregada y nos permitía manejar con mayor facilidad los datos. 
 
@@ -973,7 +1011,7 @@ Ejecutar este código a primeras veces fue un dolor de cabeza. Era extremadament
 
 Con ello, una tabla de etapas de un día (300K decisiones) se podía procesar en 2 horas solamente. 
 
-#### Entrenamiento
+### Entrenamiento
 
 El entrenamiento dio los siguientes resultados (#TODO: AHONDAR EN COMO FUE EL ENTRENAMIENTO)
 
@@ -1016,9 +1054,121 @@ Para *viajar_cost*, el coste de viajar es 0 cuando el usuario llega a un parader
 
 Para *cost_to_go* 0, es cuando es necesario solo una etapa para completar el viaje. Esto no es problema que sea 0.
 
+### Primeros Transbordos y la Penalización Inicial
+
+Una solución elegida fue penalizar a las alternativas que requieran hacer transbordo, con un tiempo extra que se pueda configurar, esto por dos razones:
+
+- Es mas simple y directo. 
+- No es necesario que Dijkstra retorne el camino completo para verificar hacia donde fue. 
+
+Una idea interesante podría haber sido guardar el camino completo hecho por dijkstra (y no solo el peso) y cuando hayan primeros transbordos, guardar el coste de caminar al paradero óptimo, pero esto es mas complicado, consume mas memoria, y además era necesario de ya entrenar apara avanzar con la memoria. Esta idea se descartó.
 
 
-## GNN
+En primera instancia, se decide entrenar con una penalización de 5 minutos a las alternativas que requieran hacer transbordo desde el paradero inicial. Entonces, obtenemos los siguientes resultados:
+
+A continuación se presentan los resultados del entrenamiento del modelo MNL con destino, organizados en tablas para mayor claridad.
+
+\begin{table}[H]
+\centering
+\caption{Resumen de datos y partición}
+\begin{tabular}{lrr}
+\toprule
+ & Filas & Decisiones \\
+\midrule
+Datos cargados & 1,049,845 & -- \\
+Después de limpieza & 876,784 & -- \\
+Train & 702,054 & 151,279 \\
+Val & 174,730 & 37,791 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Progreso del entrenamiento}
+\begin{tabular}{cccccc}
+\toprule
+Iteración & nll & $|\nabla|$ & valR$^2$ & acc & Tiempo (s) \\
+\midrule
+pre & 178,528 & $1.40\times10^5$ & -- & -- & -- \\
+1 & 96,483 & $4.17\times10^4$ & 0.456 & 0.761 & -- \\
+2 & 80,694 & $2.66\times10^4$ & 0.544 & 0.778 & -- \\
+3 & 62,125 & $1.29\times10^4$ & 0.649 & 0.919 & -- \\
+4 & 53,277 & $6.65\times10^3$ & 0.700 & 0.919 & -- \\
+5 & 49,019 & $2.95\times10^3$ & 0.725 & 0.919 & -- \\
+6 & 47,437 & $1.45\times10^3$ & 0.735 & 0.920 & -- \\
+7 & 46,988 & $6.96\times10^2$ & 0.738 & 0.920 & -- \\
+8 & 46,907 & $9.63\times10^1$ & 0.739 & 0.921 & -- \\
+9 & 46,903 & $3.93\times10^1$ & 0.739 & 0.921 & -- \\
+10 & 46,901 & $1.59\times10^1$ & 0.739 & 0.921 & -- \\
+11 & 46,901 & $6.74$ & 0.739 & 0.921 & -- \\
+12 & 46,901 & $6.74$ & 0.739 & 0.921 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes del modelo}
+\begin{tabular}{lr}
+\toprule
+Coeficiente & Valor \\
+\midrule
+intercept & $5.51\times10^{-13}$ \\
+wait\_time & $-0.787$ \\
+viajar\_cost & $-0.039$ \\
+cost\_to\_go & $-5.36$ \\
+first\_walk\_min & $-0.088$ \\
+is\_initial\_transfer & $-0.177$ \\
+zero\_onboard & $1.979$ \\
+ASC\_metro & $1.60\times10^{-13}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Evaluación del modelo}
+\begin{tabular}{lcc}
+\toprule
+ & Train & Val \\
+\midrule
+Log-likelihood & $-46,901$ & $-11,593$ \\
+Log-likelihood nulo & $-178,528$ & $-44,411$ \\
+Pseudo-$R^2$ McFadden & $0.737$ & $0.739$ \\
+Top-1 accuracy & $0.922$ & $0.921$ \\
+Decisiones & $151,279$ & $37,791$ \\
+Alternativas & $702,054$ & $174,730$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Resumen de entrenamiento}
+\begin{tabular}{lc}
+\toprule
+Éxito & True \\
+Iteraciones & 12 \\
+NLL final & 46,901.33 \\
+Tiempo total (s) & 717.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+Si revisamos las variables y sus pesos, notamos algo extraño. 
+
+- wait_time negativo: Bien
+- viajar_cost positivo: sospechoso
+- cost_to_go: altamente negativo, afecta a la utilidad
+- zero_onboard: positivo, pues hay colinealidad entre el y variable de transbordo.
+- asc_metro: Nada, muy cercano a 0. 
+
+
+
+# GNN
 
 Para comenzar a hablar de las GNN, es pertinente aclarar conceptos de redes neuronales y como nos ayudarán en el futuro a solucionar el problema.
 
