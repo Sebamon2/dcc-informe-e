@@ -1161,10 +1161,106 @@ Tiempo total (s) & 717.3 \\
 Si revisamos las variables y sus pesos, notamos algo extraño. 
 
 - wait_time negativo: Bien
-- viajar_cost positivo: sospechoso
+- viajar_cost negativo: Bien (pero no tan negativo, ojo con eso)
 - cost_to_go: altamente negativo, afecta a la utilidad
 - zero_onboard: positivo, pues hay colinealidad entre el y variable de transbordo.
 - asc_metro: Nada, muy cercano a 0. 
+
+Si corremos el mismo entrenamiento para otros dias, por ejemplo, para el dia Jueves de la misma semana, obtenemos:
+
+\begin{table}[H]
+\centering
+\caption{Resumen de datos y partición}
+\begin{tabular}{lrr}
+\toprule
+ & Filas & Decisiones \\
+\midrule
+Datos cargados & 1,063,814 & -- \\
+Después de limpieza & 885,991 & -- \\
+Train & 708,649 & 154,113 \\
+Val & 177,342 & 38,444 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Progreso del entrenamiento}
+\begin{tabular}{cccccc}
+\toprule
+Iteración & nll & $|\nabla|$ & valR$^2$ & acc & Tiempo (s) \\
+\midrule
+pre & 180,068 & $1.42\times10^5$ & -- & -- & -- \\
+1 & 96,929 & $4.20\times10^4$ & 0.461 & 0.769 & -- \\
+2 & 81,202 & $2.70\times10^4$ & 0.548 & 0.785 & -- \\
+3 & 62,311 & $1.32\times10^4$ & 0.654 & 0.924 & -- \\
+4 & 53,052 & $6.87\times10^3$ & 0.706 & 0.924 & -- \\
+5 & 48,344 & $3.08\times10^3$ & 0.733 & 0.925 & -- \\
+6 & 46,522 & $1.53\times10^3$ & 0.743 & 0.927 & -- \\
+7 & 46,025 & $9.46\times10^2$ & 0.746 & 0.928 & -- \\
+8 & 45,919 & $1.17\times10^2$ & 0.747 & 0.928 & -- \\
+9 & 45,914 & $4.21\times10^1$ & 0.747 & 0.928 & -- \\
+10 & 45,912 & $1.80\times10^1$ & 0.747 & 0.928 & -- \\
+11 & 45,912 & $5.41$ & 0.747 & 0.928 & -- \\
+12 & 45,912 & $5.41$ & 0.747 & 0.928 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes del modelo}
+\begin{tabular}{lr}
+\toprule
+Coeficiente & Valor \\
+\midrule
+intercept & $5.47\times10^{-13}$ \\
+wait\_time & $-1.003$ \\
+viajar\_cost & $0.128$ \\
+cost\_to\_go & $-5.50$ \\
+first\_walk\_min & $-0.125$ \\
+is\_initial\_transfer & $-0.249$ \\
+zero\_onboard & $2.179$ \\
+ASC\_metro & $1.63\times10^{-13}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Evaluación del modelo}
+\begin{tabular}{lcc}
+\toprule
+ & Train & Val \\
+\midrule
+Log-likelihood & $-45,912$ & $-11,437$ \\
+Log-likelihood nulo & $-180,068$ & $-45,159$ \\
+Pseudo-$R^2$ McFadden & $0.745$ & $0.747$ \\
+Top-1 accuracy & $0.930$ & $0.928$ \\
+Decisiones & $154,113$ & $38,444$ \\
+Alternativas & $708,649$ & $177,342$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Resumen de entrenamiento}
+\begin{tabular}{lc}
+\toprule
+Éxito & True \\
+Iteraciones & 12 \\
+NLL final & 45,912.15 \\
+Tiempo total (s) & 913.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Obtenemos constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si lo miramos desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es mas directo. Entonces, un coste restante menor es mas atractivo. Para tener un costo restante menor, es necesario viajar mas tiempo en el primer servicio. 
+
+Además, el intercepto no es necesario. Esto porque al calcular la probabilidad (de manera relativa) los interceptos se cancelan entre ellos ya que son todos iguales para todos los casos. Por lo tanto, un nuevo trainer es necesario. 
+
+
 
 
 
