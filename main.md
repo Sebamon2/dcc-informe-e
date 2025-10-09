@@ -1260,9 +1260,35 @@ Obtenemos constantes positivas en el coste de viajar. Una colinealidad entre el 
 
 Además, el intercepto no es necesario. Esto porque al calcular la probabilidad (de manera relativa) los interceptos se cancelan entre ellos ya que son todos iguales para todos los casos. Por lo tanto, un nuevo trainer es necesario. 
 
+## Experimentos
 
 
+Con el MNL entrenado, podemos hacer varios experimentos interesantes. En esta sección se enumerarán experimentos y sus resultados.
 
+### Experimento 1: Disminución de oferta de un servicio. 
+
+Tenemos un paradero P y Q conectados por un set de servicios {S}para un bin b. En el *baseline* (la oferta real) se obtiene una distribución de probabilidad dada. Si modificamos la oferta de uno de los servicios, por ejemplo, aumentando el doble el tiempo de espera (disminuyendo la cantidad de buses que operan el servicio) obtenemos una comparación entre las distribuciones de probabilidades para antes y después del cambio de oferta. Se muestran dos ejemplos ilustrativos. 
+
+**Ejemplo 1: Ir desde PJ394 a PA300**
+
+Ambos paraderos tienen de servicios disponibles el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura {} que ilustra los tiempos de cada servicio del paradero.
+
+Si ejecutamos el MNL con los atributos # TODO: MOSTRAR ATRIBUTOS, obtenemos una redistribución de probabilidades como la mostrada en la figura {}. 
+
+Notamos como el servicio 503 pierde probabilidad y el 517 la gana. 
+
+**Ejemplo 2: Ir desde PJ394 a PA433**
+
+Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servicio llega directamente al destino, el 507. El resto entonces, tiene un costo restante mayor que cero. Ver figura {} que ilustra los tiempos de cada servicio del paradero.
+
+Si ejecutamos el MNL con los atributos # TODO: MOSTRAR ATRIBUTOS, obtenemos una redistribución de probabilidades como la mostrada en la figura {}.
+
+Notamos que no cambia mucho la probabilidad del servicio 507. A pesar de que su tiempo de espera se duplica, sigue siendo la mejor alternativa. 
+
+#TODO: Agregar gráficos
+Notamos dos cosas interesantes: 
+
+- Cuando hay 
 
 # GNN
 
