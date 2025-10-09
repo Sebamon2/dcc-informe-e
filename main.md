@@ -1262,33 +1262,98 @@ Además, el intercepto no es necesario. Esto porque al calcular la probabilidad 
 
 ## Experimentos
 
+Se realizaron experimentos para mostrar redistribución de demanda. Para ello, se usarán los siguientes coeficientes obtenidos de un día viernes. 
 
-Con el MNL entrenado, podemos hacer varios experimentos interesantes. En esta sección se enumerarán experimentos y sus resultados.
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\toprule
+Coeficiente           & Valor         \\
+\midrule
+intercept             & $5.94 \times 10^{-13}$ \\
+wait\_time            & $-0.96$      \\
+viajar\_cost          & $-0.04$      \\
+cost\_to\_go          & $-5.64$      \\
+first\_walk\_min      & $-0.10$      \\
+is\_initial\_transfer & $-0.20$      \\
+zero\_onboard         & $2.13$       \\
+ASC\_metro            & $1.79 \times 10^{-13}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Estos valores reflejan la importancia relativa de cada atributo en la elección de alternativas de viaje según el modelo MNL entrenado. Para el predictor solo se usarán los 
 
 ### Experimento 1: Disminución de oferta de un servicio. 
 
-Tenemos un paradero P y Q conectados por un set de servicios {S}para un bin b. En el *baseline* (la oferta real) se obtiene una distribución de probabilidad dada. Si modificamos la oferta de uno de los servicios, por ejemplo, aumentando el doble el tiempo de espera (disminuyendo la cantidad de buses que operan el servicio) obtenemos una comparación entre las distribuciones de probabilidades para antes y después del cambio de oferta. Se muestran dos ejemplos ilustrativos. 
+Tenemos un paradero P y Q conectados por un set de servicios {S} para un bin b. En el *baseline* (la oferta real) se obtiene una distribución de probabilidad dada. Si modificamos la oferta de uno de los servicios, por ejemplo, aumentando el doble el tiempo de espera (disminuyendo la cantidad de buses que operan el servicio) obtenemos una comparación entre las distribuciones de probabilidades para antes y después del cambio de oferta. Se muestran dos ejemplos ilustrativos. 
 
 **Ejemplo 1: Ir desde PJ394 a PA300**
 
-Ambos paraderos tienen de servicios disponibles el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura {} que ilustra los tiempos de cada servicio del paradero.
+Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero.
 
-Si ejecutamos el MNL con los atributos # TODO: MOSTRAR ATRIBUTOS, obtenemos una redistribución de probabilidades como la mostrada en la figura {}. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp1costs.png}
+    \caption{Costes para ir desde PJ394 a PA300}
+    \label{fig:exp1costs}
+\end{figure}
 
-Notamos como el servicio 503 pierde probabilidad y el 517 la gana. 
+Si ejecutamos el predictor, obtenemos una redistribución de probabilidades como la mostrada en la figura \ref{fig:exp1probs}. 
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp1probs.png}
+    \caption{Distribución de probabilidades para alternativas de viaje antes y después del cambio de oferta}
+    \label{fig:exp1probs}
+\end{figure}
+
+Notamos como el servicio 503 pierde probabilidad y el 517 la gana. Pero no es una transferencia directa. Los otros servicios igual ganan un poco de atractivo al perderlo el 503. 
 
 **Ejemplo 2: Ir desde PJ394 a PA433**
 
-Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servicio llega directamente al destino, el 507. El resto entonces, tiene un costo restante mayor que cero. Ver figura {} que ilustra los tiempos de cada servicio del paradero.
+Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servicio llega directamente al destino, el 507. El resto entonces, tiene un costo restante mayor que cero. Ver figura \ref{fig:exp2costs} que ilustra los tiempos de cada servicio del paradero.
 
-Si ejecutamos el MNL con los atributos # TODO: MOSTRAR ATRIBUTOS, obtenemos una redistribución de probabilidades como la mostrada en la figura {}.
+Si ejecutamos el MNL, obtenemos una redistribución de probabilidades como la mostrada en la figura \ref{fig:exp2probs}.
 
 Notamos que no cambia mucho la probabilidad del servicio 507. A pesar de que su tiempo de espera se duplica, sigue siendo la mejor alternativa. 
 
-#TODO: Agregar gráficos
-Notamos dos cosas interesantes: 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp2costs.png}
+    \caption{Costes para ir desde PJ394 a PA433}
+    \label{fig:exp2costs}
+\end{figure}
 
-- Cuando hay 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp2probs.png}
+    \caption{Distribución de probabilidades para alternativas de viaje antes y después del cambio de oferta (Experimento 2)}
+    \label{fig:exp2probs}
+\end{figure}
+
+Notamos cosas interesantes:
+
+- Dos servicios *compiten* cuando tienen costes de viaje y restantes parecidos. Es decir, dos servicios que llevan directamente al destino o tienen trayectos parecidos. Un ejemplo de esto es el 503 y el 517. El coeficiente del costo restante evidencia este comportamiento. Viajes sin transbordos son altamente atractivos para los usuarios. 
+
+- Cuando hay servicios que compiten, se obtiene una redistribución de la demanda mas notoria como fue el caso del 503 vs el 517. En el caso del 507, al no tener ningun servicio que compita directamente, un mayor tiempo de espera no influye en lo atractivo del servicio.
+
+Podemos seguir aumentando el tiempo de espera, hasta un 1500% mas grande que el original (esto haria que el tiempo de espera pase a 100 minutos). Ahí obtenemos una redistribución de probabilidades como la que sigue en la figura \ref{fig:exp2probs15}.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp2probs15.png}
+    \caption{Distribución de probabilidades para alternativas de viaje con un aumento del 1500\% en el tiempo de espera del servicio 507}
+    \label{fig:exp2probs15}
+\end{figure}
+
+Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será mas determinístico. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que no aportarán mucha discusión).
+
+
 
 # GNN
 
