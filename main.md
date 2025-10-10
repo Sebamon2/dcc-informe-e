@@ -1351,9 +1351,16 @@ Podemos seguir aumentando el tiempo de espera, hasta un 1500% mas grande que el 
     \label{fig:exp2probs15}
 \end{figure}
 
-Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será mas determinístico. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que no aportarán mucha discusión).
+Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será determinístico. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que complicaría mucho el problema). 
 
 
+Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello veamos los caminos de cada servicio obtenidos por Dijsktra.
+
+- B38 hace transbordo en PJ400 con 507 (ya que B38 se bifurca) (Prob 0.00002%)
+- 503, 517 , 518 y 504 se bajan en metro SANTA ANA y toman L2 hasta PQUE OHIGGINS. Toman la 506 y se bajan frente a la Universidad (Prob 80% aprox)
+- 507 directo. (Prob 20% aprox)
+
+Notamos que si hay 1000 personas que toman el 507 en el caso base, las 1000 tomarían el 507. En el caso modificado, aumentaríamos la demanda del día en 800 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar. 
 
 # GNN
 
