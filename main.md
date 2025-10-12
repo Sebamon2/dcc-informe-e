@@ -1067,194 +1067,40 @@ Una idea interesante podría haber sido guardar el camino completo hecho por dij
 En primera instancia, se decide entrenar con una penalización de 5 minutos a las alternativas que requieran hacer transbordo desde el paradero inicial. Entonces, obtenemos los siguientes resultados:
 
 A continuación se presentan los resultados del entrenamiento del modelo MNL con destino, organizados en tablas para mayor claridad.
+A continuación se presentan los coeficientes del modelo MNL entrenado para distintos días de la semana. Cada columna corresponde a un atributo del modelo y cada fila a un día. El día miércoles no estaba disponible en la página de red.
 
+##### Métricas de Entrenamiento
+
+
+
+
+##### Coeficientes obtenidos.
 \begin{table}[H]
 \centering
-\caption{Resumen de datos y partición}
-\begin{tabular}{lrr}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrr}
 \toprule
- & Filas & Decisiones \\
+Día      & intercept & wait\_time & viajar\_cost & cost\_to\_go & first\_walk\_min & is\_initial\_transfer & zero\_onboard & ASC\_metro \\
 \midrule
-Datos cargados & 1,049,845 & -- \\
-Después de limpieza & 876,784 & -- \\
-Train & 702,054 & 151,279 \\
-Val & 174,730 & 37,791 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Progreso del entrenamiento}
-\begin{tabular}{cccccc}
-\toprule
-Iteración & nll & $|\nabla|$ & valR$^2$ & acc & Tiempo (s) \\
+lunes    & $5.81\times 10^{-13}$ & $-0.75$ & $0.06$  & $-5.41$ & $-0.10$ & $-0.19$ & $2.02$ & $1.70\times 10^{-13}$ \\
+martes   & $5.79\times 10^{-13}$ & $-0.99$ & $0.03$  & $-5.63$ & $-0.07$ & $-0.15$ & $2.13$ & $1.75\times 10^{-13}$ \\
+jueves   & $4.95\times 10^{-13}$ & $-0.83$ & $-0.01$ & $-5.59$ & $-0.07$ & $-0.15$ & $2.07$ & $1.50\times 10^{-13}$ \\
+viernes  & $5.94\times 10^{-13}$ & $-0.96$ & $-0.04$ & $-5.64$ & $-0.10$ & $-0.20$ & $2.13$ & $1.79\times 10^{-13}$ \\
+sábado   & $7.64\times 10^{-13}$ & $-1.09$ & $-0.16$ & $-5.36$ & $-0.09$ & $-0.19$ & $2.28$ & $2.38\times 10^{-13}$ \\
+domingo  & $7.59\times 10^{-13}$ & $-0.50$ & $-0.23$ & $-5.11$ & $-0.08$ & $-0.15$ & $2.28$ & $2.16\times 10^{-13}$ \\
 \midrule
-pre & 178,528 & $1.40\times10^5$ & -- & -- & -- \\
-1 & 96,483 & $4.17\times10^4$ & 0.456 & 0.761 & -- \\
-2 & 80,694 & $2.66\times10^4$ & 0.544 & 0.778 & -- \\
-3 & 62,125 & $1.29\times10^4$ & 0.649 & 0.919 & -- \\
-4 & 53,277 & $6.65\times10^3$ & 0.700 & 0.919 & -- \\
-5 & 49,019 & $2.95\times10^3$ & 0.725 & 0.919 & -- \\
-6 & 47,437 & $1.45\times10^3$ & 0.735 & 0.920 & -- \\
-7 & 46,988 & $6.96\times10^2$ & 0.738 & 0.920 & -- \\
-8 & 46,907 & $9.63\times10^1$ & 0.739 & 0.921 & -- \\
-9 & 46,903 & $3.93\times10^1$ & 0.739 & 0.921 & -- \\
-10 & 46,901 & $1.59\times10^1$ & 0.739 & 0.921 & -- \\
-11 & 46,901 & $6.74$ & 0.739 & 0.921 & -- \\
-12 & 46,901 & $6.74$ & 0.739 & 0.921 & -- \\
+\textbf{Promedio} & $6.29\times 10^{-13}$ & $-0.85$ & $-0.06$ & $-5.46$ & $-0.09$ & $-0.17$ & $2.15$ & $1.88\times 10^{-13}$ \\
 \bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Coeficientes del modelo}
-\begin{tabular}{lr}
-\toprule
-Coeficiente & Valor \\
-\midrule
-intercept & $5.51\times10^{-13}$ \\
-wait\_time & $-0.787$ \\
-viajar\_cost & $-0.039$ \\
-cost\_to\_go & $-5.36$ \\
-first\_walk\_min & $-0.088$ \\
-is\_initial\_transfer & $-0.177$ \\
-zero\_onboard & $1.979$ \\
-ASC\_metro & $1.60\times10^{-13}$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Evaluación del modelo}
-\begin{tabular}{lcc}
-\toprule
- & Train & Val \\
-\midrule
-Log-likelihood & $-46,901$ & $-11,593$ \\
-Log-likelihood nulo & $-178,528$ & $-44,411$ \\
-Pseudo-$R^2$ McFadden & $0.737$ & $0.739$ \\
-Top-1 accuracy & $0.922$ & $0.921$ \\
-Decisiones & $151,279$ & $37,791$ \\
-Alternativas & $702,054$ & $174,730$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Resumen de entrenamiento}
-\begin{tabular}{lc}
-\toprule
-Éxito & True \\
-Iteraciones & 12 \\
-NLL final & 46,901.33 \\
-Tiempo total (s) & 717.3 \\
-\bottomrule
-\end{tabular}
+\end{tabular}%
+}
+\caption{Coeficientes del modelo MNL entrenado para distintos días de la semana. La última fila muestra el promedio de cada columna.}
 \end{table}
 
 
 
-Si revisamos las variables y sus pesos, notamos algo extraño. 
 
-- wait_time negativo: Bien
-- viajar_cost negativo: Bien (pero no tan negativo, ojo con eso)
-- cost_to_go: altamente negativo, afecta a la utilidad
-- zero_onboard: positivo, pues hay colinealidad entre el y variable de transbordo.
-- asc_metro: Nada, muy cercano a 0. 
 
-Si corremos el mismo entrenamiento para otros dias, por ejemplo, para el dia Jueves de la misma semana, obtenemos:
 
-\begin{table}[H]
-\centering
-\caption{Resumen de datos y partición}
-\begin{tabular}{lrr}
-\toprule
- & Filas & Decisiones \\
-\midrule
-Datos cargados & 1,063,814 & -- \\
-Después de limpieza & 885,991 & -- \\
-Train & 708,649 & 154,113 \\
-Val & 177,342 & 38,444 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Progreso del entrenamiento}
-\begin{tabular}{cccccc}
-\toprule
-Iteración & nll & $|\nabla|$ & valR$^2$ & acc & Tiempo (s) \\
-\midrule
-pre & 180,068 & $1.42\times10^5$ & -- & -- & -- \\
-1 & 96,929 & $4.20\times10^4$ & 0.461 & 0.769 & -- \\
-2 & 81,202 & $2.70\times10^4$ & 0.548 & 0.785 & -- \\
-3 & 62,311 & $1.32\times10^4$ & 0.654 & 0.924 & -- \\
-4 & 53,052 & $6.87\times10^3$ & 0.706 & 0.924 & -- \\
-5 & 48,344 & $3.08\times10^3$ & 0.733 & 0.925 & -- \\
-6 & 46,522 & $1.53\times10^3$ & 0.743 & 0.927 & -- \\
-7 & 46,025 & $9.46\times10^2$ & 0.746 & 0.928 & -- \\
-8 & 45,919 & $1.17\times10^2$ & 0.747 & 0.928 & -- \\
-9 & 45,914 & $4.21\times10^1$ & 0.747 & 0.928 & -- \\
-10 & 45,912 & $1.80\times10^1$ & 0.747 & 0.928 & -- \\
-11 & 45,912 & $5.41$ & 0.747 & 0.928 & -- \\
-12 & 45,912 & $5.41$ & 0.747 & 0.928 & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Coeficientes del modelo}
-\begin{tabular}{lr}
-\toprule
-Coeficiente & Valor \\
-\midrule
-intercept & $5.47\times10^{-13}$ \\
-wait\_time & $-1.003$ \\
-viajar\_cost & $0.128$ \\
-cost\_to\_go & $-5.50$ \\
-first\_walk\_min & $-0.125$ \\
-is\_initial\_transfer & $-0.249$ \\
-zero\_onboard & $2.179$ \\
-ASC\_metro & $1.63\times10^{-13}$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Evaluación del modelo}
-\begin{tabular}{lcc}
-\toprule
- & Train & Val \\
-\midrule
-Log-likelihood & $-45,912$ & $-11,437$ \\
-Log-likelihood nulo & $-180,068$ & $-45,159$ \\
-Pseudo-$R^2$ McFadden & $0.745$ & $0.747$ \\
-Top-1 accuracy & $0.930$ & $0.928$ \\
-Decisiones & $154,113$ & $38,444$ \\
-Alternativas & $708,649$ & $177,342$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Resumen de entrenamiento}
-\begin{tabular}{lc}
-\toprule
-Éxito & True \\
-Iteraciones & 12 \\
-NLL final & 45,912.15 \\
-Tiempo total (s) & 913.5 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 Obtenemos constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si lo miramos desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es mas directo. Entonces, un coste restante menor es mas atractivo. Para tener un costo restante menor, es necesario viajar mas tiempo en el primer servicio. 
 
@@ -1282,7 +1128,7 @@ ASC\_metro            & $1.79 \times 10^{-13}$ \\
 \end{tabular}
 \end{table}
 
-Estos valores reflejan la importancia relativa de cada atributo en la elección de alternativas de viaje según el modelo MNL entrenado. Para el predictor solo se usarán los 
+Estos valores reflejan la importancia relativa de cada atributo en la elección de alternativas de viaje según el modelo MNL entrenado. Para el predictor solo se usarán los coeficientes wait_time, viajar_cost, cost_to_go y first_walk_min.
 
 ### Experimento 1: Disminución de oferta de un servicio. 
 
@@ -1290,12 +1136,12 @@ Tenemos un paradero P y Q conectados por un set de servicios {S} para un bin b. 
 
 **Ejemplo 1: Ir desde PJ394 a PA300**
 
-Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero.
+Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero. El experimento consiste en aumentar al doble el tiempo de espera del 503. 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp1costs.png}
-    \caption{Costes para ir desde PJ394 a PA300}
+    \caption{Costes para ir desde PJ394 a PA300. En azul se muestran los costes reales y en naranjo los cambios de oferta}
     \label{fig:exp1costs}
 \end{figure}
 
@@ -1356,11 +1202,133 @@ Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un
 
 Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello veamos los caminos de cada servicio obtenidos por Dijsktra.
 
-- B38 hace transbordo en PJ400 con 507 (ya que B38 se bifurca) (Prob 0.00002%)
-- 503, 517 , 518 y 504 se bajan en metro SANTA ANA y toman L2 hasta PQUE OHIGGINS. Toman la 506 y se bajan frente a la Universidad (Prob 80% aprox)
-- 507 directo. (Prob 20% aprox)
+\begin{itemize}
+    \item \textbf{Viaje en alternativa: B38}
+        \begin{itemize}
+            \item Inicia en paradero \texttt{T-11-64-PO-30}
+            \item Subir al servicio \textbf{B38} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
+            \item Bajar en paradero \texttt{T-8-64-PO-30}
+            \item Subir al servicio \textbf{507} (sentido Ida) en paradero \texttt{T-8-64-PO-30}
+            \item Bajar en paradero \texttt{T-20-177-PO-20}
+        \end{itemize}
+    \item \textbf{Viaje en alternativa: 503}
+        \begin{itemize}
+            \item Inicia en paradero \texttt{T-11-64-PO-30}
+            \item Subir al servicio \textbf{503} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
+            \item Bajar en paradero \texttt{E-20-289-PO-5}
+            \item Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO}
+            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_CAL Y CANTO}
+            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
+            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
+            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
+            \item Bajar en paradero \texttt{T-20-177-OP-8}
+            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
+        \end{itemize}
+    \item \textbf{Viaje en alternativa: 504}
+        \begin{itemize}
+            \item Inicia en paradero \texttt{T-11-64-PO-30}
+            \item Subir al servicio \textbf{504} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
+            \item Bajar en paradero \texttt{T-20-188-NS-10}
+            \item Caminar de \texttt{T-20-188-NS-10} a \texttt{METRO\_SANTA ANA}
+            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_SANTA ANA}
+            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
+            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
+            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
+            \item Bajar en paradero \texttt{T-20-177-OP-8}
+            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
+        \end{itemize}
+    \item \textbf{Viaje en alternativa: 517}
+        \begin{itemize}
+            \item Inicia en paradero \texttt{T-11-64-PO-30}
+            \item Subir al servicio \textbf{517} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
+            \item Bajar en paradero \texttt{E-20-289-PO-5}
+            \item Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO}
+            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_CAL Y CANTO}
+            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
+            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
+            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
+            \item Bajar en paradero \texttt{T-20-177-OP-8}
+            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
+        \end{itemize}
+    \item \textbf{Viaje en alternativa: 518}
+        \begin{itemize}
+            \item Inicia en paradero \texttt{T-11-64-PO-30}
+            \item Subir al servicio \textbf{518} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
+            \item Bajar en paradero \texttt{T-20-203-NS-20}
+            \item Caminar de \texttt{T-20-203-NS-20} a \texttt{METRO\_SANTA ANA}
+            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_SANTA ANA}
+            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
+            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
+            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
+            \item Bajar en paradero \texttt{T-20-177-OP-8}
+            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
+        \end{itemize}
+    \item \textbf{Viaje en alternativa: 507}
+        \begin{itemize}
+            \item Inicia en paradero \texttt{T-11-64-PO-30}
+            \item Subir al servicio \textbf{507} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
+            \item Bajar en paradero \texttt{T-20-177-PO-20}
+        \end{itemize}
+\end{itemize}
 
-Notamos que si hay 1000 personas que toman el 507 en el caso base, las 1000 tomarían el 507. En el caso modificado, aumentaríamos la demanda del día en 800 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar. 
+
+Notamos que si hay 100 personas que quieren ir a Beauchef en un día, las 100 tomarían el 507 en el caso base. En el caso modificado, aumentaríamos la demanda del día en 80 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar.
+
+Cuantificar los cambios de demanda en cuando hay cambios de oferta se vuelven interesantes cuando probamos situaciones mas realistas. Podemos por ejemplo, cortar la linea 1. Esto es lo que se hará en el siguiente ejemplo.
+
+### Experimento 2: Suspensión de un servicio.
+
+
+Para el siguiente experimento, se colocará una *flag* que desactive todas las aristas SUBIR, BAJAR Y VIAJAR de la L1. Haciendo esto, tomemos el caso de alguien que quiera ir de San Pablo a Baquedano. 
+
+Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las probabilidades y costes para cada alternativa. Notar como las probabilidades de usar la L1 y L5 suben. Ojo que estas probabilidades están condicionadas a que el usuario haya decidido ir a Baquedano. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp2_l1_probs.png}
+    \caption{Distribución de probabilidades para alternativas de viaje con suspensión de la Línea 1}
+    \label{fig:exp2_l1_probs}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp2_l1_costs.png}
+    \caption{Costes para ir de San Pablo a Baquedano con suspensión de la Línea 1}
+    \label{fig:exp2_l1_costs}
+\end{figure}
+
+Algo mas interesante pasa cuando queremos ir a una estación de L1 que no combine con L5, es decir, ambos servicios no compiten. Por ejemplo, ir de San Pablo a Tobalaba. 
+
+**Viaje en alternativa: L5**
+
+- **Inicio:** Paradero `METRO_SAN PABLO`
+    - Subir al servicio **L5** (sentido Metro) en `METRO_SAN PABLO`
+    - Bajar en `METRO_BAQUEDANO`
+    - Caminar desde `METRO_BAQUEDANO` hasta `E-20-53-PO-115`
+    - Subir al servicio **503** (sentido Ida) en `E-20-53-PO-115`
+    - Bajar en `E-14-170-NS-5`
+    - Caminar desde `E-14-170-NS-5` hasta `METRO_TOBALABA`
+- **Fin del camino**
+
+El algoritmo que tenemos, por construcción tomará el camino con el coste mas bajo para ir desde Baquedano hacia Tobalaba si es que el Metro está desactivado. Podemos hacer este análisis corriendo el algoritmo del MNL desde el paradero E-20-53-PO-115 (el mas cercano a Baquedano que tiene servicios que dejan cerca, según el enrutador). Las figuras \ref{fig:exp3costs} y \ref{fig:exp3probs} muestran los costes y probabilidades para cada alternativa. Notar como el servicio 503 es el mas atractivo, ya que es el que tiene el menor coste total. Una suspensión de la L1 entre Baquedano y Tobalaba nos sugiere que todo el volumen de pasajeros que usualmente toma este tramo se redistribuirá en los servicios en superficie con las probabilidades de mas abajo.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp3costs.png}
+    \caption{Costos del paradero E-20-53-PO-115 a Tobalaba con suspensión de la Línea 1}
+    \label{fig:exp3costs}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp3probs.png}
+    \caption{Distribución de probabilidades para alternativas con suspensión de la Línea 1}
+    \label{fig:exp3probs}
+\end{figure}
+
+Al ver esta redistribución, la primera medida a tomar sería reforzar con recorridos como el 412, 418 y 503 pues tienen un cost_to_go bajo (es decir, acercan mas a Tobalaba), en cambio, no reforzar servicios con recorridos similares al 517 y B27, pues por probabilidad, no deberían de ser elegidos para llegar a Tobalaba.
 
 # GNN
 
