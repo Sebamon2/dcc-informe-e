@@ -783,8 +783,13 @@ Este grafo tiene toda la información de la OFERTA de transporte. Junto con las 
 
 Recordar que el objetivo es tener un grafo de estado artificial con OFERTA ARTIFICIAL y obtener, en base a tablas de etapas y viajes reales, DEMANDA ARTIFICIAL al tener modelos de elección y de grafos que las generen .
 
-# MNL
+# MNL para primera decisión de servicio.
 
+Dado un paradero de origen, una hora del día y un día de la semana, un usuario tiene varias alternativas de servicio para elegir. El objetivo del MNL es entregar una distribución de probabilidad de que el usuario elija cada una de las alternativas. Notar que el MNL solo predice la primera elección de servicio. No predice transbordos ni nada por el estilo. Los transbordos serán deterministas con ayuda de un algoritmo de ruteo. Mas adelante se ahondará en esto.
+
+Las razones para elegir esta solución son las siguientes:
+
+- Facilidad para entrenar 
 
 ## Marco Teórico
 El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.  
@@ -1011,33 +1016,76 @@ Ejecutar este código a primeras veces fue un dolor de cabeza. Era extremadament
 
 Con ello, una tabla de etapas de un día (300K decisiones) se podía procesar en 2 horas solamente. 
 
+La tabla de decisiones resultante tiene las siguientes columnas:
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll}
+\toprule
+\textbf{Columna} & \textbf{Descripción} \\
+\midrule
+\texttt{decision\_id} & ID de la decisión. Común entre alternativas de la misma persona \\
+\texttt{person\_id} & ID de la tarjeta \\
+\texttt{trip\_id\_real} & ID de viaje real: [person\_id]\_[número\_de\_viaje]\_[número\_de\_etapa] \\
+\texttt{servicio\_usuario\_alternativa} & Servicio alternativa en código formato usuario \\
+\texttt{sentido} & Sentido del servicio \\
+\texttt{wait\_time} & Tiempo de espera \\
+\texttt{optimal\_alight\_stop} & Parada óptima de bajada del servicio alternativa. Es la bajada real observada cuando el servicio fue tomado. \\
+\texttt{cost\_to\_go} & Coste restante entre la parada de bajada y el destino final \\
+\texttt{viajar\_cost} & Coste entre el nodo servicio inicial y final del servicio inicial tomado \\
+\texttt{total\_cost} & Coste total sumando todos los costes (wait, cost\_to\_go, viajar\_cost) \\
+\texttt{chosen} & Si la alternativa fue elegida o no (solo una fila con 1 por \texttt{decision\_id}) \\
+\texttt{choice\_set\_size} & Tamaño del set de alternativas \\
+\texttt{day\_type} & Día (LAB, SAB, DOM) \\
+\texttt{bin30\_k} & Bin de tiempo en el que se llegó al paradero \\
+\texttt{origin\_p\_k} & Paradero de origen en código TS \\
+\texttt{dest\_p\_final\_obs} & Paradero de destino final real en código TS \\
+\texttt{srv\_obs\_ts} & Servicio real tomado en código TS \\
+\texttt{srv\_obs\_usuario} & Servicio real tomado en código formato usuario \\
+\texttt{is\_corrupt} & Si la fila está corrompida \\
+\texttt{is\_initial\_transfer} & 1 si Dijkstra decide caminar a otro paradero para tomar un servicio adecuado, 0 en caso contrario \\
+\bottomrule
+\end{tabular}%
+}
+\caption{Descripción de las columnas del dataset de decisiones para el modelo MNL con destino.}
+\end{table}
+
 ### Entrenamiento
 
 El entrenamiento dio los siguientes resultados (#TODO: AHONDAR EN COMO FUE EL ENTRENAMIENTO)
-
-Eval Train: {'loglik': nan, 'loglik_null': -178245.6990444304, 'pseudo_r2_mcfadden': nan, 'top1_acc': 0.435096741781741, 'n_decisions': 151279, 'n_alternatives': 701136}
-Eval Val  : {'loglik': nan, 'loglik_null': -44693.38604960674, 'pseudo_r2_mcfadden': nan, 'top1_acc': 0.4328279219920087, 'n_decisions': 37791, 'n_alternatives': 175648}
-
-Esto nos da los coeficientes :
-
-{
-  "col_order": [
-    "intercept",
-    "wait_time",
-    "viajar_cost",
-    "cost_to_go",
-    "zero_onboard",
-    "ASC_metro"
-  ],
-  "coef": [
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0
-  ]
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+ & \textbf{intercept} & \textbf{wait\_time} & \textbf{viajar\_cost} & \textbf{cost\_to\_go} & \textbf{zero\_onboard} & \textbf{ASC\_metro} \\
+\midrule
+\textbf{Coeficiente} & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}%
 }
+\caption{Coeficientes obtenidos del modelo MNL (todos nulos).}
+\end{table}
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+ & \textbf{loglik} & \textbf{loglik\_null} & \textbf{pseudo-$R^2$ (McFadden)} & \textbf{Top-1 Accuracy} & \textbf{\# Decisiones} & \textbf{\# Alternativas} \\
+\midrule
+\textbf{Entrenamiento} & NaN & -178245.70 & NaN & 0.435 & 151279 & 701136 \\
+\textbf{Validación}    & NaN & -44693.39  & NaN & 0.433 & 37791  & 175648 \\
+\bottomrule
+\end{tabular}%
+}
+\caption{Métricas de entrenamiento y validación del modelo MNL.}
+\end{table}
+
+\vspace{1em}
+
+Como se observa en las tablas, todos los coeficientes resultaron nulos y las métricas de log-likelihood y pseudo-$R^2$ no son numéricas (NaN), lo que indica que el modelo no logró aprender una relación significativa entre las variables y la elección observada. Sin embargo, la \textit{top-1 accuracy} se mantiene en torno al 43\%, lo que sugiere que, pese a la falta de ajuste en los coeficientes, el modelo logra predecir la alternativa elegida en una proporción considerable de los casos, posiblemente debido a la estructura de los datos o a la presencia de alternativas dominantes.
 
 Es decir, fallamos. La respuesta a esto está en la figura \ref{fig:hist}.
 
@@ -1281,7 +1329,7 @@ Cuantificar los cambios de demanda en cuando hay cambios de oferta se vuelven in
 
 Para el siguiente experimento, se colocará una *flag* que desactive todas las aristas SUBIR, BAJAR Y VIAJAR de la L1. Haciendo esto, tomemos el caso de alguien que quiera ir de San Pablo a Baquedano. 
 
-Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las probabilidades y costes para cada alternativa. Notar como las probabilidades de usar la L1 y L5 suben. Ojo que estas probabilidades están condicionadas a que el usuario haya decidido ir a Baquedano. 
+Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las probabilidades y costes para cada alternativa. Notar como las probabilidades de usar la L1 bajan y las de la  L5 suben. Ojo que estas probabilidades están condicionadas a que el usuario haya decidido ir a Baquedano. 
 
 \begin{figure}[H]
     \centering
@@ -1329,6 +1377,32 @@ El algoritmo que tenemos, por construcción tomará el camino con el coste mas b
 \end{figure}
 
 Al ver esta redistribución, la primera medida a tomar sería reforzar con recorridos como el 412, 418 y 503 pues tienen un cost_to_go bajo (es decir, acercan mas a Tobalaba), en cambio, no reforzar servicios con recorridos similares al 517 y B27, pues por probabilidad, no deberían de ser elegidos para llegar a Tobalaba.
+
+Este análisis solo funciona para las personas que quieran tomar el metro en Baquedano. Un análisis mas profundo debería de considerar a todas las personas que quieran tomar algún tramo de la Línea 1 y se encuentren con un corte de servicio. Por ejemplo, una distribución de usuarios desde Baquedano a Tobalaba por cada estación intermedia tomaría distintos servicios que le dejen en Tobalaba dependiendo del origen y sus estrategias de elección.
+
+## Limitaciones
+
+Este modelo tiene varias limitaciones que no serán resueltas en esta memoria, pero vale la pena discutir.
+
+*Transbordos determinísticos*
+
+Los transbordos o viajes con mas de una etapa fueron tratados de manera determinista en sus etapas posteriores a la inicial, esto quiere decir que después de bajarse, el costo restate es definido de manera estricta. Una solución interesante puede ser concatenar varios MNL para cada etapa, pero esto complica mucho el problema. Notar que este enfoque habría hecho el valor *cost_to_go* no determinado, si no que una distribución o valor esperado. 
+
+*Correlación Espacial*
+
+Tal como se mencionó al inicio de la memoria, un usuario puede decidir en base a clusters o paraderos cercanos que le proveen una mejor oferta. El caso de preferir paraderos con mas servicios competitivos que otros puede ser un factor importante, tanto, que el usuario puede preferir a caminar mas para tener un tiempo de espera mas corto o confiable. Efectos como los de preferir el Metro por sobre otros modos de viaje debido a su fiabilidad y su alta frecuencia no son modelelados.
+
+*Elección de Paradero Inicial*
+
+Esta limitación viene mas por el lado del los datos. Lógicamente no sabemos donde vive la gente, solo su paradero de inicio del viaje y el del final de éste. Por ello, el viaje ya viene condicionado a que se eligió un paradero determinado desde el comienzo. 
+
+*Comodidad*
+
+Un factor importante no modelado. La comodidad puede verse afectada dinámicamente según la hora y el momento del recorrido. Un servicio que va lleno es menos cómodo que uno que va vacío. Modelar el llenado de los buses es requeriría saber exactamente el tamaño de los buses, el tipo de flota que tiene cada servicio y que tipo de buses saca cada servicio dependiendo del bin. 
+
+*Velocidad promedio v/s Velocidad por arista*
+
+Los datos entregados por red nos muestran datos de velocidad promedio en todo el recorrido. Claramente hay trazos del recorrido mas lentos que otros, probablemente los mas lentos son en áreas céntricas mientras que los rápidos son en áreas suburbanas. Esto puede afectar localmente en viajes cortos, tomando costos de viaje mas pequeños que los reales. Este efecto se puede amortiguar en viajes cortos cuando los servicios que compiten en las alternativas comparten el eje de circulación, pero por ejemplo un servicio que no usa avenidas puede verse perjudicado ante uno que alcanza velocidades mayores. 
 
 # GNN
 
