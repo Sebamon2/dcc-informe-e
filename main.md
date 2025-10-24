@@ -211,6 +211,7 @@ Se implementará un modelo logit multinomial que aprenda a captar factores decid
 Se implementará un modelo de aprendizaje automático para replicar la demanda de uso de transporte público en función de múltiples factores. Este modelo aprenderá a predecir el comportamiento de los usuarios en función de variables como la duración del viaje, el número de transbordos y el tiempo de espera. Se utilizarán técnicas de aprendizaje supervisado para ajustar los parámetros del modelo, utilizando datos históricos de validaciones Bip!, datos de uso de suelo  y patrones de movilidad. Para ello se utilizará un modelo con GNN + RNN (por ejemplo, una LSTM) . Una GNN procesará la estructura espacial del grafo y la demanda histórica con una LSTM.
 
 
+
 4. Entrenamiento y ajuste del modelo: 
 Utilizando datos históricos (validaciones Bip!, patrones de movilidad, datos censales), se ajustarán los parámetros del modelo de ML para que el comportamiento simulado refleje lo más fielmente posible la realidad. Esto puede abordarse como un problema de optimización o incluso como un sistema de aprendizaje supervisado.
 
@@ -378,9 +379,72 @@ Igualmente, no se tomó en cuenta los casos en los que las personas validan en t
 
 Una posible métrica interesante, sería obtener el porcentaje de uso de un servicio en un sentido con respecto a la cantidad de vehículos que tiene circulando el servicio en un período de tiempo. Esto permitiría ajustar la oferta de manera dinámica. Para ello habría que estimar la cantidad de personas máxima que cae dentro de un vehículo típico del servicio. Este análisis no se hará en esta fase del informe, pero queda propuesto para el siguiente semestre.
 
-## Creación del grafo agrupado
 
-La Matriz de adyacencia puede ser construida al mirar la consolidación de recorridos. Por lo tanto, crear el grafo de la red es el paso mas crucial para poder crear esta matriz de adyacencia, que representa la estructura de la red. 
+### Métricas de Demanda
+
+La idea de predecir la demanda conlleva saber exactamente la demanda de un par paradero, servicio, hora. 
+
+Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, debemos de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
+
+Haciendo esto, podemos obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado demand_getter.ipynb se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paradero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
+
+
+
+\begin{lstlisting}[language=python, caption={Salida del Programa}]
+El paradero PJ394 en formato TS es: T-11-64-PO-30
+Buscando demanda en T-11-64-PO-30 para T507 00I entre 08:00:00 y 10:00:00...
+Procesando etapa 1...
+Demanda en T-11-64-PO-30 para T507 00I en etapa 1: 20 viajes
+Procesando etapa 2...
+Procesando etapa 3...
+Procesando etapa 4...
+Total de viajes en T-11-64-PO-30 para T507 00I: 20
+
+\end{lstlisting}
+
+Para Tobalaba L4 entre las 17:00 y las 18:00
+
+\begin{lstlisting}[language=python, caption={Salida del Programa}]
+No se encontró el paradero en formato TS.
+ O es un paradero de metro, o no existe el paradero en la base de datos.
+Buscando demanda en TOBALABA para L4 entre 17:00:00 y 18:00:00...
+Procesando etapa 1...
+Demanda en TOBALABA para L4 en etapa 1: 9226 viajes
+Procesando etapa 2...
+Demanda en TOBALABA para L4 en etapa 2: 1191 viajes
+Procesando etapa 3...
+Demanda en TOBALABA para L4 en etapa 3: 16 viajes
+Procesando etapa 4...
+Demanda en TOBALABA para L4 en etapa 4: 3 viajes
+Total de viajes en TOBALABA para L4: 10436
+\end{lstlisting}
+
+
+\clearpage
+
+Algo curioso ocurre para Tobalaba L1
+
+\begin{lstlisting}[language=python, caption={Salida del Programa}]
+No se encontró el paradero en formato TS.
+O es un paradero de metro, o no existe el paradero en la base de datos.
+Buscando demanda en TOBALABA para L1 entre 17:00:00 y 18:00:00...
+Procesando etapa 1...
+Procesando etapa 2...
+Procesando etapa 3...
+Procesando etapa 4...
+Total de viajes en TOBALABA para L1: 0
+\end{lstlisting}
+
+Nuestras sospechas sobre como se guarda el servicio en estaciones de metro fue cierto. Al marcar la Bip! en Tobalaba, se marca automaticamente como L4 , nunca como L1. Este problema hay que resolverlo prontamente.
+
+
+Esta data por cada una de las tuplas es la información de entranamiento que tendra la GNN para predecir la demanda.
+
+# Grafo de la Red
+
+Crear un grafo que represente a la red es una manera cómoda de ejecutar algoritmos especializados de ruteo y además nos permite visualizar la red. En esta sección se muestra como se creó el grafo agrupado para visualizar la red, y el Grafo Bipartito, grafo utilizado como motor de costos para la MNL y para el entrenamiento de la GNN que mas adelante se mencionarán. 
+
+## Creación del grafo agrupado
 
 Un grafo G(E,V) es un conjunto de aristas(E) y vertices(V). Estos pueden ser dirigidos (los vértices tienen dirección bloqueada) o no (ambas direcciones posibles).
 
@@ -489,74 +553,16 @@ En el grafo mostrado al final del informe, las aristas y vértices azules son la
 
 Este algoritmo nos permite visualizar el grafo completo, pero carece de funcionalidad para agregarle información de la oferta. 
 
-## Métricas de Demanda
-
-La idea de predecir la demanda conlleva saber exactamente la demanda de un par paradero, servicio, hora. 
-
-Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, debemos de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
-
-Haciendo esto, podemos obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado demand_getter.ipynb se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paradero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
 
 
 
-\begin{lstlisting}[language=python, caption={Salida del Programa}]
-El paradero PJ394 en formato TS es: T-11-64-PO-30
-Buscando demanda en T-11-64-PO-30 para T507 00I entre 08:00:00 y 10:00:00...
-Procesando etapa 1...
-Demanda en T-11-64-PO-30 para T507 00I en etapa 1: 20 viajes
-Procesando etapa 2...
-Procesando etapa 3...
-Procesando etapa 4...
-Total de viajes en T-11-64-PO-30 para T507 00I: 20
-
-\end{lstlisting}
-
-Para Tobalaba L4 entre las 17:00 y las 18:00
-
-\begin{lstlisting}[language=python, caption={Salida del Programa}]
-No se encontró el paradero en formato TS.
- O es un paradero de metro, o no existe el paradero en la base de datos.
-Buscando demanda en TOBALABA para L4 entre 17:00:00 y 18:00:00...
-Procesando etapa 1...
-Demanda en TOBALABA para L4 en etapa 1: 9226 viajes
-Procesando etapa 2...
-Demanda en TOBALABA para L4 en etapa 2: 1191 viajes
-Procesando etapa 3...
-Demanda en TOBALABA para L4 en etapa 3: 16 viajes
-Procesando etapa 4...
-Demanda en TOBALABA para L4 en etapa 4: 3 viajes
-Total de viajes en TOBALABA para L4: 10436
-\end{lstlisting}
-
-
-\clearpage
-
-Algo curioso ocurre para Tobalaba L1
-
-\begin{lstlisting}[language=python, caption={Salida del Programa}]
-No se encontró el paradero en formato TS.
-O es un paradero de metro, o no existe el paradero en la base de datos.
-Buscando demanda en TOBALABA para L1 entre 17:00:00 y 18:00:00...
-Procesando etapa 1...
-Procesando etapa 2...
-Procesando etapa 3...
-Procesando etapa 4...
-Total de viajes en TOBALABA para L1: 0
-\end{lstlisting}
-
-Nuestras sospechas sobre como se guarda el servicio en estaciones de metro fue cierto. Al marcar la Bip! en Tobalaba, se marca automaticamente como L4 , nunca como L1. Este problema hay que resolverlo prontamente.
-
-
-Esta data por cada una de las tuplas es la información de entranamiento que tendra la GNN para predecir la demanda.
-
-
-## Grafo de estado no agrupado.
+## Grafo Bipartito
 
 
 Un grafo mas sofisticado es necesario para capturar la información de la demanda. 
-Para ello, se creará un grafo no agrupado de estado. El grafo tendrá distintos tipos de aristas y nodos. Pero antes, es necesario establecer algunas fuentes de datos extra. 
+Para ello, se creará un Grafo Bipartito. El grafo tendrá distintos tipos de aristas y nodos. Pero antes, es necesario establecer algunas fuentes de datos extra. 
 
-Para la siguiente sección, se es necesario tener un diccionario en común.
+Para la siguiente sección, se es necesario que el lector y el autor tengan un diccionario en común.
 
 ### Notación y datos base
 
@@ -591,7 +597,7 @@ La ciudad de Santiago esta divivida en zonas tarifarias. Las zonas 777 son el no
 \end{figure}
 
 
-En el repositorio de GitHub em main_notebook.ipynb se encuentra un mapa interactivo con las zonas 777 de Santiago. Igualmente el mapa de la red tiene dibujadas las zonas.
+En el repositorio de GitHub en main_notebook.ipynb se encuentra un mapa interactivo con las zonas 777 de Santiago. Igualmente el mapa de la red tiene dibujadas las zonas.
 
 Esto nos permite definir lo siguiente:
 
@@ -789,12 +795,14 @@ Dado un paradero de origen, una hora del día y un día de la semana, un usuario
 
 Las razones para elegir esta solución son las siguientes:
 
-- Facilidad para entrenar 
+- Facilidad para entrenar.
+- Interpretabilidad.
+- Mayor uso en predicciones de Transporte Público.
 
 ## Marco Teórico
 El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.  
 
-Por ejemplo, si un usuario tiene 3 *alternativas* de servicio, sean S1, S2, Y S3 en un paradero de origen P y un destino Q, el modelo MNL nos permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como decicidoras por el propio ingeniero. 
+Por ejemplo, si un usuario tiene N *alternativas* de servicio, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL nos permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como decicidoras por el propio ingeniero. En este sentido, el ingeniero de software propone variables que él considera importantes para la toma de decisiones, pero no le da la importancia él mismo. El modelo será encargado de decir que variable es mas importante que otra en el proceso de entrenamiento.
 
 Algunas variables propuestas pueden ser: 
 
@@ -845,16 +853,16 @@ La receta para construir el dataset de entrenamiento es el mas complicado. El *p
 
 - Obtener todas las aristas SUBIR que salgan del paradero en cuestión y que tengan tiempos de espera no infinitos. 
 - Estas aristas proveen los servicios que el usuario puede tomar. 
-- Extraer de cada alternativa la velocidad promedido y el tiempo de espera. Estos son atributos relevantes para el modelo. 
+- Extraer de cada alternativa la velocidad promedio y el tiempo de espera. Estos son atributos relevantes para el modelo. 
 
-3. Crear la variable dependiente, que es 1 si el servicio es el que tomó el usuario y 0 en caso contrario.
+3. Crear la variable dependiente *is_chosen*, que es 1 si el servicio es el que tomó el usuario y 0 en caso contrario.
 
 4. Entrenar el modelo. 
 
 
 ### Algoritmo de entrenamiento: 
 
-Realmente, este no es un MNL, sino una regresión lineal.
+
 
 - Se eliminan valores o filas corruptas (se eliminan las decisiones mal formadas).
 - Se construyen las características. Estas son:
@@ -955,6 +963,26 @@ El modelo, para ser simple, sorprendentemente tiene una accuracy mejor que el az
 
 ## MNL con destino
 
+Un MNL con destino se refiere a incluir en los parámetros un coste llamado *coste restante* y *costo de viaje* dependiendo del destino final del usuario. Un ejemplo ilustrativo viene a continuación.
+
+Imagine que para ir a un destino $D$ desde un origen $O$ tiene dos opciones. Un servicio $S_1$ que le deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo y un transbordo necesario a otro servicio, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
+
+Si es que el tiempo de viaje de $S_1$ es menor y además deja directamente en su destino, es lógico que tomar este servicio es la decisión idónea u óptima. Ahora, si el costo de viaje de $S_1$ es mucho mas alto, quizás convenga tomar un transbordo. Un ejemplo clásico de esto sería hacer transbordo al metro usando un bus alimentador para llegar al sistema subterráneo. A priori, dependiendo de que tan "apurado" esté el usuario, deberá de elegir una de las dos alternativas. No todos los usuarios piensan igual. Algunos prefieren comodidad y no hacer transbordos, sobre todo si están con algo de tiempo de sobra. Otras personas confían mas en servicios mas rápidos que les obligan a hacer transbordo. Como no todo el mundo piensa igual, el MNL es muy útil para estos casos, ya que entrega una distribución de probabilidad sobre que servicio se va a tomar, sobre todo cuando las utilidades de ambos son parecidas. El objetivo de esta sección es descubrir que prefieren los usuarios, si viajes mas directos con menos transbordos -pero mas largos- , o viajes mas rápidos pero con transbordos. Notar que los transbordos tienen tiempos de viajes mas variables. Poca confianza en los headways de los buses de transbordo pueden inflar el tiempo de viaje real, ya que la variable de tiempo de espera suele tener mas varianza que el tiempo de viaje. Mas transbordos implican mas varianza en el tiempo de viaje total y por lo tanto menos confianza en el trayecto, o sea, menos comodidad. 
+
+Con esta reflexión, es directo darse cuenta que lo que se busca en esta sección es descubrir como se comparan el tiempo de viaje total v/s que tanto me acerca el servicio inicial a mi destino. 
+
+### Métricas de Entrenamiento 
+
+Esta sección aplicará tanto para la MNL como la próxima GNN. Las métricas de entrenamiento serán:
+
+- NLL (Loss): Indica que tan bien calibradas las probabilidades. Penaliza fuertemente la sobreconfianza cuando se falla. *Mas bajo es mejor*.
+- NLL Normalizado: Normaliza NLL dependiendo del tamaño del set de alternativas. *0 es perfecto, 1.0 es uniforme*.
+- Acc (Accuracy TOP1): Indica la proporción de predicciones que acertaron en el primer rank de las probabilidades, es decir, si la elegida realmente fue la mas alta probabilidad. *Mas alto es mejor*. 
+- AccNT (Accuracy Non Trivial): Precisión de decisiones no triviales (es decir, con set de alternativas mayor a 1). *Mas alto es mejor*. Esta métrica es mas importante que Acc, debido a la gran proporción de decisiones con solo una posibilidad.
+- MRR (Mean Reciprocal Rank): Valora que la elegida esté alta en el ranking a pesar de que no esté top 1. *Mas alto es mejor*.
+- LL (Log Likelihood): Se usa solo en el MNL. Suma de $log(p|elegida)$. *Cuanto mas negativo y cercano a cero mejor*. 
+- LL_null: LL del modelo uniforme. Para medir ganancia sobre el azar. 
+- Pseudo‑R² de McFadden: 1 − LL_model/LL_null. Análogo a R²; 0 a <1 (mayor es mejor). En elección discreta, ~0.2–0.4 suele considerarse muy bueno.
 
 ### Dataset
 
@@ -972,13 +1000,13 @@ En este punto, tenemos un dataset muy parecido al anterior, pero con la informac
 
 El costo restante es la medida en tiempo que nos da al bajarnos en el paradero óptimo y los transbordos que le preceden. Un ejemplo del día a día que el autor de la memoria pasa todos los días: 
 
-- En el paradero PJ394 tengo las siguientes alternativas a las diez de la mañana un día LABORAL: 503, 504, 507, 517, 518 , B38.
+- En el paradero PJ394 se tienen las siguientes alternativas a las diez de la mañana un día LABORAL: 503, 504, 507, 517, 518 , B38.
 
-- Mi destino lógicamente es Beauchef. Elegiremos el paradero mas cercano a Beauchef, el PA433. 
+- El destino lógicamente es Beauchef. Se elige el paradero mas cercano a Beauchef, el PA433. 
 
-- Por suerte, ahi tambíen para la 507, así que el costo restante es cero, pues después de bajarme en la parada óptima, ya llegué a mi destino. 
+- Por suerte, ahi tambíen para el 507, así que el costo restante es cero, pues después de bajarse en la parada óptima, ya se llegó al destino. 
 
-- Para los otros servicios, el costo restante es mayor que cero, ya que ninguno me deja directamente en PA433. Entonces, tenemos que calcular el costo restante desde el paradero de bajada óptimo. 
+- Para los otros servicios, el costo restante es mayor que cero, ya que ninguno deja directamente en PA433. Entonces, tenemos que calcular el costo restante desde el paradero de bajada óptimo. 
 
 **Dijkstra Inverso** 
 Para calcular el paradero óptimo y el costo restante al bajarse en ese paradero es importante la noción del Algoritmo de Dijkstra (AD). A groso modo, el AD es un algoritmo que funciona de la siguiente manera: 
@@ -988,11 +1016,11 @@ Para calcular el paradero óptimo y el costo restante al bajarse en ese paradero
 - Se marca el nodo origen como visitado.
 - Se selecciona el nodo no visitado con el costo más bajo y se repite el proceso hasta que todos los nodos hayan sido visitados o se haya alcanzado el nodo destino.
 
-En nuestro caso, el AD se corre en sentido inverso, es decir, partimos del nodo destino y vamos hacia atrás. De esta forma, obtenemos el costo mínimo para llegar al destino desde cualquier otro nodo.
+En este caso, el AD se corre en sentido inverso, es decir, partimos del nodo destino y vamos hacia atrás. De esta forma, se obtiene el costo mínimo para llegar al destino desde cualquier otro nodo.
 
-Entonces, para un paradero de destino, un bin y un día obtenemos una lista enorme de costos restantes para cada paradero de la red. Notar que es costoso ejecutar este algoritmo en un grafo tan grande, así que hay que ejecutar estrategias para evitar el sobrecoste. 
+Entonces, para un paradero de destino, un bin y un día se obtiene una lista enorme de costos restantes para cada paradero de la red. Notar que es costoso ejecutar este algoritmo en un grafo tan grande, así que hay que ejecutar estrategias para evitar el sobrecoste. 
 
-Por ejemplo, podemos correr el AD para PA433 y el costo restante para ir desde cada paradero hasta PA433 es el costo de viajar. Como separamos los servicios (es decir, el grafo no es agrupado), cada camino es una combinacion de aristas. Lo bueno de este enfoque, es que penaliza fuertemente los transbordos, haciendo mas realistas los caminos. 
+Por ejemplo, se puede ejecutar el AD para PA433 y el costo restante para ir desde cada paradero hasta PA433 es el costo de viajar. Como se separaron los servicios (es decir, el grafo no es agrupado), cada camino es una combinacion de aristas. Lo bueno de este enfoque, es que penaliza fuertemente los transbordos, haciendo mas realistas los caminos. 
 
 Entonces, obtenemos un camino C que tiene de extremos dos nodos PARADERO y una cantidad par de aristas SUBIR + BAJAR y un número arbitrario de aristas VIAJAR visitadas. Esto es, el costo restante tiene el costo de los transbordos, esperas, tiempo a bordo y todo lo incluído. 
 
@@ -1004,7 +1032,7 @@ Siguendo con el pipeline...
 
 - Por cada decisión, se obtienen todos los servicios disponibles.
 - Por cada alternativa, incluída la elegida, se extraen desde el grafo de estado el tiempo de espera en ese paradero y bin. 
-- Por cada alternativa que NO sea la decisión, se ejecuta el AD Inverso desde el paradero de destino FINAL . El paradero óptimo es el que minimiza el costo restante dentro del perfil de paraderos del servicio, siendo el perfil de paraderos una lista de paraderos que le preceden al paradero actual .
+- Por cada alternativa que NO sea la decisión, se ejecuta el AD Inverso desde el paradero de destino FINAL . El paradero óptimo es el que minimiza el costo restante dentro del perfil de paraderos del servicio, siendo el perfil de paraderos una lista de paraderos que le siguen al paradero actual .
 - Por cada alternativa, se calcula el costo de esperar el servicio mas el costo de viajar al paradero óptimo (o el de bajada real en el caso del usado) y el costo restante ya obtenido por Dijsktra. 
 - Se agregan todos estos atributos a la fila por cada alternativa. 
 
@@ -1012,7 +1040,7 @@ Ejecutar este código a primeras veces fue un dolor de cabeza. Era extremadament
 
 - Se agruparon todos los viajes que iban al mismo destino. Con ello, se calculaba solo una vez el algoritmo de dijsktra para muchas decisiones a la vez, y estos resultados se cacheaban. Al ver el código en ejecución, notamos algo interesante. Al comenzar computando el AD para el grupo mas grande, inmediatamente comenzó a construir el grafo inverso para el paradero METRO TOBALABA, y es que gran cantidad de los viajes tenían como destino final este paradero. 
 
-- Se cacheo el perfil de cada servicio. 
+- Se *cacheo* el perfil de cada servicio. 
 
 Con ello, una tabla de etapas de un día (300K decisiones) se podía procesar en 2 horas solamente. 
 
@@ -1051,9 +1079,36 @@ La tabla de decisiones resultante tiene las siguientes columnas:
 \caption{Descripción de las columnas del dataset de decisiones para el modelo MNL con destino.}
 \end{table}
 
+
+#### Nota sobre el coste restante
+
+Probablemente el lector se dió cuenta de que el costo restante limita el modelo. Asume que después de la primera decisión las personas son deterministas y no eligen con distribución de probabilidad. Esto es intencional. Modelar todo el trayecto como una concatenación de decisiones probabilísticas complica el modelo, cosa que para el desarrollo de la memoria puede ser perjudicial, teniendo en cuenta que se desarrollará el GNN después. Una pequeña intuición que no se desarrollará en este trabajo indica que posiblemente el costo restante sería una distribución o variable aleatoria mas que un valor fijo escalar. Esto tiene mas sentido real. Una persona sabe que hacer transbordo aumenta su varianza en su tiempo de viaje debido a que debe de esperar otro servicio, que induce una incerteza temporal. Aunque en el coste restante está incluído el tiempo de espera, realmente el tiempo de espera *esperado* debería de ser un tiempo que tenga en cuenta todos los tiempos de espera del paradero que le puedan servir al usuario. Lo mismo con los tiempos de viaje del servicio que pueda tomar el usuario. Es inmediato notar como se complica el problema, pues ahora cada decisión subsecuente tiene una distribución. 
+
 ### Entrenamiento
 
-El entrenamiento dio los siguientes resultados (#TODO: AHONDAR EN COMO FUE EL ENTRENAMIENTO)
+#### Algoritmo de Entrenamiento
+
+Para el entrenamiento, se considera lo siguiente: 
+
+- Variables base: cost_to_go, wait_time, viajar_cost.
+- Variables derivadas : is_initial_transfer (binaria) y first_walk_time= penalty (5 mins) si is_initial_transfer es True.
+- zero_onboard = 1 si viajar_cost es 0. 
+- ASC_METRO si usa el metro. 
+- intercepto. Constante de probabilidad. 
+
+1. Se limpiaron las decisiones que no tengan exactamente un servicio elegido, se excluyeron decisiones triviales. Se spliteo en 0.2 test size. 
+2. El modelo tiene la utilidad ya mencionada anteriormente u = Xβ. La probabilidad por alternativa es un softmax estable por decisión. 
+3. Tiene una regularización L2 sobre ß. 
+4. Optimización. Minimiza NLL con L-BFGS-B.
+5. Gradiente Analítico. 
+6. 300 iteraciones máximas por época. tol = 1e-7 y l2_reg= 1e-3. 
+7. Métricas las ya anteriormente mencionadas. 
+
+
+#### Resultados y coeficientes.
+
+
+El entrenamiento dio los siguientes resultados.
 \begin{table}[H]
 \centering
 \resizebox{\textwidth}{!}{%
@@ -1104,25 +1159,27 @@ Para *cost_to_go* 0, es cuando es necesario solo una etapa para completar el via
 
 ### Primeros Transbordos y la Penalización Inicial
 
-Una solución elegida fue penalizar a las alternativas que requieran hacer transbordo, con un tiempo extra que se pueda configurar, esto por dos razones:
+Una solución elegida fue penalizar a las alternativas que requieran hacer transbordo inicial (es decir, cambiarse de paradero sin siquiera tomar el primer servicio), con un tiempo extra que se pueda configurar, esto por dos razones:
 
 - Es mas simple y directo. 
 - No es necesario que Dijkstra retorne el camino completo para verificar hacia donde fue. 
 
 Una idea interesante podría haber sido guardar el camino completo hecho por dijkstra (y no solo el peso) y cuando hayan primeros transbordos, guardar el coste de caminar al paradero óptimo, pero esto es mas complicado, consume mas memoria, y además era necesario de ya entrenar apara avanzar con la memoria. Esta idea se descartó.
 
+Se decide con aplicar una penalización de 5 minutos al tiempo inicial para evitar valores nulos. Es un tiempo razonable de caminata.
 
-En primera instancia, se decide entrenar con una penalización de 5 minutos a las alternativas que requieran hacer transbordo desde el paradero inicial. Entonces, obtenemos los siguientes resultados:
 
-A continuación se presentan los resultados del entrenamiento del modelo MNL con destino, organizados en tablas para mayor claridad.
 A continuación se presentan los coeficientes del modelo MNL entrenado para distintos días de la semana. Cada columna corresponde a un atributo del modelo y cada fila a un día. El día miércoles no estaba disponible en la página de red.
 
-##### Métricas de Entrenamiento
+
+##### Métricas Obtenidas
+
 
 
 
 
 ##### Coeficientes obtenidos.
+
 \begin{table}[H]
 \centering
 \resizebox{\textwidth}{!}{%
@@ -1144,15 +1201,14 @@ domingo  & $7.59\times 10^{-13}$ & $-0.50$ & $-0.23$ & $-5.11$ & $-0.08$ & $-0.1
 \caption{Coeficientes del modelo MNL entrenado para distintos días de la semana. La última fila muestra el promedio de cada columna.}
 \end{table}
 
-
-
-
-
+Notar como afecta mas a la utilidad tener un *cost_to_go* alto que un tiempo de viaje alto. Con esto se puede concluir que los usuarios prefieren alternativas que le acerquen lo mas que puedan al destino, inclusive pagando mas coste de viaje que otro servicio alimentador. 
 
 
 Obtenemos constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si lo miramos desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es mas directo. Entonces, un coste restante menor es mas atractivo. Para tener un costo restante menor, es necesario viajar mas tiempo en el primer servicio. 
 
-Además, el intercepto no es necesario. Esto porque al calcular la probabilidad (de manera relativa) los interceptos se cancelan entre ellos ya que son todos iguales para todos los casos. Por lo tanto, un nuevo trainer es necesario. 
+
+
+## Entrenamiento semanal. 
 
 ## Experimentos
 
@@ -1184,7 +1240,7 @@ Tenemos un paradero P y Q conectados por un set de servicios {S} para un bin b. 
 
 **Ejemplo 1: Ir desde PJ394 a PA300**
 
-Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero. El experimento consiste en aumentar al doble el tiempo de espera del 503. 
+Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero. El experimento consiste en aumentar al doble el tiempo de espera del 517. 
 
 \begin{figure}[H]
     \centering
@@ -1248,76 +1304,75 @@ Podemos seguir aumentando el tiempo de espera, hasta un 1500% mas grande que el 
 Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será determinístico. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que complicaría mucho el problema). 
 
 
-Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello veamos los caminos de cada servicio obtenidos por Dijsktra.
+Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello veamos los caminos de cada servicio obtenidos por Dijsktra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis superficial indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
 
-\begin{itemize}
-    \item \textbf{Viaje en alternativa: B38}
-        \begin{itemize}
-            \item Inicia en paradero \texttt{T-11-64-PO-30}
-            \item Subir al servicio \textbf{B38} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
-            \item Bajar en paradero \texttt{T-8-64-PO-30}
-            \item Subir al servicio \textbf{507} (sentido Ida) en paradero \texttt{T-8-64-PO-30}
-            \item Bajar en paradero \texttt{T-20-177-PO-20}
-        \end{itemize}
-    \item \textbf{Viaje en alternativa: 503}
-        \begin{itemize}
-            \item Inicia en paradero \texttt{T-11-64-PO-30}
-            \item Subir al servicio \textbf{503} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
-            \item Bajar en paradero \texttt{E-20-289-PO-5}
-            \item Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO}
-            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_CAL Y CANTO}
-            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
-            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
-            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
-            \item Bajar en paradero \texttt{T-20-177-OP-8}
-            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
-        \end{itemize}
-    \item \textbf{Viaje en alternativa: 504}
-        \begin{itemize}
-            \item Inicia en paradero \texttt{T-11-64-PO-30}
-            \item Subir al servicio \textbf{504} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
-            \item Bajar en paradero \texttt{T-20-188-NS-10}
-            \item Caminar de \texttt{T-20-188-NS-10} a \texttt{METRO\_SANTA ANA}
-            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_SANTA ANA}
-            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
-            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
-            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
-            \item Bajar en paradero \texttt{T-20-177-OP-8}
-            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
-        \end{itemize}
-    \item \textbf{Viaje en alternativa: 517}
-        \begin{itemize}
-            \item Inicia en paradero \texttt{T-11-64-PO-30}
-            \item Subir al servicio \textbf{517} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
-            \item Bajar en paradero \texttt{E-20-289-PO-5}
-            \item Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO}
-            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_CAL Y CANTO}
-            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
-            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
-            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
-            \item Bajar en paradero \texttt{T-20-177-OP-8}
-            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
-        \end{itemize}
-    \item \textbf{Viaje en alternativa: 518}
-        \begin{itemize}
-            \item Inicia en paradero \texttt{T-11-64-PO-30}
-            \item Subir al servicio \textbf{518} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
-            \item Bajar en paradero \texttt{T-20-203-NS-20}
-            \item Caminar de \texttt{T-20-203-NS-20} a \texttt{METRO\_SANTA ANA}
-            \item Subir al servicio \textbf{L2} (sentido Metro) en paradero \texttt{METRO\_SANTA ANA}
-            \item Bajar en paradero \texttt{METRO\_PARQUE OHIGGINS}
-            \item Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40}
-            \item Subir al servicio \textbf{506} (sentido Ret) en paradero \texttt{E-20-189-OP-40}
-            \item Bajar en paradero \texttt{T-20-177-OP-8}
-            \item Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20}
-        \end{itemize}
-    \item \textbf{Viaje en alternativa: 507}
-        \begin{itemize}
-            \item Inicia en paradero \texttt{T-11-64-PO-30}
-            \item Subir al servicio \textbf{507} (sentido Ida) en paradero \texttt{T-11-64-PO-30}
-            \item Bajar en paradero \texttt{T-20-177-PO-20}
-        \end{itemize}
-\end{itemize}
+Una vez se bajen en Parque Ohiggins, un efecto importante ocurre en el paradero aledaño a la estación de Metro. El AD predice que se tomará el 506, pero realmente es el servicio mas probable a ser tomado, no necesariamente todos lo tomarán. Esta nueva demanda redistribuída se repartirá en los servicios que pasan por este paradero y que llevan a Beauchef, en este caso, el 506, 506v, 506e y el 507.  
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}l p{0.78\textwidth}@{}}
+\toprule
+Alternativa & Itinerario \\ \midrule
+B38 (+ 0\% de probabilidades) &
+Inicia en paradero \texttt{T-11-64-PO-30} \newline
+Subir al servicio \textbf{B38} (Ida) en \texttt{T-11-64-PO-30} \newline
+Bajar en \texttt{T-8-64-PO-30} \newline
+Subir al servicio \textbf{507} (Ida) en \texttt{T-8-64-PO-30} \newline
+Bajar en \texttt{T-20-177-PO-20} \\[0.5em]
+503 (+ 22\% de probabilidades) &
+Inicia en paradero \texttt{T-11-64-PO-30} \newline
+Subir al servicio \textbf{503} (Ida) en \texttt{T-11-64-PO-30} \newline
+Bajar en \texttt{E-20-289-PO-5} \newline
+Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_CAL Y CANTO} \newline
+Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
+Bajar en \texttt{T-20-177-OP-8} \newline
+Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+504 (+ 20\% de probabilidades) &
+Inicia en paradero \texttt{T-11-64-PO-30} \newline
+Subir al servicio \textbf{504} (Ida) en \texttt{T-11-64-PO-30} \newline
+Bajar en \texttt{T-20-188-NS-10} \newline
+Caminar de \texttt{T-20-188-NS-10} a \texttt{METRO\_SANTA ANA} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_SANTA ANA} \newline
+Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
+Bajar en \texttt{T-20-177-OP-8} \newline
+Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+517 (+ 19\% de probabilidades) &
+Inicia en paradero \texttt{T-11-64-PO-30} \newline
+Subir al servicio \textbf{517} (Ida) en \texttt{T-11-64-PO-30} \newline
+Bajar en \texttt{E-20-289-PO-5} \newline
+Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_CAL Y CANTO} \newline
+Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
+Bajar en \texttt{T-20-177-OP-8} \newline
+Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+518 (+ 22\% de probabilidades) &
+Inicia en paradero \texttt{T-11-64-PO-30} \newline
+Subir al servicio \textbf{518} (Ida) en \texttt{T-11-64-PO-30} \newline
+Bajar en \texttt{T-20-203-NS-20} \newline
+Caminar de \texttt{T-20-203-NS-20} a \texttt{METRO\_SANTA ANA} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_SANTA ANA} \newline
+Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
+Bajar en \texttt{T-20-177-OP-8} \newline
+Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+507 (- 86\% de probabilidades) &
+Inicia en paradero \texttt{T-11-64-PO-30} \newline
+Subir al servicio \textbf{507} (Ida) en \texttt{T-11-64-PO-30} \newline
+Bajar en \texttt{T-20-177-PO-20} \\
+\bottomrule
+\end{tabular}
+\caption{Itinerarios de las alternativas desde \texttt{T-11-64-PO-30} hasta \texttt{T-20-177-PO-20}}
+\label{tab:trayectos}
+\end{table} 
 
 
 Notamos que si hay 100 personas que quieren ir a Beauchef en un día, las 100 tomarían el 507 en el caso base. En el caso modificado, aumentaríamos la demanda del día en 80 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar.
@@ -1386,7 +1441,9 @@ Este modelo tiene varias limitaciones que no serán resueltas en esta memoria, p
 
 *Transbordos determinísticos*
 
-Los transbordos o viajes con mas de una etapa fueron tratados de manera determinista en sus etapas posteriores a la inicial, esto quiere decir que después de bajarse, el costo restate es definido de manera estricta. Una solución interesante puede ser concatenar varios MNL para cada etapa, pero esto complica mucho el problema. Notar que este enfoque habría hecho el valor *cost_to_go* no determinado, si no que una distribución o valor esperado. 
+Los transbordos o viajes con mas de una etapa fueron tratados de manera determinista en sus etapas posteriores a la inicial, esto quiere decir que después de bajarse, el costo restate es definido de manera estricta. Una solución interesante puede ser concatenar varios MNL para cada etapa, pero esto complica mucho el problema. Notar que este enfoque habría hecho el valor *cost_to_go* no determinado, si no que una distribución o valor esperado. En esta memoria el cost_to_go es el mínimo dado que el usuario se baja en el paradero óptimo y elija el servicio óptimo. Es una simplificación fuerte, pero que funciona en gran parte de las decisiones (notar el 92% de precisión obtenido).
+
+\clearpage
 
 *Correlación Espacial*
 
@@ -1406,119 +1463,110 @@ Los datos entregados por red nos muestran datos de velocidad promedio en todo el
 
 # GNN
 
-Para comenzar a hablar de las GNN, es pertinente aclarar conceptos de redes neuronales y como nos ayudarán en el futuro a solucionar el problema.
+## Modelos 
 
-## Redes Neuronales
-Las redes neuronales pueden ser pensadas como una colección de nodos o neuronas conectados por aristas o axones, los cuales tienen pesos. Estos nodos o neuronas se agrupan según su función en capas, las cuales pueden estar encargadas de recibir la información, procesarla o dar la respuesta a la pregunta. Por ejemplo, un clasificador binario tiene una capa de output con sola una neurona. Si la neurona se activa o no depende de la clasificación final. 
-
-El ajuste de los pesos se hace en el entrenamiento, proceso en el cual la red "aprende" en base a fallar una y otra vez en base a datos etiquetados y a funciones de pérdida que el algoritmo debe de minimizar. La forma que tiene la red de ajustar los pesos depende la tasa de aprendizaje (learning rate) o la función usada para optimizar o converger a la red (optimizer). 
+### GNN con features de alternativas de Dijsktra (GNND)
 
 
-## Redes Neuronales de Grafos
-
-Las redes neuronales tradicionales (MLP, CNN, RNN/LSTM) están preparadas para recibir datos en forma de vectores, rejillas (grafos en forma de grilla, como imágenes) o secuencias temporales (grafos dirigidos en solo una dirección). Es decir, podemos pensar en una GNN como una abstracción o generalización de muchos tipos de redes neuronales. Técnicamente, una GNN puede recibir una imagen, pues una imagen es un grafo cuadriculado. 
-
-Se nos vienen a la cabeza miles de estructuras de datos que pueden aprovechar a las GNN para realizar predicciones. Redes sociales, moléculas, redes de transporte, entre otras. 
-
-### ¿Cómo funcionan las GNN?
-
-La idea de las GNN es la siguiente:
-
-- Cada nodo tiene un vector de características inicial (atributos).
-- Los nodos "envían mensajes" a sus vecinos. 
-- Cada nodo actualiza su representación basado en los mensajes recibidos.
-- Este proceso se repite varias veces (capas de la GNN).
-
-En el caso del transporte público, tenemos:
-
-- Cada parada tiene su información propia (ubicación, servicios, tipo, información relevante del entorno).
-- En la primera iteración, el nodo recibe información de los nodos que están conectados directamente a él.
-- En la segunda, a dos pasos del nodo.
-- Así sucesivamente.
+El primer enfoque mas sencillo es entrenar una GNND con embeddings de paraderos y servicios, y concatenando a estos embeddings los costes obtenidos con Dijkstra. Es decir, obtenemos una GNND con datos de la MNL.
 
 
-### Algunos ejemplos
-
-
-#### STGCN  (Spacio Temporal Graph Convolutional Network)
-
-Trabajo realizado por Jin [@stgcn] uso una combinación de redes convolucionales para la predicción temporal y una Cluster-GCNN para la predicción espacial. El set de datos fue de Metro de Shangai.
-
-#### GNN for Robust Public Transit Demand Prediction usando PGCN
-
-Un trabajo interesante de Li [@pgcn] abordó la partición de la ciudad de Sidney en zonas de acuerdo a su código postal (nodos) y agregó información del uso del suelo a los nodos (Densidad residencial, Oficinas, Industrias, Zonas Comerciales, etc). Por el lado de las GNN, utilizó una PGCN (Probabilistic Graph Convolutional Network) para predecir la demanda entre los pares (O,D). Esta red se compone de correlaciones espacio temporales mas un módulo de aproximación bayesiana para cuantificar la incertidumbre.
+#### Arquitectura
 
 
 
-## Reconstrucción de Demanda sin contexto temporal.
-
-El reconstrucción de demanda, se refiere al proceso en el cual, dado un tiempo T, datos históricos X(T)  y un grafo G(T) con características espaciales concretas, predecir la demanda en ese instante de tiempo. Ese instante puede ser igualmente una ventana de tiempo corta (5 minutos), o un período (hora punta entre las 17:30 y las 19:30). La versatilidad de este enfoque esta en la obtención de una abstracción espacial, que nos permitirá, a priori, cambiar la topología sustancialmente.
-
-Algunas características que podrían tener los nodos, son:
-
-- Servicios.
-- Ubicación.
-- Tipo (metro o bus).
-- Si es combinación.
-- Comuna.
-- Frecuencia de los recorridos. 
-- Uso del suelo cercano.
-- Paraderos cercanos a una distancia X.
-- Tiempo actual del grafo (la demanda no es invariante temporalmente)
-
-Las aristas tendrían...
-
-- Tiempo promedio en recorrerla.
-- Distancia entre nodos.
-- Servicios que la recorren.
-- Tipo (bus o metro)
-
-Con ello, las aristas tendrían PESO, algo importante para detectar que camino utilizarían los usuarios. 
+#### Resultados
 
 
-Debido a que no tenemos el contexto temporal como input al modelo , es importante entrenar con muchos datos de distintos días y horas. Además, datos del uso de suelo pueden ser claves al detectar por qué una parada es mas usada que otra. Datos de densidad poblacional también lo pueden ser. 
+
+En la tabla \ref{tab:gnn_training_1} observamos el entrenamiento del Modelo de GNN 
+
+\begin{table}[H]
+\centering
+\caption{Resumen de entrenamiento (GNN) con features de Alternativas de Dijkstra}
+\label{tab:gnn_training_1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{r r r r r r r r r}
+\toprule
+Época & Train NLL & Train Acc & Train AccNT & Train MRR & Val NLL & Val Acc & Val AccNT & Val MRR \\
+\midrule
+01 & 0.2559 & 0.912 & 0.782 & 0.948 & 0.1521 & 0.957 & 0.895 & 0.975 \\
+02 & 0.1425 & 0.953 & 0.884 & 0.973 & 0.1256 & 0.961 & 0.904 & 0.977 \\
+03 & 0.1276 & 0.955 & 0.889 & 0.974 & 0.1151 & 0.962 & 0.906 & 0.978 \\
+04 & 0.1204 & 0.956 & 0.891 & 0.974 & 0.1090 & 0.962 & 0.907 & 0.978 \\
+05 & 0.1156 & 0.956 & 0.892 & 0.975 & 0.1051 & 0.963 & 0.909 & 0.979 \\
+06 & 0.1114 & 0.957 & 0.893 & 0.975 & 0.1010 & 0.963 & 0.909 & 0.979 \\
+07 & 0.1076 & 0.958 & 0.895 & 0.975 & 0.0983 & 0.964 & 0.911 & 0.979 \\
+08 & 0.1054 & 0.958 & 0.896 & 0.976 & 0.0958 & 0.963 & 0.910 & 0.979 \\
+09 & 0.1034 & 0.957 & 0.894 & 0.975 & 0.0943 & 0.964 & 0.910 & 0.979 \\
+10 & 0.1011 & 0.958 & 0.895 & 0.976 & 0.0922 & 0.964 & 0.911 & 0.979 \\
+11 & 0.0998 & 0.958 & 0.896 & 0.976 & 0.0919 & 0.964 & 0.911 & 0.979 \\
+12 & 0.0985 & 0.959 & 0.897 & 0.976 & 0.0893 & 0.964 & 0.912 & 0.979 \\
+13 & 0.0978 & 0.959 & 0.898 & 0.976 & 0.0888 & 0.964 & 0.912 & 0.979 \\
+14 & 0.0971 & 0.958 & 0.897 & 0.976 & 0.0882 & 0.964 & 0.911 & 0.979 \\
+15 & 0.0967 & 0.958 & 0.896 & 0.976 & 0.0882 & 0.964 & 0.912 & 0.980 \\
+16 & 0.0958 & 0.959 & 0.898 & 0.976 & 0.0877 & 0.964 & 0.912 & 0.979 \\
+17 & 0.0957 & 0.958 & 0.897 & 0.976 & 0.0883 & 0.964 & 0.912 & 0.979 \\
+18 & 0.0950 & 0.959 & 0.898 & 0.976 & 0.0870 & 0.964 & 0.912 & 0.980 \\
+19 & 0.0948 & 0.959 & 0.898 & 0.977 & 0.0866 & 0.965 & 0.913 & 0.980 \\
+20 & 0.0950 & 0.958 & 0.897 & 0.976 & 0.0869 & 0.964 & 0.911 & 0.979 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
 
-### Flujo de trabajo 
+Observamos claramente que los resultados de GNND son casi idénticos a los de MNL. La presencia de los costes de Dijkstra hace trivial la tarea de clasificar ya obteniendo estos costes. Un experimento interesante es quitar las features de Dijkstra a la red y ahora crear los embeddings de los paraderos y servicios usando los costes dependientes del tiempo. Esto se explora en la siguiente sección.
 
-- Intentar obtener la mayor cantidad de datos de uso de suelo posibles para enriquecer la información de los nodos. 
-- Agregar datos de tiempo/distancia a las aristas.
-- Entrenar al modelo en instantes de tiempo dados. 
-- Comprobar la eficacia del modelo comparándola con configuraciones topológicas ya existentes.
-- Probar a predecir en configuraciones topológicas artificiales en las que se agregan servicios. 
-- Probar a predecir en configuraciones topológicas artificiales en las que se quitan servicios. 
+### GNN solo con embeddings 
+
+Ahora, quitamos los costos de Dijsktra, para que la GNN tenga que inferir usando solo los embeddings. Esto es sencillo de hacer, simplemente no se concatenan los costes. 
+
+#### Resultados
+
+La tabla \ref{tab:gnn_embeddings} muestra los resultados. Notar la fuerte caída en la métrica importante, AccNT. Esto ocurre porque usamos SAGEConv, (#TODO: MOSTRAR PAPER DE SAGECONV). SAGEConv utiliza promedios de embeddings de nodos vecinos sin tomar en cuenta cuanto pesa cada conexión entre ellos. 
+
+\begin{table}[H]
+\centering
+\caption{Entrenamiento y validación por época — métricas NLL, Accuracy, AccNT y MRR.}
+\label{tab:gnn_embeddings}
+\small
+\begin{tabular}{r r r r r r r r r}
+\toprule
+Epoch & Train NLL & Train Acc & Train AccNT & Train MRR & Val NLL & Val Acc & Val AccNT & Val MRR \\
+\midrule
+01 & 0.6235 & 0.705 & 0.270 & 0.802 & 0.6247 & 0.699 & 0.259 & 0.797 \\
+02 & 0.6178 & 0.709 & 0.278 & 0.804 & 0.6196 & 0.705 & 0.275 & 0.803 \\
+03 & 0.6141 & 0.711 & 0.283 & 0.806 & 0.6152 & 0.707 & 0.279 & 0.804 \\
+04 & 0.6111 & 0.713 & 0.288 & 0.808 & 0.6129 & 0.710 & 0.285 & 0.806 \\
+05 & 0.6087 & 0.715 & 0.294 & 0.810 & 0.6095 & 0.712 & 0.290 & 0.808 \\
+06 & 0.6070 & 0.716 & 0.297 & 0.811 & 0.6083 & 0.711 & 0.288 & 0.807 \\
+07 & 0.6055 & 0.717 & 0.298 & 0.811 & 0.6074 & 0.711 & 0.290 & 0.807 \\
+08 & 0.6045 & 0.717 & 0.299 & 0.812 & 0.6060 & 0.714 & 0.295 & 0.809 \\
+09 & 0.6035 & 0.718 & 0.301 & 0.812 & 0.6045 & 0.714 & 0.296 & 0.810 \\
+10 & 0.6024 & 0.718 & 0.302 & 0.813 & 0.6036 & 0.713 & 0.294 & 0.809 \\
+11 & 0.6011 & 0.719 & 0.304 & 0.813 & 0.6033 & 0.714 & 0.295 & 0.809 \\
+12 & 0.6006 & 0.718 & 0.302 & 0.813 & 0.6021 & 0.713 & 0.295 & 0.810 \\
+13 & 0.6001 & 0.719 & 0.304 & 0.813 & 0.6031 & 0.714 & 0.297 & 0.810 \\
+14 & 0.5995 & 0.720 & 0.305 & 0.814 & 0.6014 & 0.715 & 0.299 & 0.811 \\
+15 & 0.5988 & 0.720 & 0.306 & 0.814 & 0.6014 & 0.714 & 0.297 & 0.810 \\
+16 & 0.5984 & 0.721 & 0.307 & 0.814 & 0.5999 & 0.716 & 0.302 & 0.811 \\
+17 & 0.5977 & 0.721 & 0.308 & 0.815 & 0.5996 & 0.715 & 0.299 & 0.810 \\
+18 & 0.5973 & 0.721 & 0.308 & 0.815 & 0.5991 & 0.716 & 0.302 & 0.811 \\
+19 & 0.5973 & 0.721 & 0.307 & 0.815 & 0.5986 & 0.715 & 0.300 & 0.811 \\
+20 & 0.5969 & 0.721 & 0.309 & 0.815 & 0.5982 & 0.715 & 0.299 & 0.811 \\
+\bottomrule
+\end{tabular}
 
 
-## GNN con contexto temporal.
+\end{table}
 
-Otro enfoque a tomar será el de predecir la demanda del TP usando datos históricos de tiempos anteriores como input al modelo, para predecir el tiempo siguiente. Varios trabajos nombrados en este informe hicieron eso. La diferencia será en que en el tiempo siguiente se cambiará la topología. 
+- Mejor modelo: época 20 (Val NLL: 0.5982)
 
-
-Luego, el input del modelo sería una secuencia de demandas para un paradero P y servicio S, con D(t~k~,P,S) una secuencia de demandas temporales. Una red neuronal apta para captar correlaciones temporales y series de tiempo tomará esta información y predecirá la demanda para el mismo paradero,servicio pero para un tiempo futuro. 
-
-### Flujo de trabajo 
-
-- Crear atributos de demanda en cada nodo
-- Validar modelo con datos históricos
-- Con el modelo validado, agregar servicios.
-- Quitar servicios.
-
-Podemos pensar en agregar a los servicios nuevos con demanda vacía o con una demanda base tomando en cuenta servicios parecidos con paraderos parecidos. Luego, dejar evolucionar el modelo en el tiempo. 
+- TEST | NLL 0.5952 | Acc 0.720 | AccNT 0.309 | MRR 0.815
 
 
-## Validación del modelo.
 
-### Reconstrucción de Demanda sin contexto temporal
-
-Al momento de escribir este informe, (Finales de Junio/Inicios de Julio de 2025) se han agregado servicios nuevos los cuales aun no registran demanda. Se puede ver mas información de ello en https://www.red.cl/red-comunica/ajuste-en-malla-de-recorridos-de-buses-dos-nuevos-servicios-y-cuatro-extensiones-comienzan-a-funcionar-este-sabado-05-de-julio/ .
-
-Esta es una oportunidad perfecta para agregar el trazado de los recorridos nuevos, calcular la demanda esperada, y cuando red saque los datos de demanda de los nuevos recorridos (las tablas de viaje), podremos contrastar. Otra opción es viajar a atrás en el tiempo, analizar una tabla de datos antigua (anterior a la agregación de nuevos recorridos) y compararla con la actual (con los recorridos ya circulando). 
-
-### GNN con contexto temporal
-
-La validación de este caso es mas sencilla. Simplemente podemos comparar datos históricos en tiempos posteriores. (Por ejemplo, en base a datos históricos del dia miércoles, predecir el día Jueves a las 5 de la tarde). Naturalmente, tenemos los datos de ese día jueves, por lo que solo es necesario comparar.
-
-En ambos casos, al ser valores discretos numéricos muy variados, comparar con variables estadísticas globales como el promedio o la desviación estándar será razonable para establecer la demanda en paraderos. 
 
 
 
