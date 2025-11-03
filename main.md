@@ -1172,13 +1172,11 @@ Se decide con aplicar una penalización de 5 minutos al tiempo inicial para evit
 A continuación se presentan los coeficientes del modelo MNL entrenado para distintos días de la semana. Cada columna corresponde a un atributo del modelo y cada fila a un día. El día miércoles no estaba disponible en la página de red.
 
 
-##### Métricas Obtenidas
+#### Entrenamiento Diario.
 
+Primero, para agilizar el entrenamiento, se analizó día por día. El día miércoles no estaba disponible en red. Entrenar semanalmente nos permite identificar cambios en los parámetros dependiendo del día. Ver la tabla \ref{tab:params_dias_mnl} a modo resumen de los parámetros obtenidos.
 
-
-
-
-##### Coeficientes obtenidos.
+En esta sección no se mostrarán las métricas diarias, pues consumirían mucho espacio, pero en la sección siguiente, se mostrarán las métricas de desempeño semanal. La precisión promedio de todos los días fue del 92% tanto en el split de validación como en el de entrenamiento.
 
 \begin{table}[H]
 \centering
@@ -1198,8 +1196,105 @@ domingo  & $7.59\times 10^{-13}$ & $-0.50$ & $-0.23$ & $-5.11$ & $-0.08$ & $-0.1
 \bottomrule
 \end{tabular}%
 }
-\caption{Coeficientes del modelo MNL entrenado para distintos días de la semana. La última fila muestra el promedio de cada columna.}
+\caption{Coeficientes del modelo MNL entrenado para distintos días de la semana. La última fila muestra el promedio de cada columna. Este entrenamiento fue por cada día.}
+\label{tab:params_dias_mnl}
 \end{table}
+
+
+
+#### Entrenamiento Semanal completo.
+
+Para tener una vista general, se opta por hacer un entrenamiento general de la semana completa, tomando un split del 20% de los datos totales. La tabla \ref {tab:particionado} muestra la cantidad de decisiones. Con ello, se obtienen las siguientes métricas (\ref{tab:train_mnl}) y parámetros (\ref{tab:coeff_mnl}). 
+
+
+
+\begin{table}[h]
+\centering
+\caption{Resumen de datos y particionado}
+\begin{tabular}{lr}
+\hline
+Split de Datos & Cantidad \\
+\hline
+Datos cargados (tuplas) & (5\,609\,970, 25) \\
+Después de limpieza (tuplas) & (4\,620\,455, 25) \\
+Train (filas) & 3\,696\,362 \\
+Val (filas) & 924\,093 \\
+Decisiones (train) & 814\,793 \\
+\hline
+\label{tab:particionado}
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Historial de optimización (iteraciones)}
+\begin{tabular}{r r r r r r r r}
+\hline
+Iter & NLL & $\lVert\text{grad}\rVert$ & Acc & AccNT & MRR & NLLn & $R^2$ \\
+\hline
+pre & 942\,424.1203 & 7.395e+05 & -- & -- & -- & -- & -- \\
+001 & 514\,839.8027 & 2.153e+05 & 0.762 & 0.680 & 0.861 & 0.400 & 0.454 \\
+002 & 435\,046.4608 & 1.410e+05 & 0.778 & 0.702 & 0.872 & 0.338 & 0.538 \\
+003 & 333\,427.0366 & 6.856e+04 & 0.918 & 0.890 & 0.953 & 0.259 & 0.644 \\
+004 & 284\,922.6559 & 3.608e+04 & 0.916 & 0.887 & 0.951 & 0.223 & 0.695 \\
+005 & 259\,999.6626 & 1.618e+04 & 0.917 & 0.889 & 0.952 & 0.205 & 0.720 \\
+006 & 250\,318.8548 & 8.243e+03 & 0.919 & 0.891 & 0.953 & 0.199 & 0.730 \\
+007 & 247\,499.3992 & 4.732e+03 & 0.919 & 0.892 & 0.953 & 0.198 & 0.733 \\
+008 & 246\,881.7824 & 6.201e+02 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
+009 & 246\,841.4710 & 2.107e+02 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
+010 & 246\,833.2999 & 9.714e+01 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
+011 & 246\,831.8212 & 1.026e+01 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
+012 & 246\,831.8212 & 1.026e+01 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
+\hline
+\label{tab:train_mnl}
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes del modelo MNL}
+\begin{tabular}{lr}
+\hline
+Parámetro & Valor \\
+\hline
+intercept & 6.10933635e-13 \\
+wait\_time & -9.01719464e-01 \\
+viajar\_cost & 8.10947587e-02 \\
+cost\_to\_go & -5.61161490e+00 \\
+first\_walk\_min & -9.16079751e-02 \\
+is\_initial\_transfer & -1.83215950e-01 \\
+zero\_onboard & 2.22291522e+00 \\
+ASC\_metro & 1.85152930e-13 \\
+\hline
+\label{tab:coeff_mnl}
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Resultados finales de entrenamiento y evaluación}
+\begin{tabular}{ll}
+\hline
+Elemento & Valor \\
+\hline
+Train -- NLL & 0.3029 \\
+Train -- Acc & 0.922 \\
+Train -- AccNT & 0.895 \\
+Train -- MRR & 0.954 \\
+Train -- NLLn & 0.196 \\
+Train -- $R^2$ & 0.738 \\
+Val -- NLL & 0.3078 \\
+Val -- Acc & 0.921 \\
+Val -- AccNT & 0.893 \\
+Val -- MRR & 0.954 \\
+Val -- NLLn & 0.198 \\
+Val -- $R^2$ & 0.733 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+Si corremos el entrenamiento en un dataset semanal completo, a diferencial del particionado, obtenemos los siguientes resultados en los coeficientes. 
 
 Notar como afecta mas a la utilidad tener un *cost_to_go* alto que un tiempo de viaje alto. Con esto se puede concluir que los usuarios prefieren alternativas que le acerquen lo mas que puedan al destino, inclusive pagando mas coste de viaje que otro servicio alimentador. 
 
@@ -1208,7 +1303,7 @@ Obtenemos constantes positivas en el coste de viajar. Una colinealidad entre el 
 
 
 
-## Entrenamiento semanal. 
+
 
 ## Experimentos
 
@@ -1313,7 +1408,7 @@ Una vez se bajen en Parque Ohiggins, un efecto importante ocurre en el paradero 
 \small
 \begin{tabular}{@{}l p{0.78\textwidth}@{}}
 \toprule
-Alternativa & Itinerario \\ \midrule
+Alternativa (Porcentaje en comparación al *baseline*) & Itinerario \\ \midrule
 B38 (+ 0\% de probabilidades) &
 Inicia en paradero \texttt{T-11-64-PO-30} \newline
 Subir al servicio \textbf{B38} (Ida) en \texttt{T-11-64-PO-30} \newline
@@ -1465,6 +1560,16 @@ Los datos entregados por red nos muestran datos de velocidad promedio en todo el
 
 ## Modelos 
 
+
+### GNN solo con embeddings 
+
+
+
+#### Resultados
+
+
+
+
 ### GNN con features de alternativas de Dijsktra (GNND)
 
 
@@ -1518,52 +1623,7 @@ En la tabla \ref{tab:gnn_training_1} observamos el entrenamiento del Modelo de G
 
 Observamos claramente que los resultados de GNND son casi idénticos a los de MNL. La presencia de los costes de Dijkstra hace trivial la tarea de clasificar ya obteniendo estos costes. Un experimento interesante es quitar las features de Dijkstra a la red y ahora crear los embeddings de los paraderos y servicios usando los costes dependientes del tiempo. Esto se explora en la siguiente sección.
 
-### GNN solo con embeddings 
 
-Ahora, quitamos los costos de Dijsktra, para que la GNN tenga que inferir usando solo los embeddings. Esto es sencillo de hacer, simplemente no se concatenan los costes. 
-
-#### Resultados
-
-La tabla \ref{tab:gnn_embeddings} muestra los resultados. Notar la fuerte caída en la métrica importante, AccNT. Esto ocurre porque usamos SAGEConv, (#TODO: MOSTRAR PAPER DE SAGECONV). SAGEConv utiliza promedios de embeddings de nodos vecinos sin tomar en cuenta cuanto pesa cada conexión entre ellos. 
-
-\begin{table}[H]
-\centering
-\caption{Entrenamiento y validación por época — métricas NLL, Accuracy, AccNT y MRR.}
-\label{tab:gnn_embeddings}
-\small
-\begin{tabular}{r r r r r r r r r}
-\toprule
-Epoch & Train NLL & Train Acc & Train AccNT & Train MRR & Val NLL & Val Acc & Val AccNT & Val MRR \\
-\midrule
-01 & 0.6235 & 0.705 & 0.270 & 0.802 & 0.6247 & 0.699 & 0.259 & 0.797 \\
-02 & 0.6178 & 0.709 & 0.278 & 0.804 & 0.6196 & 0.705 & 0.275 & 0.803 \\
-03 & 0.6141 & 0.711 & 0.283 & 0.806 & 0.6152 & 0.707 & 0.279 & 0.804 \\
-04 & 0.6111 & 0.713 & 0.288 & 0.808 & 0.6129 & 0.710 & 0.285 & 0.806 \\
-05 & 0.6087 & 0.715 & 0.294 & 0.810 & 0.6095 & 0.712 & 0.290 & 0.808 \\
-06 & 0.6070 & 0.716 & 0.297 & 0.811 & 0.6083 & 0.711 & 0.288 & 0.807 \\
-07 & 0.6055 & 0.717 & 0.298 & 0.811 & 0.6074 & 0.711 & 0.290 & 0.807 \\
-08 & 0.6045 & 0.717 & 0.299 & 0.812 & 0.6060 & 0.714 & 0.295 & 0.809 \\
-09 & 0.6035 & 0.718 & 0.301 & 0.812 & 0.6045 & 0.714 & 0.296 & 0.810 \\
-10 & 0.6024 & 0.718 & 0.302 & 0.813 & 0.6036 & 0.713 & 0.294 & 0.809 \\
-11 & 0.6011 & 0.719 & 0.304 & 0.813 & 0.6033 & 0.714 & 0.295 & 0.809 \\
-12 & 0.6006 & 0.718 & 0.302 & 0.813 & 0.6021 & 0.713 & 0.295 & 0.810 \\
-13 & 0.6001 & 0.719 & 0.304 & 0.813 & 0.6031 & 0.714 & 0.297 & 0.810 \\
-14 & 0.5995 & 0.720 & 0.305 & 0.814 & 0.6014 & 0.715 & 0.299 & 0.811 \\
-15 & 0.5988 & 0.720 & 0.306 & 0.814 & 0.6014 & 0.714 & 0.297 & 0.810 \\
-16 & 0.5984 & 0.721 & 0.307 & 0.814 & 0.5999 & 0.716 & 0.302 & 0.811 \\
-17 & 0.5977 & 0.721 & 0.308 & 0.815 & 0.5996 & 0.715 & 0.299 & 0.810 \\
-18 & 0.5973 & 0.721 & 0.308 & 0.815 & 0.5991 & 0.716 & 0.302 & 0.811 \\
-19 & 0.5973 & 0.721 & 0.307 & 0.815 & 0.5986 & 0.715 & 0.300 & 0.811 \\
-20 & 0.5969 & 0.721 & 0.309 & 0.815 & 0.5982 & 0.715 & 0.299 & 0.811 \\
-\bottomrule
-\end{tabular}
-
-
-\end{table}
-
-- Mejor modelo: época 20 (Val NLL: 0.5982)
-
-- TEST | NLL 0.5952 | Acc 0.720 | AccNT 0.309 | MRR 0.815
 
 
 
