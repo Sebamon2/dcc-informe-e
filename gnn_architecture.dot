@@ -1,0 +1,64 @@
+digraph FirstBoardGNN {
+    rankdir=TB;  // Top to Bottom
+    node [shape=box, style=filled, fontname="Arial", fontsize=9];
+    edge [fontname="Arial", fontsize=8];
+    
+    // Configuración compacta para layout vertical
+    graph [nodesep=0.3, ranksep=0.5, margin=0.1];
+    
+    // LEYENDA (en cluster arriba de todo)
+    subgraph cluster_leyenda {
+        label="LEYENDA";
+        style=filled;
+        color=lightgray;
+        
+        {rank=same; legend_datos; legend_params; legend_optional; legend_output;}
+        legend_datos [label="Datos", fillcolor=lightcyan, width=0.8, height=0.4];
+        legend_params [label="Parámetros\nAprendibles", fillcolor=lightsteelblue, width=1.0, height=0.4];
+        legend_optional [label="Opcional", fillcolor=lightcoral, width=0.8, height=0.4];
+        legend_output [label="Salida", fillcolor=lightsalmon, width=0.8, height=0.4];
+    }
+    
+    // NIVEL 1: ENTRADA (compacta horizontalmente)
+    {rank=same; input_group; aux_params;}
+    input_group [shape=record, label="{Stops\n(N_s, feat)|Services\n(N_srv, feat)|Choice Sets|{SUBIR\nwait+penalty|VIAJAR\nrun_48x3|BAJAR\ncost≈0|CAMINAR\nrun_scalar}}", fillcolor=lightcyan];
+    aux_params [shape=record, label="{GroupByDayBin\nSampler|τ Parameters\n(per relation)|Edge Weights\n(day, bin30)}", fillcolor=gold];
+    
+    // NIVEL 2: EMBEDDINGS
+    {rank=same; emb_group;}
+    emb_group [shape=record, label="{Stop Embeddings\n(learned if needed)|Service Embeddings\n(learned if needed)|Dest Embeddings\n(always learned)}", fillcolor=wheat];
+    
+    // NIVEL 3: GNN CORE
+    {rank=same; gnn_layers;}
+    gnn_layers [label="BipartiteGNN\n4 capas GraphConv\nτ aprendible por relación", fillcolor=lightsteelblue, width=2.5, height=1.0];
+    
+    // NIVEL 4: NORMALIZACIÓN Y CONTEXTO
+    {rank=same; norm_context;}
+    norm_context [shape=record, label="{L2 Normalization|{Origin Stop\nEmbedding|Destination\nEmbedding|Service Candidates\nEmbeddings (B,K,D)}}", fillcolor=lightpink];
+    
+    // NIVEL 5: FEATURES Y CONCATENACIÓN
+    {rank=same; feat_concat;}
+    feat_concat [shape=record, label="{Alternative Features\n[wait, travel, cost_to_go, transfer, time_cycle, day_oh]\n(B,K,F)|use_feat_alts\n(configurable)|{Concat Context\n[origin, dest, services]|Concat Final\n[context, services, feat?]}}", fillcolor=lightcoral];
+    
+    // NIVEL 6: SCORING Y PROCESAMIENTO
+    {rank=same; scoring;}
+    scoring [shape=record, label="{MLP Scorer\n(context+service+feat)→hidden→1|Scores (B,K)|{Masking\n(padding → -inf)|Softmax\n(cross-entropy loss)}}", fillcolor=lightgreen];
+    
+    // NIVEL 7: OUTPUT
+    {rank=same; output;}
+    output [label="Métricas\nNLL, Acc, AccNT, MRR", fillcolor=lightsalmon, width=2.0, height=0.8];
+    
+    // FLUJO PRINCIPAL (vertical)
+    input_group -> emb_group;
+    input_group -> gnn_layers;
+    emb_group -> gnn_layers;
+    aux_params -> gnn_layers [style=dashed, color=orange];
+    
+    gnn_layers -> norm_context;
+    norm_context -> feat_concat;
+    feat_concat -> scoring;
+    scoring -> output;
+    
+    // Conexión auxiliar del sampler
+    aux_params -> input_group [style=dashed, color=blue];
+}

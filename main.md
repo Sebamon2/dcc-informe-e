@@ -195,20 +195,20 @@ Cada objetivo se verificaría de la siguiente manera:
 
 La solución propuesta se basa en la creación de un sistema de simulación del transporte público que combine estructuras de grafos y técnicas de aprendizaje automático. El enfoque contempla los siguientes componentes:
 
-0. En cuanto al tech stack, se usará Python como lenguaje de programación,  bibliotecas como Tensorflow o Pytorch y sus derivados para crear las LSTM y GNN/CNN. NetworkX puede ser utilizado para trabajar con grafos y numpy, scipy y pandas para analizar y cargar los datos.
+0. En cuanto al tech stack, se usará Python como lenguaje de programación,  bibliotecas como Tensorflow o Pytorch y sus derivados para crear redes. NetworkX puede ser utilizado para trabajar con grafos y numpy, scipy y pandas para analizar y cargar los datos.
 
 1. Modelado de la red como grafo:
 La red de transporte será representada como un grafo, donde los nodos corresponden a paradas o estaciones, y las aristas a tramos recorridos. Esta representación permitirá modelar recorridos compartidos (por ejemplo, buses distintos que recorren el mismo tramo), y considerar distintas características de cada servicio como atributos de las aristas: frecuencia, tiempo estimado, comodidad, etc. Los datos para esto se obtendrán de datos de RED y sus recorridos.
 
-También se va a explorar la creación del hipergrafo peatonal si es que es necesario para mejorar las métricas del modelo, ya que no todas las estaciones combinan (por ejemplo, caminar dos cuadras para ir de un lugar a otro).
+
 
 2. MNL
 
 Se implementará un modelo logit multinomial que aprenda a captar factores decididores ajustando una función de probabilidad. Estos factores decididores son factores cuantitativos tales como el tiempo de viaje, el numero de transbordos, el tipo de transporte usado y demases. 
 
 
-3. GNN + RNN:
-Se implementará un modelo de aprendizaje automático para replicar la demanda de uso de transporte público en función de múltiples factores. Este modelo aprenderá a predecir el comportamiento de los usuarios en función de variables como la duración del viaje, el número de transbordos y el tiempo de espera. Se utilizarán técnicas de aprendizaje supervisado para ajustar los parámetros del modelo, utilizando datos históricos de validaciones Bip!, datos de uso de suelo  y patrones de movilidad. Para ello se utilizará un modelo con GNN + RNN (por ejemplo, una LSTM) . Una GNN procesará la estructura espacial del grafo y la demanda histórica con una LSTM.
+3. GNN + MNL 
+Se implementará un modelo de aprendizaje automático para replicar la demanda de uso de transporte público en función de múltiples factores. Este modelo aprenderá a predecir el comportamiento de los usuarios en función de variables como la duración del viaje, el número de transbordos y el tiempo de espera. Se utilizarán técnicas de aprendizaje supervisado para ajustar los parámetros del modelo, utilizando datos históricos de validaciones Bip! y patrones de movilidad. Para ello se utilizará un modelo con GNN + MNL. Una GNN procesará la estructura espacial del grafo y los datos de costes serán procesados por un modelo de decisión discreto.
 
 
 
@@ -221,11 +221,10 @@ Con el modelo calibrado, se podrán introducir cambios en la red (nuevas líneas
 6. Análisis de resultados:
 Finalmente, se realizará un análisis exhaustivo de los resultados obtenidos: se evaluarán métricas como tiempos promedio de viaje, número de transbordos, uso por línea y comparativas entre escenarios. El objetivo es que este análisis brinde insumos para decisiones estratégicas en la planificación del sistema de transporte.
 
-En la figura \ref{fig:diagrama} se presenta un diagrama de la solución propuesta, que ilustra los componentes y flujos de información del sistema.
 
 \clearpage
 
-![Diagrama de solución](solucion.png){#fig:diagrama width=100%}
+
 
 \clearpage
 ## Plan de trabajo
@@ -1556,72 +1555,154 @@ Un factor importante no modelado. La comodidad puede verse afectada dinámicamen
 
 Los datos entregados por red nos muestran datos de velocidad promedio en todo el recorrido. Claramente hay trazos del recorrido mas lentos que otros, probablemente los mas lentos son en áreas céntricas mientras que los rápidos son en áreas suburbanas. Esto puede afectar localmente en viajes cortos, tomando costos de viaje mas pequeños que los reales. Este efecto se puede amortiguar en viajes cortos cuando los servicios que compiten en las alternativas comparten el eje de circulación, pero por ejemplo un servicio que no usa avenidas puede verse perjudicado ante uno que alcanza velocidades mayores. 
 
-# GNN
-
-## Modelos 
+# Red Neuronal de Grafos
 
 
-### GNN solo con embeddings 
+Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura mas rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. 
+
+Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. La idea es que la GNN prediga la primera elección de un viaje en el transporte público, dado un paradero inicial, un destino paradero y un bin/día. Para ello, se explora la solución de una GNN Heterogénea que aproveche las riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
+
+## Arquitectura de la Solución.
+
+Para ello, se implementa una GNN con la siguiente arquitectura mostrada en la figura \ref{fig:arquitectura_gnn}.
+
+### Datos 
+
+Para los datos, se uso el grafo Bipartito ya mencionado anteriormente. Además, se utilizó la misma tabla de decisiones para entrenar al MNL para reutilizar datos. Se añadió la variante a la tabla de decisiones infiriéndola desde el bin, día y paradero en que tomó el servicio el usuario. Esto para homogeneizar los datos con respecto al grafo bipartito. 
+
+Las aristas SUBIR, VIAJAR, BAJAR Y CAMINAR tienen tensores relacionados con los costes de transicionar de estado en el grafo bipartito. 
+
+- SUBIR: "wait_48x3" un tensor [servicio, tipo dia, bin30].
+- VIAJAR: "run_48x3" un tensor [arista, day_type, bin30].
+- BAJAR: "cost" un tensor de ceros (no penalizar bajar del servicio).
+- CAMINAR: "run_scalar" un tensor de rango 0 (un escalar) que denota el tiempo de caminata calculando distancia euclidiana divivido por la velocidad. 
 
 
+### Embeddings Iniciales
 
-#### Resultados
+Los embeddings son atributos vectoriales aprendibles por la red locales a cada nodo. Hay embeddings para : 
 
+- Paraderos
+- Servicios
+- Destinos
 
+Una representación vectorial de un nodo es útil pues permite reducir la dimensionalidad, establecer similitudes y aprender localmente características de los nodos. Notar que la MNL no tiene esta característica espacial. Esto hace a la GNN mas completa. Se podrían hacer embeddings para las aristas, pero esto hace al modelo menos interpretable. 
 
+### Bipartite GNN
 
-### GNN con features de alternativas de Dijsktra (GNND)
+Una GNN Bipartita tiene 4 capas de GraphConv (en un inicio se usó SageConv, pero SageConv daba resultados muy malos pues trabaja con promedios). GraphConv aplica una convolución que permite que cada nodo agregue información de sus vecinos, el *message passing*. 
 
-
-El primer enfoque mas sencillo es entrenar una GNND con embeddings de paraderos y servicios, y concatenando a estos embeddings los costes obtenidos con Dijkstra. Es decir, obtenemos una GNND con datos de la MNL.
-
-
-#### Arquitectura
-
-
-
-#### Resultados
+Se agrega un parámetro $\tau_e$ que es aprendible por relación. Esto para todas las aristas. Este $\tau_e$ modula la intensidad del paso de mensajes, lo que implica aristas mas importantes que otras (en otras palabras, unos costes pueden ponderar mas, básicamente lo que hace la MNL)
 
 
+### Normalización y Contexto
 
-En la tabla \ref{tab:gnn_training_1} observamos el entrenamiento del Modelo de GNN 
+Se aplica una Normalizacíon L2 para que algunos embeddings dominen por magnitud, mejore la convergencia, facilita las comparaciones entre embeddings y previene el overfitting. 
+
+### Features y Concatenación
+
+Las features de Dikstra son añadidas opcionalmente como una capa extra. Estos features se concatenan con todas las características ya aprendidas mediante los embeddings. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES DE DIJSKTRA (FEATURES). 
+
+### MLP (Perceptron Multi Capa) Scorer
+
+Toma el vector concatenado y retorna una probabilidad para cada alternativa del modelo, implementando la lógica de decisión del modelo, muy parecido al MNL. 
+El scorer es dinámico, por lo que respeta las dimensiones del vector concatenado. El MLP tiene las siguientes fases:
+
+- Capa de entrada (nn.Sequential) 
+- Scores de Utilidad: Retorna los scores de cada servicio. 
+- Masking de choice sets : Tamaño variable de choice sets nos pide padding.
+- Softmax: Transforma Scores a probabilidades de la misma manera que el MNL. 
+- CrossEntropyLoss: Penaliza predicciones incorrectas. 
+
+
+Las métricas de evaluación serán las mismas que las del MNL para poder compararlos efectivamente. 
+
+
+\clearpage
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.90\textheight,keepaspectratio]{gnn_architecture.png}
+    \caption{Arquitectura de la GNN}
+    \label{fig:arquitectura_gnn}
+\end{figure}
+
+\clearpage
+
+## Resultados
+
+A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los embeddings los features de dijkstra, y posteriormente cuando se omiten estos features. 
+
+### GNN con Features de Dikstra 
 
 \begin{table}[H]
 \centering
-\caption{Resumen de entrenamiento (GNN) con features de Alternativas de Dijkstra}
-\label{tab:gnn_training_1}
-\resizebox{\textwidth}{!}{%
+\caption{Resumen del modelo}
+\label{tab:model_summary}
+\begin{tabular}{ll}
+\toprule
+Elemento & Valor \\
+\midrule
+Embedding destinos & 10\,687 (dim = 128) \\
+Scorer dinámico & 393 $\rightarrow$ 128 $\rightarrow$ 1 \\
+Parámetros entrenables & $\approx$ 1\,717\,765 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Historial de entrenamiento por época}
+\label{tab:training_epochs}
 \begin{tabular}{r r r r r r r r r}
 \toprule
 Época & Train NLL & Train Acc & Train AccNT & Train MRR & Val NLL & Val Acc & Val AccNT & Val MRR \\
 \midrule
-01 & 0.2559 & 0.912 & 0.782 & 0.948 & 0.1521 & 0.957 & 0.895 & 0.975 \\
-02 & 0.1425 & 0.953 & 0.884 & 0.973 & 0.1256 & 0.961 & 0.904 & 0.977 \\
-03 & 0.1276 & 0.955 & 0.889 & 0.974 & 0.1151 & 0.962 & 0.906 & 0.978 \\
-04 & 0.1204 & 0.956 & 0.891 & 0.974 & 0.1090 & 0.962 & 0.907 & 0.978 \\
-05 & 0.1156 & 0.956 & 0.892 & 0.975 & 0.1051 & 0.963 & 0.909 & 0.979 \\
-06 & 0.1114 & 0.957 & 0.893 & 0.975 & 0.1010 & 0.963 & 0.909 & 0.979 \\
-07 & 0.1076 & 0.958 & 0.895 & 0.975 & 0.0983 & 0.964 & 0.911 & 0.979 \\
-08 & 0.1054 & 0.958 & 0.896 & 0.976 & 0.0958 & 0.963 & 0.910 & 0.979 \\
-09 & 0.1034 & 0.957 & 0.894 & 0.975 & 0.0943 & 0.964 & 0.910 & 0.979 \\
-10 & 0.1011 & 0.958 & 0.895 & 0.976 & 0.0922 & 0.964 & 0.911 & 0.979 \\
-11 & 0.0998 & 0.958 & 0.896 & 0.976 & 0.0919 & 0.964 & 0.911 & 0.979 \\
-12 & 0.0985 & 0.959 & 0.897 & 0.976 & 0.0893 & 0.964 & 0.912 & 0.979 \\
-13 & 0.0978 & 0.959 & 0.898 & 0.976 & 0.0888 & 0.964 & 0.912 & 0.979 \\
-14 & 0.0971 & 0.958 & 0.897 & 0.976 & 0.0882 & 0.964 & 0.911 & 0.979 \\
-15 & 0.0967 & 0.958 & 0.896 & 0.976 & 0.0882 & 0.964 & 0.912 & 0.980 \\
-16 & 0.0958 & 0.959 & 0.898 & 0.976 & 0.0877 & 0.964 & 0.912 & 0.979 \\
-17 & 0.0957 & 0.958 & 0.897 & 0.976 & 0.0883 & 0.964 & 0.912 & 0.979 \\
-18 & 0.0950 & 0.959 & 0.898 & 0.976 & 0.0870 & 0.964 & 0.912 & 0.980 \\
-19 & 0.0948 & 0.959 & 0.898 & 0.977 & 0.0866 & 0.965 & 0.913 & 0.980 \\
-20 & 0.0950 & 0.958 & 0.897 & 0.976 & 0.0869 & 0.964 & 0.911 & 0.979 \\
+01 & 0.1166 & 0.948 & 0.870 & 0.970 & 0.0924 & 0.960 & 0.900 & 0.977 \\
+02 & 0.0839 & 0.956 & 0.890 & 0.975 & 0.0856 & 0.961 & 0.901 & 0.977 \\
+03 & 0.0806 & 0.956 & 0.891 & 0.975 & 0.0852 & 0.961 & 0.902 & 0.978 \\
+04 & 0.0800 & 0.957 & 0.892 & 0.975 & 0.0838 & 0.961 & 0.903 & 0.978 \\
+05 & 0.0799 & 0.957 & 0.891 & 0.975 & 0.0833 & 0.961 & 0.902 & 0.978 \\
+06 & 0.0793 & 0.957 & 0.892 & 0.975 & 0.0842 & 0.961 & 0.902 & 0.978 \\
+07 & 0.0793 & 0.957 & 0.891 & 0.975 & 0.0829 & 0.961 & 0.902 & 0.978 \\
+08 & 0.0790 & 0.957 & 0.892 & 0.975 & 0.0831 & 0.961 & 0.903 & 0.978 \\
+09 & 0.0788 & 0.957 & 0.891 & 0.975 & 0.0830 & 0.961 & 0.903 & 0.978 \\
+10 & 0.0787 & 0.957 & 0.891 & 0.975 & 0.0822 & 0.961 & 0.902 & 0.978 \\
+11 & 0.0786 & 0.957 & 0.891 & 0.975 & 0.0812 & 0.961 & 0.902 & 0.978 \\
+12 & 0.0785 & 0.957 & 0.892 & 0.975 & 0.0822 & 0.962 & 0.903 & 0.978 \\
+13 & 0.0784 & 0.957 & 0.892 & 0.975 & 0.0816 & 0.961 & 0.902 & 0.978 \\
+14 & 0.0786 & 0.957 & 0.892 & 0.975 & 0.0815 & 0.961 & 0.903 & 0.978 \\
+15 & 0.0788 & 0.957 & 0.891 & 0.975 & 0.0826 & 0.961 & 0.903 & 0.978 \\
+16 & 0.0786 & 0.957 & 0.891 & 0.975 & 0.0825 & 0.962 & 0.903 & 0.978 \\
+17 & 0.0784 & 0.957 & 0.892 & 0.975 & 0.0810 & 0.961 & 0.903 & 0.978 \\
+18 & 0.0783 & 0.957 & 0.892 & 0.975 & 0.0811 & 0.962 & 0.903 & 0.978 \\
+19 & 0.0783 & 0.957 & 0.892 & 0.975 & 0.0813 & 0.961 & 0.903 & 0.978 \\
+20 & 0.0780 & 0.957 & 0.892 & 0.976 & 0.0817 & 0.962 & 0.903 & 0.978 \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
+\begin{table}[H]
+\centering
+\caption{Mejor modelo según validación}
+\label{tab:best_model}
+\begin{tabular}{ll}
+\toprule
+Criterio & Valor \\
+\midrule
+Mejor época & 17 \\
+Val NLL (época 17) & 0.0810 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Observamos claramente que los resultados de GNND son casi idénticos a los de MNL. La presencia de los costes de Dijkstra hace trivial la tarea de clasificar ya obteniendo estos costes. Un experimento interesante es quitar las features de Dijkstra a la red y ahora crear los embeddings de los paraderos y servicios usando los costes dependientes del tiempo. Esto se explora en la siguiente sección.
+### GNN sin Features de Dijkstra.
+
+
+
+
+
+
 
 
 
