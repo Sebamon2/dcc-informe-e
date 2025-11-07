@@ -589,20 +589,7 @@ Para la siguiente sección, se es necesario que el lector y el autor tengan un d
 
 
 
-### Zona 777
 
-La ciudad de Santiago esta divivida en zonas tarifarias. Las zonas 777 son el nombre que poseen. Mas abajo se muestra la figura \ref{fig:zonas777} que muestra las zonas 777 de Santiago.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/zonas777.png}
-    \caption{Zonas tarifarias 777 en Santiago}
-    \label{fig:zonas777}
-\end{figure}
-
-
-En el repositorio de GitHub en main_notebook.ipynb se encuentra un mapa interactivo con las zonas 777 de Santiago. Igualmente el mapa de la red tiene dibujadas las zonas.
 
 Esto nos permite definir lo siguiente:
 
@@ -799,11 +786,11 @@ La receta para construir el dataset de entrenamiento es el mas complicado. El *p
 
 Un MNL con destino se refiere a incluir en los parámetros un coste llamado *coste restante* y *costo de viaje* dependiendo del destino final del usuario. Un ejemplo ilustrativo viene a continuación.
 
-Imagine que para ir a un destino $D$ desde un origen $O$ tiene dos opciones. Un servicio $S_1$ que le deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo y un transbordo necesario a otro servicio, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
+Imagine que para ir a un destino $D$ desde un origen $O$ tiene dos opciones. Un servicio $S_1$ que le deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
 
 Si es que el tiempo de viaje de $S_1$ es menor y además deja directamente en su destino, es lógico que tomar este servicio es la decisión idónea u óptima. Ahora, si el costo de viaje de $S_1$ es mucho mas alto, quizás convenga tomar un transbordo. Un ejemplo clásico de esto sería hacer transbordo al metro usando un bus alimentador para llegar al sistema subterráneo. A priori, dependiendo de que tan "apurado" esté el usuario, deberá de elegir una de las dos alternativas. No todos los usuarios piensan igual. Algunos prefieren comodidad y no hacer transbordos, sobre todo si están con algo de tiempo de sobra. Otras personas confían mas en servicios mas rápidos que les obligan a hacer transbordo. Como no todo el mundo piensa igual, el MNL es muy útil para estos casos, ya que entrega una distribución de probabilidad sobre que servicio se va a tomar, sobre todo cuando las utilidades de ambos son parecidas. El objetivo de este modelo es descubrir que prefieren los usuarios, si viajes mas directos con menos transbordos -pero mas largos- , o viajes mas rápidos pero con transbordos. Notar que los transbordos tienen tiempos de viajes mas variables. Poca confianza en los headways de los buses de transbordo pueden inflar el tiempo de viaje real, ya que la variable de tiempo de espera suele tener mas varianza que el tiempo de viaje. Mas transbordos implican mas varianza en el tiempo de viaje total y por lo tanto menos confianza en el trayecto, o sea, menos comodidad. 
 
-Con esta reflexión, es directo darse cuenta que lo que se busca con este modelo es descubrir como se comparan el tiempo de viaje total v/s que tanto me acerca el servicio inicial a mi destino. 
+Con esta reflexión, es directo darse cuenta que lo que se busca con este modelo es descubrir como se comparan el tiempo de viaje total v/s que tanto acerca el servicio inicial al destino. 
 
 ### Métricas de Entrenamiento 
 
@@ -820,15 +807,15 @@ Esta sección aplicará tanto para la MNL como la próxima GNN. Las métricas de
 
 ### Dataset
 
-Para el modelo MNL con destino, se utilizó la tabla de etapas, ya que ya venía disgregada y nos permitía manejar con mayor facilidad los datos. 
+Para el modelo MNL con destino, se utilizó la tabla de etapas, ya que ya venía disgregada y permitía manejar con mayor facilidad los datos. 
 
 Los pasos para generar el dataset fueron los siguientes: 
 
-1. De la tabla de etapas, obtenemos todos los viajes que tienen bajada registrada gracias a ADATRAP.
+1. De la tabla de etapas, se obtienen todos los viajes que tienen bajada registrada gracias a ADATRAP.
 
-2. Por cada fila obtenemos el paradero de origen, el servicio tomado, el bin, el paradero de bajada observado, el tipo de día y el tipo de servicio.  Agregamos el destino final para cada etapa gracias a agrupar las etapas con el mismo ID.
+2. Por cada fila se obtiene el paradero de origen, el servicio tomado, el bin, el paradero de bajada observado, el tipo de día y el tipo de servicio.  Se agrega el destino final para cada etapa gracias a agrupar las etapas con el mismo ID.
 
-En este punto, tenemos un dataset muy parecido al anterior, pero con la información del destino. Lógicamente, la información del destino enriquece la cantidad de atributos observables que introduciremos al MNL. Entre ellos, el costo restante. 
+En este punto, se tiene un dataset muy parecido al anterior, pero con la información del destino. Lógicamente, la información del destino enriquece la cantidad de atributos observables que introduciremos al MNL. Entre ellos, el costo restante. 
 
 **Costo Restante** 
 
@@ -872,7 +859,7 @@ Siguendo con el pipeline...
 
 Ejecutar este código a primeras veces fue un dolor de cabeza. Era extremadamente lento en las primeras iteraciones (miles de años, literalmente). Muchas optimizaciones fueron hechas, que nos permitió aplicar muchas técnicas de caché y de cursos teóricos de la carrera.
 
-- Se agruparon todos los viajes que iban al mismo destino. Con ello, se calculaba solo una vez el algoritmo de dijsktra para muchas decisiones a la vez, y estos resultados se cacheaban. Al ver el código en ejecución, notamos algo interesante. Al comenzar computando el AD para el grupo mas grande, inmediatamente comenzó a construir el grafo inverso para el paradero METRO TOBALABA, y es que gran cantidad de los viajes tenían como destino final este paradero. 
+- Se agruparon todos los viajes que iban al mismo destino. Con ello, se calculaba solo una vez el algoritmo de dijsktra para muchas decisiones a la vez, y estos resultados se cacheaban. Al ver el código en ejecución, se observó algo interesante. Al comenzar computando el AD para el grupo mas grande, inmediatamente comenzó a construir el grafo inverso para el paradero METRO TOBALABA, y es que gran cantidad de los viajes tenían como destino final este paradero. 
 
 - Se *cacheo* el perfil de cada servicio. 
 
@@ -1031,10 +1018,23 @@ Todo esto para comparar con la MNL.
 
 # Resultados y Discusiones
 
+En la siguiente sección se mostrarán resultados e inmediatamente una discusión de ellos. Esta parte está estructurada de la misma manera que la metodología para relacionarlas directamente de manera mas sencilla.
+
 
 ## Parte 1: Exploración de los Datos
 
+En la siguiente sección se mostrarán los resultados de una exploración previa de los datos, fase importante para entender su estructura y trabajar de manera adecuada con ellos.
+
 ### Subidas a un paradero durante el día.
+
+Las subidas a un paradero durante el día se denotan simplemente contando las subidas en un paradero con código paradero igual al deseado en la tabla de viajes. 
+
+La figura \ref{fig:subidas} muestra la cantidad de subidas en el paradero PJ394 (Presidente José Joaquín Pérez esq. Las Lomas). Es directo notar que este paradero recoge a usuarios mas que los deja. Todos los servicios que pasan por este paradero van hacia el centro de Santiago o hacia el lado oriente de la ciudad. Los servicios que se detienen aquí son el 503,504,507,517,518 Y B38. 
+
+Se puede observar un pico a las siete de la mañana y una bajada consistente hasta la noche, sin experimentar otro máximo. 
+
+Notar además como no se registran subidas entre las 23:00 y las 4:30. Una explicación probable es porque esta zona de Cerro Navia no es segura. Es interesante ver la posible incidencia de la seguridad o comodidad en el proceso de elección de un servicio o una parada. 
+
 
 \begin{figure}[H]
     \centering
@@ -1043,8 +1043,7 @@ Todo esto para comparar con la MNL.
     \label{fig:subidas}
 \end{figure}
 
-
-Podemos hacer el mismo análisis para paradas del Metro de Santiago, por ejemplo, analizar la estación de Metro Tobalaba.
+El mismo análisis se puede hacer para estaciones de Metro, en este caso, la figura \ref{fig:subidas_tobalaba} muestra las subidas en Tobalaba, tanto de Línea 1 y Línea 4. Notar que al no saber a priori cual de las dos líneas toma el usuario, ya que el torniquete es global para la estación, la única forma de saber en que línea efectivamente uso es infiriéndola sobre la estación de bajada, lo cual ya es una predicción hecha por ADATRAP.
 
 \begin{figure}[H]
     \centering
@@ -1053,11 +1052,11 @@ Podemos hacer el mismo análisis para paradas del Metro de Santiago, por ejemplo
     \label{fig:subidas_tobalaba}
 \end{figure}
 
-Podemos darnos cuenta claramente de la distribución de la hora peak en el Metro Tobalaba a las 18:00 horas. Algo importante se nos muestra en el grafico anterior. Tenemos que tratar a las paradas de buses igual que a las de Metro, es decir, como un Hub de servicios que pasan por ahí. Alguien puede marcar su pasaje en los torniquetes de la línea 1 y dirigirse automáticamente a la línea 4. 
+Darse cuenta claramente de la distribución de la hora peak en el Metro Tobalaba a las 18:00 horas. Esta estación es caracterizada por una alta afluencia de usuarios en hora peak. Solo con este dato, se puede extrapolar cuanto tiempo tardaría un usuario en tomar el metro al llegar a la estación, si es que quiere ir a Tobalaba L4. Esto se puede hacer viendo la frecuencia y la capacidad máxima de los trenes. Esta información es clave para planear una estación con mas espacio y con mejores andenes.
 
 ### Uso de un servicio.
 
-Una métrica clave a comparar cuando se realicen cambios en la oferta del transporte, es el uso de un servicio. Una hipótesis razonable es que si quito un servicio dado, servicios aledaños van a ver su demanda subir. Ejemplos tangibles de ello es cuando la línea 1 colapsa por eventos fortuitos. Servicios de superficie que circulan por el eje Alameda-Providencia se ven saturados. El siguiente gráfico muestra el uso del servicio T507 00R.
+Una métrica clave a comparar cuando se realicen cambios en la oferta del transporte, es el uso de un servicio. Una hipótesis razonable es que si se quita un servicio dado, servicios aledaños van a ver su demanda subir. Ejemplos tangibles de ello es cuando la línea 1 colapsa por eventos fortuitos. Servicios de superficie que circulan por el eje Alameda-Providencia se ven saturados. El siguiente gráfico muestra el uso del servicio T507 00R.
 
 \begin{figure}[H]
     \centering
@@ -1075,11 +1074,11 @@ Algunos viajes no tenían hora de bajada (eran nulls). Cuando esto pasaba, se as
     \label{fig:uso_l1}
 \end{figure}
 
-La figura \ref{fig:uso_l1} nos muestra algo interesante. El uso de la Línea 1 no es simétrico en el tiempo como el de la 507.
+La figura \ref{fig:uso_l1} muestra algo interesante. El uso de la Línea 1 no es simétrico en el tiempo como el de la 507.
 
 Igualmente, no se tomó en cuenta los casos en los que las personas validan en torniquetes de la línea 1 y combinan inmediatamente. Es necesario mas cuidado en casos del metro.
 
-Una posible métrica interesante, sería obtener el porcentaje de uso de un servicio en un sentido con respecto a la cantidad de vehículos que tiene circulando el servicio en un período de tiempo. Esto permitiría ajustar la oferta de manera dinámica. Para ello habría que estimar la cantidad de personas máxima que cae dentro de un vehículo típico del servicio. Este análisis no se hará en esta fase del informe, pero queda propuesto para el siguiente semestre.
+Una posible métrica interesante, sería obtener el porcentaje de uso de un servicio en un sentido con respecto a la cantidad de vehículos que tiene circulando el servicio en un período de tiempo. Esto permitiría ajustar la oferta de manera dinámica. Para ello habría que estimar la cantidad de personas máxima que cae dentro de un vehículo típico del servicio. Este análisis no se hará en esta memoria, pero queda como propuesto.
 
 
 ### Métricas de Demanda
@@ -1088,7 +1087,7 @@ La idea de predecir la demanda conlleva saber exactamente la demanda de un par p
 
 Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, debemos de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
 
-Haciendo esto, podemos obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado demand_getter.ipynb se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paradero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
+Haciendo esto, se puede obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. En el notebook de jupyter llamado *demand_getter.ipynb* se muestran ejemplos de demandas de varios paraderos. Por ejemplo, al ejecutar la función en el paradero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
 
 
 
@@ -1137,18 +1136,31 @@ Procesando etapa 4...
 Total de viajes en TOBALABA para L1: 0
 \end{lstlisting}
 
-Nuestras sospechas sobre como se guarda el servicio en estaciones de metro fue cierto. Al marcar la Bip! en Tobalaba, se marca automaticamente como L4 , nunca como L1. Este problema hay que resolverlo prontamente.
+Las sospechas sobre como se guarda el servicio en estaciones de metro fue cierto. Al marcar la Bip! en Tobalaba, se marca automaticamente como L4 , nunca como L1.
+
+### Zona 777
+
+La ciudad de Santiago esta divivida en zonas tarifarias. Las zonas 777 son el nombre que poseen. Mas abajo la figura \ref{fig:zonas777} muestra las zonas 777 de Santiago.
 
 
-Esta data por cada una de las tuplas es la información de entranamiento que tendra la GNN para predecir la demanda.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/zonas777.png}
+    \caption{Zonas tarifarias 777 en Santiago}
+    \label{fig:zonas777}
+\end{figure}
 
-## Parte 2:  Grafo de la Red
 
-Crear un grafo que represente a la red es una manera cómoda de ejecutar algoritmos especializados de ruteo y además nos permite visualizar la red. En esta sección se muestra como se creó el grafo agrupado para visualizar la red, y el Grafo Bipartito, grafo utilizado como motor de costos para la MNL y para el entrenamiento de la GNN que mas adelante se mencionarán. 
-
+En el repositorio de GitHub en main_notebook.ipynb se encuentra un mapa interactivo con las zonas 777 de Santiago. Igualmente el mapa de la red tiene dibujadas las zonas.
 
 
-Con ello, se crearon:
+## Parte 2:  Grafos de la Red
+
+
+### Grafo Agrupado
+
+La creación del grafo agrupado dió como resultados un grafo con las siguientes características:
+
 
 - 11890 paraderos de bus
 - 126 estaciones de metro
@@ -1169,23 +1181,27 @@ En el grafo mostrado al final del informe, las aristas y vértices azules son la
 \end{figure}
 
 
-Este algoritmo nos permite visualizar el grafo completo, pero carece de funcionalidad para agregarle información de la oferta. 
+Este mapa permite visualizar el grafo completo, pero carece de funcionalidad para agregarle información de la oferta. 
 
 
-En la figura \ref{fig:grafo_estado} se muestra un ejemplo del grafo no agrupado.
+### Grafo Bipartito
+
+A modo de recordatorio, se mostrará un esquema del grafo bipartito. 
+
+En la figura \ref{fig:grafo_estado} se muestra un ejemplo del grafo de estado en la misma zona que se mostró en la figura \ref{fig:mapa_plotly}.
 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/grafo_estado.png}
-    \caption{Esquema resumen del grafo de Estado}
+    \caption{Esquema resumen del grafo bipartito}
     \label{fig:grafo_estado}
 \end{figure}
 
 
 
 
-Si auditamos el grafo para sanear errores, obtenemos lo siguiente: 
+Si se audita el grafo para sanear errores, se obtiene lo siguiente: 
 
 === Estado del grafo de servicio-aware ===
 
@@ -1227,36 +1243,22 @@ bnodes_without_viajar:
      ('b', 'E-7-53-PO-50', 'I04', 'Ida', 'normal')
      ('b', 'L-33-95-10-SN', 'H14', 'Ret', 'normal')
 
-Obtenemos un grafo muy útil. Por ejemplo, ya con este grafo con pesos podemos correr un algoritmo de Dijkstra para encontrar la ruta mas corta entre dos paraderos. Notar que esta ruta mas corta es teniendo en cuenta que todos los pesos "pesan" lo mismo, es decir, da lo mismo recorrer 15 minutos caminando, que en bus o metro, ni que un minuto de espera vale lo mismo que un minuto a bordo. Esto es lo que tenemos que descubrir viendo los parámetros, en este caso, del MNL. 
+Se obtiene un grafo muy útil. Por ejemplo, ya con este grafo con pesos se puede correr un algoritmo de Dijkstra para encontrar la ruta mas corta entre dos paraderos. Notar que esta ruta mas corta es teniendo en cuenta que todos los pesos "pesan" lo mismo, es decir, da lo mismo recorrer 15 minutos caminando, que en bus o metro, ni que un minuto de espera vale lo mismo que un minuto a bordo. Esto es lo que se tiene que descubrir viendo los parámetros, en este caso, del MNL. 
 
 Este grafo tiene toda la información de la OFERTA de transporte. Junto con las tablas de etapas y viajes tenemos la DEMANDA. 
 
 Recordar que el objetivo es tener un grafo de estado artificial con OFERTA ARTIFICIAL y obtener, en base a tablas de etapas y viajes reales, DEMANDA ARTIFICIAL al tener modelos de elección y de grafos que las generen .
 
-# MNL para primera decisión de servicio.
+\clearpage
 
-Dado un paradero de origen, una hora del día y un día de la semana, un usuario tiene varias alternativas de servicio para elegir. El objetivo del MNL es entregar una distribución de probabilidad de que el usuario elija cada una de las alternativas. Notar que el MNL solo predice la primera elección de servicio. No predice transbordos ni nada por el estilo. Los transbordos serán deterministas con ayuda de un algoritmo de ruteo. Mas adelante se ahondará en esto.
-
-Las razones para elegir esta solución son las siguientes:
-
-- Facilidad para entrenar.
-- Interpretabilidad.
-- Mayor uso en predicciones de Transporte Público.
-
-## Marco Teórico
+## Parte 3: Modelo de Regresión Lineal Simple
 
 
 
 
+### Estructura del Dataset
 
-
-## Modelo de Regresión Lineal simple
-
-
-
-### Resultados
-
-El modelo se entrenó con 8 millones de decisiones de los 7 días de la semana. Al expandirlo en alternativas, obtenemos 47 millones de decisiones. La figura \ref{fig:mnl_basic_summary} muestra el resumen de los datos de entrenamiento del modelo.
+El modelo se entrenó con 8 millones de decisiones de los 7 días de la semana. Al expandirlo en alternativas, se obtienen 47 millones de decisiones. La figura \ref{fig:mnl_basic_summary} muestra el resumen de los datos de entrenamiento del modelo.
 
 \begin{figure}[H]
     \centering
@@ -1265,10 +1267,11 @@ El modelo se entrenó con 8 millones de decisiones de los 7 días de la semana. 
     \label{fig:mnl_basic_summary}
 \end{figure}
 
-Nos damos cuenta que en promedio hay 5 decisiones por abordaje. También, vemos claramente la distribución de bins (notar las horas punta), las frecuencias (notar las frecuencias 0 que denotan servicios inactivos) y velocidades como una gaussiana centrada en 16 km/h con outliers en 0, mostrando a los servicios inactivos.  
+Notar que en promedio hay 5 decisiones por abordaje. También, se ve claramente la distribución de bins (notar las horas punta), las frecuencias (notar las frecuencias 0 que denotan servicios inactivos) y velocidades como una gaussiana centrada en 16 km/h con outliers en 0, mostrando a los servicios inactivos.  
 
+### Resultados del Entrenamiento
 
-Los resultados se muestran a continuación:
+Los resultados del entrenamiento se muestran a continuación:
 
 
 \clearpage
@@ -1320,12 +1323,16 @@ Los resultados se muestran a continuación:
 El modelo, para ser simple, sorprendentemente tiene una accuracy mejor que el azar, teniendo en cuenta que en promedio hay 5 decisiones. Se decide seguir explorando el MNL pero ahora teniendo en cuenta el destino de la persona. Esto debería de subir considerablemente las métricas.
 
 
-## MNL con destino
+## Parte 4: MNL con destino
+
+Recordar ahora que el MNL tiene mas parámetros a ajustar. Estos son:
+
+- Tiempo de espera
+- Tiempo de viaje
+- Coste restante
 
 
-
-
-#### Resultados y coeficientes.
+### Resultados y coeficientes.
 
 
 El entrenamiento dio los siguientes resultados.
@@ -1362,7 +1369,7 @@ El entrenamiento dio los siguientes resultados.
 
 Como se observa en las tablas, todos los coeficientes resultaron nulos y las métricas de log-likelihood y pseudo-$R^2$ no son numéricas (NaN), lo que indica que el modelo no logró aprender una relación significativa entre las variables y la elección observada. Sin embargo, la \textit{top-1 accuracy} se mantiene en torno al 43\%, lo que sugiere que, pese a la falta de ajuste en los coeficientes, el modelo logra predecir la alternativa elegida en una proporción considerable de los casos, posiblemente debido a la estructura de los datos o a la presencia de alternativas dominantes.
 
-Es decir, fallamos. La respuesta a esto está en la figura \ref{fig:hist}.
+Es decir, hay un problema. La respuesta a esto está en la figura \ref{fig:hist}.
 
 \begin{figure}[H]
     \centering
@@ -1392,7 +1399,7 @@ Se decide con aplicar una penalización de 5 minutos al tiempo inicial para evit
 A continuación se presentan los coeficientes del modelo MNL entrenado para distintos días de la semana. Cada columna corresponde a un atributo del modelo y cada fila a un día. El día miércoles no estaba disponible en la página de red.
 
 
-#### Entrenamiento Diario.
+### Entrenamiento Diario.
 
 Primero, para agilizar el entrenamiento, se analizó día por día. El día miércoles no estaba disponible en red. Entrenar semanalmente nos permite identificar cambios en los parámetros dependiendo del día. Ver la tabla \ref{tab:params_dias_mnl} a modo resumen de los parámetros obtenidos.
 
@@ -1422,7 +1429,7 @@ domingo  & $7.59\times 10^{-13}$ & $-0.50$ & $-0.23$ & $-5.11$ & $-0.08$ & $-0.1
 
 
 
-#### Entrenamiento Semanal completo.
+### Entrenamiento Semanal completo.
 
 Para tener una vista general, se opta por hacer un entrenamiento general de la semana completa, tomando un split del 20% de los datos totales. La tabla \ref {tab:particionado} muestra la cantidad de decisiones. Con ello, se obtienen las siguientes métricas (\ref{tab:train_mnl}) y parámetros (\ref{tab:coeff_mnl}). 
 
@@ -1490,42 +1497,36 @@ ASC\_metro & 1.85152930e-13 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[ht]
 \centering
-\caption{Resultados finales de entrenamiento y evaluación}
-\begin{tabular}{ll}
-\hline
-Elemento & Valor \\
-\hline
-Train -- NLL & 0.3029 \\
-Train -- Acc & 0.922 \\
-Train -- AccNT & 0.895 \\
-Train -- MRR & 0.954 \\
-Train -- NLLn & 0.196 \\
-Train -- $R^2$ & 0.738 \\
-Val -- NLL & 0.3078 \\
-Val -- Acc & 0.921 \\
-Val -- AccNT & 0.893 \\
-Val -- MRR & 0.954 \\
-Val -- NLLn & 0.198 \\
-Val -- $R^2$ & 0.733 \\
-\hline
+\caption{Métricas de la mejor época de la MNL con Destino Semanal}
+\label{tab:metrics}
+\begin{tabular}{lrr}
+\toprule
+Métrica & Train & Val \\
+\midrule
+NLL & 0.3029 & 0.3078 \\
+Acc & 0.922 & 0.921 \\
+AccNT & 0.895 & 0.893 \\
+MRR & 0.954 & 0.954 \\
+NLLn & 0.196 & 0.198 \\
+$R^2$ & 0.738 & 0.733 \\
+\bottomrule
 \end{tabular}
 \end{table}
 
 
-Si corremos el entrenamiento en un dataset semanal completo, a diferencial del particionado, obtenemos los siguientes resultados en los coeficientes. 
 
 Notar como afecta mas a la utilidad tener un *cost_to_go* alto que un tiempo de viaje alto. Con esto se puede concluir que los usuarios prefieren alternativas que le acerquen lo mas que puedan al destino, inclusive pagando mas coste de viaje que otro servicio alimentador. 
 
 
-Obtenemos constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si lo miramos desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es mas directo. Entonces, un coste restante menor es mas atractivo. Para tener un costo restante menor, es necesario viajar mas tiempo en el primer servicio. 
+Se obtienen constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si se mira desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es mas directo. Entonces, un coste restante menor es mas atractivo. Para tener un costo restante menor, es necesario viajar mas tiempo en el primer servicio. 
 
 
 
 
 
-## Experimentos
+### Experimentos
 
 Se realizaron experimentos para mostrar redistribución de demanda. Para ello, se usarán los siguientes coeficientes obtenidos de un día viernes. 
 
@@ -1551,7 +1552,7 @@ Estos valores reflejan la importancia relativa de cada atributo en la elección 
 
 ### Experimento 1: Disminución de oferta de un servicio. 
 
-Tenemos un paradero P y Q conectados por un set de servicios {S} para un bin b. En el *baseline* (la oferta real) se obtiene una distribución de probabilidad dada. Si modificamos la oferta de uno de los servicios, por ejemplo, aumentando el doble el tiempo de espera (disminuyendo la cantidad de buses que operan el servicio) obtenemos una comparación entre las distribuciones de probabilidades para antes y después del cambio de oferta. Se muestran dos ejemplos ilustrativos. 
+Se tiene un paradero P y Q conectados por un set de servicios {S} para un bin b. En el *baseline* (la oferta real) se obtiene una distribución de probabilidad dada. Si se modifica la oferta de uno de los servicios, por ejemplo, aumentando el doble el tiempo de espera (disminuyendo la cantidad de buses que operan el servicio) se obtiene una comparación entre las distribuciones de probabilidades para antes y después del cambio de oferta. Se muestran dos ejemplos ilustrativos. 
 
 **Ejemplo 1: Ir desde PJ394 a PA300**
 
@@ -1575,7 +1576,7 @@ Si ejecutamos el predictor, obtenemos una redistribución de probabilidades como
     \label{fig:exp1probs}
 \end{figure}
 
-Notamos como el servicio 503 pierde probabilidad y el 517 la gana. Pero no es una transferencia directa. Los otros servicios igual ganan un poco de atractivo al perderlo el 503. 
+Notar como el servicio 503 pierde probabilidad y el 517 la gana. Pero no es una transferencia directa. Los otros servicios igual ganan un poco de atractivo al perderlo el 503. 
 
 **Ejemplo 2: Ir desde PJ394 a PA433**
 
@@ -1583,7 +1584,7 @@ Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servi
 
 Si ejecutamos el MNL, obtenemos una redistribución de probabilidades como la mostrada en la figura \ref{fig:exp2probs}.
 
-Notamos que no cambia mucho la probabilidad del servicio 507. A pesar de que su tiempo de espera se duplica, sigue siendo la mejor alternativa. 
+Notar que no cambia mucho la probabilidad del servicio 507. A pesar de que su tiempo de espera se duplica, sigue siendo la mejor alternativa. 
 
 \begin{figure}[H]
     \centering
@@ -1600,13 +1601,13 @@ Notamos que no cambia mucho la probabilidad del servicio 507. A pesar de que su 
     \label{fig:exp2probs}
 \end{figure}
 
-Notamos cosas interesantes:
+Se observa que:
 
 - Dos servicios *compiten* cuando tienen costes de viaje y restantes parecidos. Es decir, dos servicios que llevan directamente al destino o tienen trayectos parecidos. Un ejemplo de esto es el 503 y el 517. El coeficiente del costo restante evidencia este comportamiento. Viajes sin transbordos son altamente atractivos para los usuarios. 
 
 - Cuando hay servicios que compiten, se obtiene una redistribución de la demanda mas notoria como fue el caso del 503 vs el 517. En el caso del 507, al no tener ningun servicio que compita directamente, un mayor tiempo de espera no influye en lo atractivo del servicio.
 
-Podemos seguir aumentando el tiempo de espera, hasta un 1500% mas grande que el original (esto haria que el tiempo de espera pase a 100 minutos). Ahí obtenemos una redistribución de probabilidades como la que sigue en la figura \ref{fig:exp2probs15}.
+Se puede seguir aumentando el tiempo de espera, hasta un 1500% mas grande que el original (esto haria que el tiempo de espera pase a 100 minutos). Ahí se obtiene una redistribución de probabilidades como la que sigue en la figura \ref{fig:exp2probs15}.
 
 
 \begin{figure}[H]
@@ -1619,7 +1620,7 @@ Podemos seguir aumentando el tiempo de espera, hasta un 1500% mas grande que el 
 Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será determinístico. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que complicaría mucho el problema). 
 
 
-Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello veamos los caminos de cada servicio obtenidos por Dijsktra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis superficial indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
+Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello , se verán los caminos de cada servicio obtenidos por Dijsktra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis superficial indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
 
 Una vez se bajen en Parque Ohiggins, un efecto importante ocurre en el paradero aledaño a la estación de Metro. El AD predice que se tomará el 506, pero realmente es el servicio mas probable a ser tomado, no necesariamente todos lo tomarán. Esta nueva demanda redistribuída se repartirá en los servicios que pasan por este paradero y que llevan a Beauchef, en este caso, el 506, 506v, 506e y el 507.  
 
@@ -1690,7 +1691,7 @@ Bajar en \texttt{T-20-177-PO-20} \\
 \end{table} 
 
 
-Notamos que si hay 100 personas que quieren ir a Beauchef en un día, las 100 tomarían el 507 en el caso base. En el caso modificado, aumentaríamos la demanda del día en 80 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar.
+Notar que si hay 100 personas que quieren ir a Beauchef en un día, las 100 tomarían el 507 en el caso base. En el caso modificado, aumentaríamos la demanda del día en 80 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar.
 
 Cuantificar los cambios de demanda en cuando hay cambios de oferta se vuelven interesantes cuando probamos situaciones mas realistas. Podemos por ejemplo, cortar la linea 1. Esto es lo que se hará en el siguiente ejemplo.
 
@@ -1715,7 +1716,7 @@ Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las proba
     \label{fig:exp2_l1_costs}
 \end{figure}
 
-Algo mas interesante pasa cuando queremos ir a una estación de L1 que no combine con L5, es decir, ambos servicios no compiten. Por ejemplo, ir de San Pablo a Tobalaba. 
+Algo mas interesante pasa cuando se quiere ir a una estación de L1 que no combine con L5, es decir, ambos servicios no compiten. Por ejemplo, ir de San Pablo a Tobalaba. 
 
 **Viaje en alternativa: L5**
 
@@ -1728,7 +1729,7 @@ Algo mas interesante pasa cuando queremos ir a una estación de L1 que no combin
     - Caminar desde `E-14-170-NS-5` hasta `METRO_TOBALABA`
 - **Fin del camino**
 
-El algoritmo que tenemos, por construcción tomará el camino con el coste mas bajo para ir desde Baquedano hacia Tobalaba si es que el Metro está desactivado. Podemos hacer este análisis corriendo el algoritmo del MNL desde el paradero E-20-53-PO-115 (el mas cercano a Baquedano que tiene servicios que dejan cerca, según el enrutador). Las figuras \ref{fig:exp3costs} y \ref{fig:exp3probs} muestran los costes y probabilidades para cada alternativa. Notar como el servicio 503 es el mas atractivo, ya que es el que tiene el menor coste total. Una suspensión de la L1 entre Baquedano y Tobalaba nos sugiere que todo el volumen de pasajeros que usualmente toma este tramo se redistribuirá en los servicios en superficie con las probabilidades de mas abajo.
+El algoritmo que se tiene, por construcción tomará el camino con el coste mas bajo para ir desde Baquedano hacia Tobalaba si es que el Metro está desactivado. Se puede hacer este análisis corriendo el algoritmo del MNL desde el paradero E-20-53-PO-115 (el mas cercano a Baquedano que tiene servicios que dejan cerca, según el enrutador). Las figuras \ref{fig:exp3costs} y \ref{fig:exp3probs} muestran los costes y probabilidades para cada alternativa. Notar como el servicio 503 es el mas atractivo, ya que es el que tiene el menor coste total. Una suspensión de la L1 entre Baquedano y Tobalaba sugiere que todo el volumen de pasajeros que usualmente toma este tramo se redistribuirá en los servicios en superficie con las probabilidades de mas abajo.
 
 
 
@@ -1750,7 +1751,7 @@ Al ver esta redistribución, la primera medida a tomar sería reforzar con recor
 
 Este análisis solo funciona para las personas que quieran tomar el metro en Baquedano. Un análisis mas profundo debería de considerar a todas las personas que quieran tomar algún tramo de la Línea 1 y se encuentren con un corte de servicio. Por ejemplo, una distribución de usuarios desde Baquedano a Tobalaba por cada estación intermedia tomaría distintos servicios que le dejen en Tobalaba dependiendo del origen y sus estrategias de elección.
 
-## Limitaciones
+### Discusión Final
 
 Este modelo tiene varias limitaciones que no serán resueltas en esta memoria, pero vale la pena discutir.
 
@@ -1766,7 +1767,7 @@ Tal como se mencionó al inicio de la memoria, un usuario puede decidir en base 
 
 *Elección de Paradero Inicial*
 
-Esta limitación viene mas por el lado del los datos. Lógicamente no sabemos donde vive la gente, solo su paradero de inicio del viaje y el del final de éste. Por ello, el viaje ya viene condicionado a que se eligió un paradero determinado desde el comienzo. 
+Esta limitación viene mas por el lado del los datos. Lógicamente no se sabe donde vive la gente, solo su paradero de inicio del viaje y el del final de éste. Por ello, el viaje ya viene condicionado a que se eligió un paradero determinado desde el comienzo. 
 
 *Comodidad*
 
@@ -1776,20 +1777,14 @@ Un factor importante no modelado. La comodidad puede verse afectada dinámicamen
 
 Los datos entregados por red nos muestran datos de velocidad promedio en todo el recorrido. Claramente hay trazos del recorrido mas lentos que otros, probablemente los mas lentos son en áreas céntricas mientras que los rápidos son en áreas suburbanas. Esto puede afectar localmente en viajes cortos, tomando costos de viaje mas pequeños que los reales. Este efecto se puede amortiguar en viajes cortos cuando los servicios que compiten en las alternativas comparten el eje de circulación, pero por ejemplo un servicio que no usa avenidas puede verse perjudicado ante uno que alcanza velocidades mayores. 
 
-# Red Neuronal de Grafos
+## Parte 5:  GNN
 
 
-Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura mas rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. 
-
-Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. La idea es que la GNN prediga la primera elección de un viaje en el transporte público, dado un paradero inicial, un destino paradero y un bin/día. Para ello, se explora la solución de una GNN Heterogénea que aproveche las riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
-
-
-
-## Resultados
+### Resultados
 
 A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los embeddings los features de dijkstra, y posteriormente cuando se omiten estos features. 
 
-### GNN con Features de Dikstra 
+#### GNN con Features de Dikstra 
 
 \begin{table}[H]
 \centering
@@ -1852,7 +1847,9 @@ Val NLL (época 17) & 0.0810 \\
 \end{tabular}
 \end{table}
 
-### GNN sin Features de Dijkstra.
+#### GNN sin Features de Dijkstra.
+
+
 
 
 
