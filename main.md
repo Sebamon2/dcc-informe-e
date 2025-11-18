@@ -14,9 +14,9 @@ citecolor: purple
 
 
 resumen: |
-  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un trabajo difícil ya que cambios en frecuencias o de topología de la red de transporte provocan efectos dominó complicados de predecir. Es por ello, que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y asi tomar decisiones con mejores datos.
+  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un trabajo difícil ya que cambios en frecuencias o de topología de la red de transporte provocan efectos en cadena complicados de predecir. Es por ello, que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y asi tomar decisiones con mejores datos.
 
-  Para ello, se utilizaron los datos de viajes proporcionados por red, enriquecidos por ADATRAP para modelar la elección de ruta pasando por tres arista fundamentales del trabajo, el modelado del mundo, en este caso, un grafo bipartito que simula a la red completa, un motor de utilidades, en este caso, el GNN/MNL y experimentos para comprobar y poner a prueba estos modelos.
+  Para ello, se utilizaron los datos de viajes proporcionados por red, enriquecidos por ADATRAP para modelar la elección de ruta pasando por tres ejes (o componentes) fundamentales del trabajo, el modelado del mundo, en este caso, un grafo bipartito que simula a la red completa, un motor de utilidades, en este caso, el GNN/MNL y experimentos para comprobar y poner a prueba estos modelos.
 
   El modelo MNL resultó ser interpretable y preciso, con un 90% de precisión. El hallazgo principal fue la preferencia de los usuarios a viajes sin transbordo aunque eso signifique mas tiempo de viaje.
 
@@ -1043,33 +1043,33 @@ Se obtendrá un trazado de la nueva Linea 7 pronta a construir. Los datos de est
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{lrr}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrr}
 \toprule
-Nombre de estación & Latitud & Longitud \\
+Nombre de estación & Latitud & Longitud & Intersección  \\
 \midrule
-BRASIL & -33.399883 & -70.746484 \\
-JOSE MIGUEL INFANTE & -33.405696 & -70.745215 \\
-ROLANDO PETERSEN & -33.417343 & -70.747309 \\
-HOSPITAL FELIX BULNES & -33.422838 & -70.740265 \\
-CERRO NAVIA & -33.425626 & -70.719065 \\
-RADAL & -33.428551 & -70.703910 \\
-TROPEZON & -33.431563 & -70.692404 \\
-MATUCANA & -33.433030 & -70.680587 \\
-BALMACEDA & -33.431988 & -70.669194 \\
-CAL Y CANTO (L2,L3) & -33.431988 & -70.658000 \\
-BAQUEDANO (L1,L5) & -33.437389 & -70.639917 \\
-PEDRO DE VALDIVIA (L1) & -33.425000 & -70.625000 \\
-ISIDORA GOYENECHEA & -33.413733 & -70.603370 \\
-PARQUE BICENTENARIO & -33.406303 & -70.598682 \\
-ALONSO DE CORDOVA & -33.401971 & -70.593995 \\
-PARQUE ARAUCO & -33.402253 & -70.575612 \\
-GERONIMO DE ALDERETE & -33.394910 & -70.561597 \\
-LAS CONDES & -33.389963 & -70.547933 \\
-ESTORIL & -33.384047 & -70.533917 \\
+BRASIL & -33.399883 & -70.746484 & Av. Vicuña Mackenna esq Av. Brasil (Renca) \\
+JOSE MIGUEL INFANTE & -33.405696 & -70.745215 & Av. Vicuña Mackenna esq Av. José Miguel Infante (Renca) \\ 
+ROLANDO PETERSEN & -33.417343 & -70.747309 & Rolando Petersen esq Av. Salvador Gutiérrez (Cerro Navia) \\
+HUELÉN & -33.422838 & -70.740265 & Av.Mapocho esq Av.Huelén (Cerro Navia)\\
+CERRO NAVIA & -33.425626 & -70.719065 & Av. Mapocho esq Av.Neptuno (Cerro Navia) \\
+RADAL & -33.428551 & -70.703910 & Av. Mapocho esq Radal (Quinta Normal)\\
+TROPEZON & -33.431563 & -70.692404 & Av. Mapocho esq Walker Martínez (Quinta Normal) \\
+MATUCANA & -33.433030 & -70.680587 & Av. Mapocho esq Av. Matucana (Quinta Normal)\\
+BALMACEDA & -33.431988 & -70.669194 & Av. Mapocho esq Av. Ricardo Cumming (Santiago) \\
+CAL Y CANTO (L2,L3) & -33.431988 & -70.658000 & Av. Balmaceda esq Bandera (Santiago) \\
+BAQUEDANO (L1,L5) & -33.437389 & -70.639917 & Av. Providencia esq Av. Gral Bustamante (Providencia)\\
+PEDRO DE VALDIVIA (L1) & -33.425000 & -70.625000 & Av. Providencia esq Av. Pedro de Valdivia (Providencia) \\
+ISIDORA GOYENECHEA & -33.413733 & -70.603370 & Av. Vitacura esq Isidora Goyenechea (Las Condes) \\
+PARQUE BICENTENARIO & -33.406303 & -70.598682 & Av. Vitacura esq Las Catalpas (Vitacura) \\
+ALONSO DE CORDOVA & -33.401971 & -70.593995 & AV. Alonso de Córdova esq Av. Américo Vespucio (Vitacura) \\
+PARQUE ARAUCO & -33.402253 & -70.575612 & Cerro Colorado esq Rosario Norte (Las Condes) \\
+GERONIMO DE ALDERETE & -33.394910 & -70.561597 & Av. Kennedy esq Av. Gerónimo de Alderete (Vitacura) \\
+LAS CONDES & -33.389963 & -70.547933 & Av. Las Condes esq Av. Padre Hurtado (Las Condes)\\
+ESTORIL & -33.384047 & -70.533917 & Av. Keneddy esq Av. Estoril (Las Condes)\\
 \bottomrule
-\end{tabular}
-
-\caption{Estaciones y coordenadas. El nombre de las estaciones no es el oficial. Están en orden partiendo desde Brasil hasta Estoril. Entre paréntesis aparecen las combinaciones.}
+\end{tabular}}
+\caption{Estaciones y coordenadas. El nombre de las estaciones no es el oficial. Están en orden partiendo desde Brasil hasta Estoril. Entre paréntesis aparecen las combinaciones. "esq" abrevia "esquina"}
 \label{tab:linea7}
 \end{table}
 
@@ -2206,9 +2206,12 @@ Para trabajo futuro, sería interesante desacoplar a los usuarios de los parader
 
 
 \clearpage
+
 \section*{Bibliografía}
 <div id="refs"></div>
 \section*{Anexos}
+
+
 
 
 
