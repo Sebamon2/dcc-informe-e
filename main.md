@@ -14,7 +14,7 @@ citecolor: purple
 
 
 resumen: |
-  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un trabajo difícil ya que cambios en frecuencias o de topología de la red de transporte provocan efectos en cadena complicados de predecir. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y así tomar decisiones con mejores datos.
+  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un trabajo arduo, pues estos cambios provocan efectos en cadena en toda la red. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y así tomar decisiones con mejores datos.
 
   Para ello, se utilizaron los datos de viajes proporcionados por Red Metropolitana de Movilidad, enriquecidos por ADATRAP para modelar la elección de ruta pasando por tres ejes (o componentes) fundamentales del trabajo, el modelado del mundo, en este caso, un grafo bipartito que simula a la red completa, un motor de utilidades, en este caso, el GNN/MNL y experimentos para comprobar y poner a prueba estos modelos.
 
@@ -38,44 +38,41 @@ resumen: |
 
 El sistema de transporte público en Santiago de Chile es un componente esencial para el funcionamiento de la ciudad. Cambios en su oferta, sean planificados o inesperados, pueden generar impactos significativos en la movilidad en los barrios cercanos, tanto a corto como a largo plazo.
 
-La planificación o intervenciones a la red de transporte enfrenta el desafío de predecir efectos colaterales en la red existente. 
+La planificación o intervenciones a la red de transporte enfrentan el desafío de predecir efectos colaterales en la red existente. Crear un modelo de decisión en base a alternativas ofrecidas al usuario para llegar a un destino dado, un origen y hora, para luego con ese mismo modelo, generar una demanda sintética de una red de transporte en base a cambios nuevos (una redistribución de la demanda) es el objetivo de esta memoria. 
 
-Crear un modelo de decisión en base a alternativas (oferta) ofrecidas al usuario para llegar a un destino dado un origen y hora , para luego con ese mismo modelo, generar una demanda sintética de una red de transporte en base a cambios nuevos (una redistribución de la demanda) es el objetivo de esta memoria. 
+Históricamente se han usado soluciones discretas como las MNL (Multinomial Logit) y recientemente modelos como GNN (Redes Neuronales de Grafos) para la predicción de la demanda. Por el lado de la MNL, esta solución se enfoca en una ingeniería de características la cual propone variables de interés en el proceso de decisión de un usuario, tales como el tiempo de espera, la velocidad o que tanto acerca al destino el servicio de transporte público. Por otro lado, es importante notar la correlación espacial de la red, sobre todo si ocurren cambios en ella. Debido a la naturaleza de Red o **set de puntos conectados**, usar Redes Neuronales de Grafos es un área de investigación llamativa, gracias a su versatilidad en la forma de los inputs, a diferencia de los Perceptrón Multi Capa (MLP) o las Redes Neuronales Convolucionales (CNN) las cuales reciben vectores o grillas (como las imágenes). 
 
+Actualmente, algunos de los estudios que abordan esta problemática desde Chile lo hacen desde enfoques estadísticos y/o a nivel macro. Estos suelen analizar el antes y el después de una intervención, sin capacidad real de abstracción. Otros modelos tienen una orientación más predictiva, pero se encuentran desactualizados y no reflejan adecuadamente las dinámicas actuales del transporte urbano. También existen enfoques centrados en el transporte privado, que estudian cómo factores como la infraestructura, las tarifas o las políticas públicas afectan la movilidad general. Sin embargo, estos trabajos no se enfocan en cambios estructurales de la red de transporte público, sino que operan sobre la oferta ya existente. Por otro lado, existe el sistema ADATRAP [@adatrap2025], desarrollado por la Universidad de Chile y el Instituto Sistemas Complejos de Ingeniería. ADATRAP es un software que analiza datos y permite planificar y crear estrategias para la priorización en la asignación de servicios públicos de transporte. El software toma en cuenta la distribución de la oferta para los usuarios del servicio en la Región Metropolitana. ADATRAP será una fuente de datos importante para la predicción de la demanda.
 
-Históricamente se han usado soluciones discretas como las MNL (Multinomial Logit) y recientemente modelos como GNN (Redes Neuronales de Grafos) para la predicción de la demanda. 
+La solución propuesta en este proyecto se basa en el uso de técnicas de aprendizaje automático, modelando el sistema de transporte como un grafo en el que se representen recorridos, paradas y transbordos. Este modelo (sea uno discreto como una MNL o una GNN) tendrá que predecir el proceso de decisión de los usuarios en función de múltiples factores, como la duración del viaje, el número de transbordos y el tiempo de espera. Estos modelos y sus resultados se compararán con datos reales de uso, para afinar el modelo y su precisión.
 
-Por el lado de la MNL, esta solución se enfoca en una ingeniería de características la cual propone variables de interés en el proceso de decisión de un usuario, tales como el tiempo de espera, la velocidad o que tanto acerca al destino el servicio de transporte público. 
+#### Objetivo general
 
-Es importante notar la correlación espacial de la red, sobre todo si ocurren cambios en ella. Debido a la naturaleza de Red o **set de puntos conectados**, usar Redes Neuronales de Grafos es buena idea, gracias a su versatilidad en la forma de los inputs, a diferencia de los MLP o las CNN las cuales reciben vectores o grillas (como las imágenes). 
+Es por ello, que el objetivo de esta memoria se reduce a: *Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual.*
 
-Actualmente, algunos de los estudios que abordan esta problemática desde Chile lo hacen desde enfoques estadísticos y/o a nivel macro. Estos suelen analizar el antes y el después de una intervención, sin capacidad real de abstracción. Otros modelos tienen una orientación más predictiva, pero se encuentran desactualizados y no reflejan adecuadamente las dinámicas actuales del transporte urbano. También existen enfoques centrados en el transporte privado, que estudian cómo factores como la infraestructura, las tarifas o las políticas públicas afectan la movilidad general. Sin embargo, estos trabajos no se enfocan en cambios estructurales de la red de transporte público, sino que operan sobre la oferta ya existente.
+#### Objetivos específicos a cumplir
 
-Por otro lado, existe el sistema ADATRAP [@adatrap2025], desarrollado por la Universidad de Chile y el Instituto Sistemas Complejos de Ingeniería. ADATRAP es un software que analiza datos y permite planificar y crear estrategias para la priorización en la asignación de servicios públicos de transporte. El software toma en cuenta la distribución de la oferta para los usuarios del servicio en la Región Metropolitana. ADATRAP será una fuente de datos importante para la predicción de la demanda.
+1. (OE1) Recopilar datos sobre el uso de transporte público desde Red Metropolitana de Movilidad, de Santiago de Chile, tales como itinerarios, origenes y destinos de los usuarios.
+2. (OE2) Modelar la red de transporte público en un grafo, que permita representar la topología de la red de transporte y las combinaciones de ellas. 
+3. (OE3) Modelar un sistema de decisiones con un Modelo Logit Multinomial (MNL) y obtener parámetros para una función de probabilidad para crear datos de demanda de transporte público sintéticos. 
+4. (OE4) Modelar la demanda de transporte público en su aspecto topológico, a través de una Red Neuronal de Grafos (GNN) que incluya los parámetros encontrados por el MNL en su arquitectura. 
+5. (OE5) Cambiar la topología de la red en tres casos separados entre sí, estos casos son, cambiar la frecuencia de algunos recorridos, suspendiendo la Línea 1 del Metro de Santiago y agregando la Línea 7.
+6. (OE6) Generar demanda sintética usando los modelos de predicción usando como base la nueva infraestructura.
+7. (OE7) Analizar la demanda de transporte público sintética.
 
-La solución propuesta en este proyecto se basa en el uso de técnicas de aprendizaje automático, modelando el sistema de transporte como un grafo en el que se representen recorridos, paradas y transbordos. Este modelo (sea uno discreto, como una MNL o una GNN) tendrá que aprender a predecir el proceso de decisión de los usuarios en función de múltiples factores, como la duración del viaje, el número de transbordos y el tiempo de espera. Estos modelos y sus resultados se compararán con datos reales de uso, para afinar el modelo y su precisión.
-
-Finalmente, se realizarán simulaciones de diferentes escenarios, como la introducción de nuevas líneas o la eliminación de recorridos, para observar cómo estos cambios afectan la demanda y la distribución de usuarios en la red obteniendo datos de la red y su uso modelado usando técnicas de ML y grafos.
-
-Como objetivos específicos, se propone modelar la red completa como un grafo, entrenar a modelos predictores, para terminar con experimentos para poner a prueba a estos modelos.
-
-Es por ello, que el objetivo de esta memoria se reduce a: 
-
-*Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual.*
-
-La estructura de la memoria consiste en el Capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el Capitulo 3 se presenta una metodología basada en exploracion de los datos y su modelado, datos y entrenamiento del MNL/GNN y termina con los experimentos. El Capítulo 4 presenta los resultados y conclusiones de la metodología aplicada con su respectiva discusión. El capítulo 5 presenta la conclusión de la memoria.
+El cuerpo de la memoria comienza con el Capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el Capitulo 3 se presenta una metodología basada en exploracion de los datos y su modelado; datos y entrenamiento del MNL/GNN y termina con los experimentos. El Capítulo 4 presenta los resultados y discusión inmediata de ellos. El capítulo 5 presenta la conclusión de la memoria.
 
 
 
-# Revisión de la Literatura
+# Revisión de la literatura
 
 Una gran motivación para este proyecto es la optimización en el uso de los recursos públicos. Modificar dinámicamente la frecuencia de los buses, crear nuevos recorridos o eliminar aquellos que han quedado obsoletos son decisiones que pueden tener un impacto significativo en la calidad del servicio y en la satisfacción de los usuarios. Sin embargo, estas decisiones deben basarse en datos precisos y actualizados sobre el uso del transporte público, así como en una comprensión profunda de cómo los cambios en la red afectan la demanda.
 
 La siguiente sección se dividirá en dos, la primera, una revisión de literatura para entender el contexto y el estado del arte en el ámbito de la predicción de uso de transporte público, y la segunda, un marco teórico que explora las técnicas de predicción y las herramientas a utilizar en la memoria. 
 
-## Revisión de Literatura y Contexto 
+## Contexto 
 
-Siguiendo el trabajo de Torrepadula más a fondo [@diTorrepadula2024] se abren muchas soluciones y consideraciones: 
+Siguiendo el trabajo de Torrepadula más a fondo [@diTorrepadula2024], un paper review sobre este sujeto de estudio, se abren muchas soluciones y consideraciones: 
 La primera , el sujeto de la predicción. 
 
 ### Sujeto de la predicción : 
@@ -86,13 +83,8 @@ Diversos trabajos se enfocan tanto en:
 3. Cantidad de personas en un vehículo. Algunos trabajos lo predicen , como el de Wang et. al[@li2022deep] con un Support Vector Machine más un filtro de Kalman.
 4. Cantidad de personas en un área. El trabajo de Wang et al [@wang2021passenger] explora predicciones espacio temporales con un modelo llamado GALLAT (GrAphic preddiction with ALL ATtention), que modela la red como un grafo 
 
-Notar que cada enfoque o sujeto requiere un set de datos distintos, por ejemplo, para saber cuanta gente hay en un momento dado en un vehículo, debemos de usar cámaras o sensores, en cambio, para saber un estimado de gente en la ruta, podemos usar los datos de las validaciones de la tarjeta bip! de la ruta.
+Notar que cada enfoque o sujeto requiere un set de datos distintos, por ejemplo, para saber cuanta gente hay en un momento dado en un vehículo, se deben usar cámaras o sensores, en cambio, para saber un estimado de gente en la ruta, se usan los datos de las validaciones de la tarjeta bip! de la ruta.
 
-Por otro lado, todos los enfoques tienen el objetivo de predecir la demanda, pero cada uno de ellos tiene una metodología distinta de cómo hacerlo.
-
-Un dato importante es el de como ADATRAP estima la cantidad de personas en la ruta[@adatrap2025]. ADATRAP tiene un algoritmo estimador de paradas de bajada de los usuarios. En sistemas como RED, el usuario solo valida en su subida al vehículo, por lo que no se sabe donde baja. La predicción se basa en el horario y ubicación de su subida al bus en la ida  y en el horario y ubicación de la vuelta. Se entiende como ida y vuelta como el primer y el último viaje del día.
-
-Una exploración inicial indica que el curso ideal sería contar cuanta gente usa cada ruta, por ello es que la cantidad de personas en la ruta puede ser un buen candidato.
 
 ### Tipo de datos:
 
@@ -138,21 +130,13 @@ Los factores que afectan la demanda son diversos y pueden variar según el conte
 
 8. **Fiestas y feriados**: La demanda de transporte público puede variar significativamente durante días festivos o feriados, lo que puede afectar la planificación de la oferta.
 
-9. **Búsqueda Web** Los turistas, generalmente, se informan de las rutas y horarios de los buses en la web, por lo que el tráfico web puede ser un buen indicador de la demanda.
+9. **Búsqueda Web** Los turistas, generalmente, se informan de las rutas y horarios de los buses en la web, por lo que el tráfico web puede ser un buen indicador de la demanda. También aplicaciones móviles de mapas pueden sugerir rutas de transporte público, lo que puede influir en la demanda. 
 
-### Modo de transporte
-
-En distintos trabajos, se exploró la predicción de distintos métodos de transporte. Entre ellos están el Metro, buses, trenes y tranvías.
-
-
-### Técnicas de preprocesado de datos
-
-Transformar los datos en una estructura de datos es un paso importante. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu Et. Al[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Predicciones hechas por ADATRAP [@adatrap2025] pueden ser utilizadas para llenar esta matriz de origen-destino. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. 
 
 
 ### Actualmente en Chile.
 
-Hoy en día, la red está enfrentando transformaciones importantes. La construcción e implementación de nuevas líneas de metro, como la Línea 7 y la futura Línea 8, tendrá un efecto profundo sobre el uso de ciertos recorridos de buses. Algunos servicios podrían volverse redundantes, mientras que otros —como los recorridos locales tipo [LETRA]-XX— podrían experimentar un aumento significativo en la demanda, al convertirse en alimentadores hacia las nuevas estaciones. Esta situación presenta una oportunidad para replantear frecuencias, redistribuir flotas y mejorar la eficiencia general del sistema.
+Hoy en día, la red está enfrentando transformaciones importantes. La construcción e implementación de nuevas líneas de metro, como la Línea 7 y la futura Línea 8, tendrán un efecto profundo sobre el uso de ciertos recorridos de buses. Algunos servicios podrían volverse redundantes, mientras que otros —como los recorridos locales tipo [LETRA]-XX— podrían experimentar un aumento significativo en la demanda, al convertirse en alimentadores hacia las nuevas estaciones. Esta situación presenta una oportunidad para replantear frecuencias, redistribuir flotas y mejorar la eficiencia general del sistema.
 
 El más destacado es ADATRAP, desarrollado por la Universidad de Chile y el Instituto Sistemas Complejos de Ingeniería. Este software permite analizar datos y planificar estrategias para la priorización en la asignación de servicios públicos de transporte. ADATRAP toma en cuenta la distribución de la oferta para los usuarios del servicio en la Región Metropolitana. 
 
@@ -169,14 +153,15 @@ Asimismo, existen modelos de demanda agregada, como el desarrollado por Méndez 
 
 
 
-## Representación de los Datos y las Técnicas de Predicción
+## Representación de los datos 
 
-En este trabajo se explorarán dos formas de predecir el uso del transporte público, estas son el MNL y las GNN. Pero antes de seguir ahondando en ellas, es importante establecer bases teóricas sobre como se harán estas predicciones.
+
+Transformar los datos en una *estructura de datos* es un paso importante. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu Et. Al[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. Antes de seguir hablando de las posibles soluciones, es importante definir las estructuras de datos más básicas.
 
 
 ### Grafo
 
-Un grafo G(E,V) es un conjunto de aristas(E) y vertices(V). Estos pueden ser dirigidos (los vértices tienen dirección bloqueada) o no (ambas direcciones posibles). Es directo observar que se puede modelar un sistema complejo de caminos usando grafos, si es que además se agregan pesos a las aristas. 
+Un grafo G(E,V) es un conjunto de aristas(E) y vertices(V). Estos pueden ser dirigidos (los vértices tienen dirección única) o no (ambas direcciones posibles). Se pueden asignar pesos a las aristas, que representan el coste de ir de un nodo a otro. 
 
 Considerar una red de transporte de la siguiente manera: 
 
@@ -187,33 +172,32 @@ Considerar una red de transporte de la siguiente manera:
 
 En este sentido, se definen dos tipos de grafos que se utilizarán en la memoria, uno para exploración visual, el Grafo Agrupado, y otro para el uso de algoritmos de *ruteo* y las técnicas de aprendizaje que se mencionarán en un futuro, el Grafo Bipartito. 
 
-#### Grafo Agrupado
+#### Grafo agrupado
 
 El primer grafo, denominado grafo agrupado, es un grafo necesario para la visualización de la información. No es útil para entrenar modelos ni para ejecutar algoritmos de ruteo, pero permite un mayor entendimiento de la estructura de la red. 
 
 Consiste en un grafo el cual los nodos son los paraderos y las aristas son las conexiones consecutivas de un servicio al recorrer los paraderos. Un servicio $S$ tiene un set de paraderos P~k~ con k el índice del paradero en el orden en que los recorre. 
 
-Por ejemplo, se tienen dos servicios , $S_1$ y $S_2$, ambos tienen un set de paraderos distintos P~k~ y Q~i~, con P denotando los paraderos de $S_1$ y Q los de $S_2$. Notar que un paradero V en el grafo (un nodo V) puede ser el paradero P~3~ (el tercer paradero para $S_1$) y el paradero Q~4~ (el cuarto paradero del recorrido $S_2$). Entonces, si es que el primer servicio recorre en un subset de paraderos en el mismo orden que el segundo servicio, la arista que une ambos paraderos tendrá la información de que es recorrida por ambos servicios, en una sola arista. Es directo ver que este grafo no conviene para ejecutar algoritmos de ruteo, pues se pierde la información del peso de la arista, ya que $S_1$ puede demorarse más en recorrer la arista que $S_2$. 
+Por ejemplo, se tienen dos servicios $S_1$ y $S_2$, ambos tienen un set de paraderos distintos P~k~ y Q~i~, con P denotando los paraderos de $S_1$ y Q los de $S_2$. Notar que un paradero V en el grafo (un nodo V) puede ser el paradero P~3~ (el tercer paradero para $S_1$) y el paradero Q~4~ (el cuarto paradero del recorrido $S_2$). Entonces, si es que el primer servicio recorre en un subset de paraderos en el mismo orden que el segundo servicio, la arista que une ambos paraderos tendrá la información de que es recorrida por ambos servicios. Es directo ver que este grafo no conviene para ejecutar algoritmos de ruteo, pues se pierde la información del peso de la arista, ya que $S_1$ puede demorarse más en recorrer la arista que $S_2$. 
 
 Este grafo si conviene para visualizar la red, pues agrupa todos los servicios que recorren los mismos paraderos en el mismo orden en una sola arista. Cada nodo entonces tendrá la información de los servicios que paran en él y las aristas los servicios que conectan los nodos. 
 
 
-#### Grafo Bipartito.
+#### Grafo bipartito.
 
-Un grafo Bipartito en cambio se puede entender como un grafo de estado que captura las transiciones por las que pasa un usuario al tomar un transporte. Se entienden 4 cambios de fases. 
+Un grafo Bipartito en cambio se puede entender como un grafo de estado que captura las transiciones por las que pasa un usuario al tomar un transporte. Se entienden 4 cambios de fases. Se denomina bipartito pues se tienen dos tipos de nodos en el grafo y se puede dividir en dos conjuntos.
 
-- CAMINAR: Se permite caminar entre paraderos para combinar o hacer transbordo si es necesario. 
-- SUBIR: Subir al servicio. 
-- BAJAR: Bajarse del servicio.
-- VIAJAR: Viajar a bordo del servicio.
-
+- *CAMINAR*: Se permite caminar entre paraderos para combinar o hacer transbordo si es necesario. 
+- *SUBIR*: Subir al servicio. 
+- *BAJAR*: Bajarse del servicio.
+- *VIAJAR*: Viajar a bordo del servicio.
 
 Para cada cambio de fase, se asocia un coste, estos son:
 
 - COSTE DE CAMINAR: Calculado como la distancia entre dos paraderos caminando a una velocidad dada promedio.
-- COSTE DE ESPERA (SUBIR) : Calculado como el tiempo de espera esperado para subir al servicio. 
-- COSTE DE BAJAR (BAJAR): Es cero, pues bajar del servicio es un acto puntual.
-- COSTE DE VIAJAR (VIAJAR) : Es el tiempo que tarda en recorrer un servicio entre dos paraderos. 
+- COSTE DE ESPERA  : Calculado como el tiempo de espera esperado para subir al servicio. 
+- COSTE DE BAJAR : Es cero, pues bajar del servicio es un acto puntual.
+- COSTE DE VIAJAR  : Es el tiempo que tarda en recorrer un servicio entre dos paraderos de una etapa de viaje. 
 
 Como los cambios de fase con costes, es directo entender que los cambios de fases definen los tipos de aristas que habrán en el grafo. 
 
@@ -248,30 +232,21 @@ Finalmente, un usuario si quiere ir de un paradero P al paradero Q, tendrá que:
 
 Cada acción requiere pagar un coste. 
 
-### Algoritmos de Ruteo
+### Algoritmos de ruteo
 
-Para saber el camino óptimo de un usuario dado un paradero, se usará el Algoritmo de Dijkstra, debido a su simplicidad, y porque en muchas librerías ya está implementado y muy optimizado. Dado dos nodos, el algoritmo de Dijkstra buscará el camino con menos coste entre ambos nodos. 
+Para saber el camino óptimo de un usuario dado un paradero, se usará el Algoritmo de Dijkstra, debido a su simplicidad, y porque en muchas librerías ya está implementado y muy optimizado. Dado dos nodos, el algoritmo de Dijkstra buscará el camino con menos coste entre ambos nodos.
 
-Gracias a que el grafo indirectamente penaliza los transbordos, el algoritmo de Dijkstra podrá encontrar caminos con sentido lógico, en vez de cambiar de recorrido en cada paradero, cosa que pasaría en el grafo agrupado, en el cual no se penaliza hacer transbordos. 
+No se usará A* pues este algoritmo es útil para cálculos punto a punto, pero Dijkstra será usado para la generación de atributos en un espacio de estados completo, el grafo bipartito.
 
+Gracias a que el grafo indirectamente penaliza los transbordos, el algoritmo de Dijkstra podrá encontrar caminos con sentido lógico, en vez de cambiar de recorrido en cada paradero, hecho que  pasaría en el grafo agrupado, en el cual no se penaliza hacer transbordos. 
 
 
 
 ### MNL
 
-
 El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.  
 
-Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el propio ingeniero. En este sentido, el ingeniero de software propone variables que él considera importantes para la toma de decisiones, pero no le da la importancia él mismo. El modelo será encargado de decir que variable es más importante que otra en el proceso de entrenamiento.
-
-Algunas variables propuestas pueden ser: 
-
-- Tiempo de viaje
-- Tiempo de caminata
-- Número de transbordos (o indirectamente el tiempo de caminata)
-- Tipo de transporte (Bus o Metro)
-
-Notar que todas estas variables son *atributos* de la alternativa.
+Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el propio ingeniero. En este sentido, el ingeniero(a) de software propone variables que él (ella) considera importantes para la toma de decisiones, pero no se ponderan aún. El modelo será encargado de decir que variable pondera más que otra en el proceso de entrenamiento.Notar que todas estas variables son *atributos* de la alternativa.
 
 Una Utilidad $U_n$ se define como la suma de la parte determinística (los atributos) y una parte aleatoria $\epsilon_n$ que captura la incertidumbre del modelo.
 
@@ -315,7 +290,7 @@ En el ámbito de predicción de demanda en transporte público, el modelo MNL se
 
 Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura más rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. 
 
-Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. La idea es que la GNN prediga la primera elección de un viaje en el transporte público, dado un paradero inicial, un destino paradero y un bin/día. Para ello, se explora la solución de una GNN Heterogénea que aproveche la riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
+Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. Se explora la solución de una GNN Heterogénea que aproveche la riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
 
 Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. 
 
@@ -330,22 +305,25 @@ Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos para
 - Menos interpretabilidad debido a lo abstracto que son los vectores de embeddings. 
 - Requiere reentrenar para escenarios ficticios de servicios que no existen (ya que hay que obtener los embeddings)
 
+Para el caso preciso de Santiago de Chile, es importante tener en cuenta el contexto de los datos y de la ciudad.
 
 ### Red Metropolitana de Movilidad 
 
 Red Metropolitana de Movilidad es el sistema de transporte público de Santiago, el cual opera mediante empresas como Metro S.A, el tren urbano Estación Central-Nos y el sistema de Buses anteriormente llamado Transantiago .
 
-Su operación se basa en distintas unidades de negocio (UN) que trabajan en conjunto con un set de servicios acordados mediante licitaciones.
+Su operación se basa en distintas unidades de negocio (UN) que trabajan en conjunto con un set de servicios acordados mediante licitaciones. Los datos necesarios para crear el grafo y enriquecerlo con costes para entrenar están disponibles de manera pública en los planes de operaciones y en las matrices de viaje. 
 
-Los datos necesarios para crear el grafo y enriquecerlo con costes para entrenar están disponibles de manera pública en los planes de operaciones y en las matrices de viaje. 
+Recalcar algunas características que impone el sistema de transporte a la solución. El usuario solo valida su tarjeta en el paradero de subida, esto implica que no se sabe con inequivocidad donde se baja el usuario. Además, el coste de un pasaje depende de la hora, siendo estas franjas tarifarias valle y peak. Otro caso borde incluye a las zonas paga, en las cuales se valida en un tótem fuera del servicio, por lo que se pierde información sobre el servicio a bordo real del usuario una vez se sube al vehículo. En estaciones de metro de combinación un usuario puede validar su tarjeta en el tótem de una de las lineas, pero combinar inmediatamente y subirse a la otra.  
 
 
-### ADATRAP
+### Datos de ADATRAP
 
 
 ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el siguiente enlace: https://www.dtpm.cl/index.php/documentos/matrices-de-viaje. Cada viaje tiene n etapas, hasta 4 como máximo. 
 
-Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la Bip! o sus derivados al término de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Por ejemplo, si un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad, entonces se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
+Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la Bip! o sus derivados al término de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Tomar el siguiente caso: 
+
+Un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad, entonces se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
 
 #### Tabla de viajes y etapas
 
@@ -353,7 +331,7 @@ Las tablas de viajes y etapas serán las demandas históricas.
 
 La tabla de viajes contiene la información de los viajes del usuario, registrando hasta 4 etapas o 3 combinaciones. Combinaciones en metro no cuentan, pues no se valida la tarjeta al cambiar de línea. Cada tabla de viajes o de etapas corresponde a un solo día de análisis. Las tablas de viajes y de etapas vienen generalmente en packs de una semana completa. 
 
-#### Código TS y Código Usuario
+#### Código TS y código usuario
 
 Los servicios y paraderos se encuentran codificados en formato TS, esto es, un código interno usado por DTPM para identificar a los recorridos. La mayoría de los recorridos tiene un código TS que coincide con el de usuario. Por ejemplo, el servicio **T507 OOI** codifica al servicio 507 de ida (servicio en sentido ENEA- AV GRECIA). En algunas ocasiones no coincide, esto ocurre mayoritariamente en servicios locales con prefijo alfabético, casos como el servicio con código de usuario **J01** en código TS es en **T521**. Esta es la razón por la cual algunos recorridos nuevos tienen códigos de usuario que no siguen el numerado del usuario, ya que si lo siguieran, habrían colisiones de nombres.
 
@@ -368,9 +346,7 @@ Estimados con la velocidad promedio de los buses y los itinerarios, cada etapa t
 #### Servicios de las 4 etapas
 En formato TS. Servicio de cada etapa. Máximo 4 (1 por cada etapa).
 
-Hay más columnas, pero para el análisis posterior no son de relevancia.
-
-La tabla de etapas contiene la misma información pero de manera disgregada, es decir, cada fila es una etapa. 
+Hay más columnas, pero para el análisis posterior no son de relevancia. La tabla de etapas contiene la misma información pero de manera disgregada, es decir, cada fila es una etapa. 
 
 #### Consolidado de recorridos
 Para crear el grafo, lógicamente es necesario el trazado de todos los recorridos de RED. Para ello, se RED tiene en su página web el trazado activo hasta ahora. Este archivo contiene en sus columnas:
@@ -385,22 +361,15 @@ Para crear el grafo, lógicamente es necesario el trazado de todos los recorrido
 
 Cada fila contiene una parada de un trazado de un servicio. 
 
-Con esta información, se podría hacer lo siguiente:
-
-1. Crear el grafo de la red (sin aún añadir información de la demanda).
-
-2. Crear un diccionario de TS a Usuario de los paraderos.
-
-
 Algo importante a notar es la fecha de esta tabla de recorridos. Es válida desde el 31/05/2025 hasta a fin de año (al momento de hacer este informe)
 
 #### Zonas 777
 
-Red delimita Santiago en zonas, llamadas Zonas777. Estas están accesibles tanto desde la tabla de etapas (es decir, la subida y bajada denota en que zona ocurrieron), como también en el consolidado en cada paradero. Además, RED entrega archivos SHAPE que pueden analizarse con GEOPANDAS para visualizar las zonas 777.
+Red delimita Santiago en zonas, llamadas Zonas777. Estas están accesibles tanto desde la tabla de etapas (es decir, la subida y bajada denota en que zona ocurrieron), como también en el consolidado en cada paradero. Además, RED entrega archivos SHAPE que pueden analizarse con GEOPANDAS (paquete del lenguaje de programación Python) para visualizar las zonas 777.
 
 Con todo esto presente, se hacen las siguientes afirmaciones:
 
-- La demanda de origen y destino es inamovible. Esto debido a que no se sabe donde vive exactamente cada usuario, ni donde trabaja o estudia. 
+- La demanda de origen y destino es inamovible en esta solución, es decir, cada usuario tiene que comenzar y terminar su viaje en los paraderos reales históricos. Esto debido a que no se sabe donde vive exactamente cada usuario, ni donde trabaja o estudia. 
 
 - La demanda de transición (las bajadas y subidas interetapas) pueden cambiar si es que la oferta cambia, es decir, si es que el usuario decide que es mejor hacer transbordo en un paradero P en la zona777 z1 en vez del paradero Q en la zona777 z2. Esto es perfectamente posible. La idea de la redistribución de la demanda propuesta en esta memoria, es mover el trayecto de una persona con dos puntos fijos, el origen y el destino final. 
 
@@ -409,124 +378,92 @@ Con todo esto presente, se hacen las siguientes afirmaciones:
 
 # Metodología
 
-En la presente sección, primero se darán a conocer los objetivos específicos para completar el objetivo general ya mencionado. Luego, se enunciará la solución escogida y finalmente la metodología para cumplir cada paso de la solución. 
-
-## Objetivos Específicos a cumplir
-
-
-1. Disponer de datos actualizados sobre el uso de transporte publico, como frecuencias e itinerarios y los destinos/origenes de los usuarios, como también, a de ser posible, de flujos de transporte.
-2. Modelar la red de transporte publico en un grafo, que permita representar la topología de la red de transporte y las combinaciones de ellas. 
-3. Modelar un sistema de decisiones con un Modelo Logit Multinomial y obtener parámetros para una función de probabilidad para crear datos de demanda sintéticos. 
-
-3. Modelar la demanda en sus dos aspectos, espacial y temporal. Para ello, se utilizará un GNN para capturar la topología de la red. Se espera que el modelo sea capaz de predecir la demanda en función de los factores anteriormente mencionados.
-4. Cambiar la topología de la red y observar cómo cambia la demanda . Cambiar la topología involucrará cambios de infraestructura (agregar, quitar o modificar rutas existentes) como también cambios en la frecuencia de los buses.
-5. Analizar los datos de la nueva demanda prestando atención al nuevo número de pasajeros transportados por cada línea.
-
-## Solución Propuesta
-
-
-La solución propuesta se basa en la creación de un sistema de simulación del transporte público que combine estructuras de grafos y técnicas de aprendizaje automático. El enfoque contempla los siguientes componentes:
-
-0. En cuanto a la "Pila Tecnológica", se usará Python como lenguaje de programación,  bibliotecas como Tensorflow o Pytorch y sus derivados para crear redes. NetworkX puede ser utilizado para trabajar con grafos y numpy, scipy y pandas para analizar y cargar los datos.
-
-1. Modelado de la red como grafo:
-Se creará un grafo agrupado y un grafo bipartito para la visualización y entrenamiento respectivamente.
-
-2. MNL:
-Se implementará un modelo logit multinomial que aprenda a captar factores determinantes ajustando una función de probabilidad. Estos factores determinantes son factores cuantitativos tales como el tiempo de viaje, el numero de transbordos, el tipo de transporte usado y el tiempo de espera.
-
-
-3. GNN + MNL 
-Se implementará un modelo de aprendizaje automático para replicar la demanda de uso de transporte público en función de múltiples factores. Este modelo aprenderá a predecir el comportamiento de los usuarios en función de variables como la duración del viaje, el número de transbordos y el tiempo de espera. Se utilizarán técnicas de aprendizaje supervisado para ajustar los parámetros del modelo, utilizando datos históricos de validaciones Bip! y patrones de movilidad. Para ello se utilizará un modelo con GNN + MNL. Una GNN procesará la estructura espacial del grafo y los datos de costes serán procesados por un modelo de decisión discreto.
+En la presente sección, primero se dará a conocer la solución propuesta y  finalmente la metodología para cumplir cada paso de la solución. 
 
 
 
-4. Entrenamiento y ajuste del modelo: 
-Utilizando datos históricos (validaciones Bip!, patrones de movilidad, datos censales), se ajustarán los parámetros del modelo de MNL y GNN para que el comportamiento simulado refleje lo más fielmente posible la realidad.
-
-5. Ajustes a la oferta:
-Con el modelo calibrado, se introducirán cambios en la red (nuevas líneas, suspensión de servicios, variaciones de frecuencia) y observar cómo cambia la distribución de la demanda. Esto permitirá anticipar efectos como saturación de recorridos, desplazamiento de flujos o desuso de servicios.
-
-6. Análisis de resultados:
-Finalmente, se realizará un análisis exhaustivo de los resultados obtenidos: se evaluarán métricas como tiempos promedio de viaje, número de transbordos, uso por línea y comparativas entre escenarios. El objetivo es que este análisis brinde insumos para decisiones estratégicas en la planificación del sistema de transporte.
+## Solución propuesta
 
 
-## Evaluación
+La solución propuesta se basa en la creación de un sistema de simulación del transporte público que combine estructuras de grafos y técnicas de aprendizaje automático. Se presenta una lista de los pasos seguidos de manera general para cumplir cada objetivo específico planteado en la introducción. Entre paréntesis se indica el objetivo específico que cumple cada paso.
 
-Cada objetivo se verificaría de la siguiente manera:
+1. En cuanto a la plataforma de desarrollo, se usó Python como lenguaje de programación, bibliotecas como  Pytorch y sus derivados para crear redes neuronales. NetworkX como el paquete para manejar grafos y Polars para manejar los datos.
 
-1. Datos actualizados: Se espera contar con datos de validación de la tarjeta Bip! y registros de uso de suelo de Santiago.
-2. Modelado de la red: Se espera contar con un modelo de la red de transporte público que permita representar recorridos, paradas y transbordos. Para ello, se compara con trabajos previos que han utilizado modelos similares de modelado de las redes.
-3. Modelo de MNL/GNN para predicción: Se espera contar con un modelo de aprendizaje automático que simule el comportamiento de los usuarios en función de múltiples factores. Este modelo se validará comparando sus predicciones con datos reales de uso de transporte público, como los proporcionados por la tarjeta Bip!.
-4. Al modificar la red, se espera que el modelo de MNL/GNN pueda predecir cambios en la demanda y la distribución de usuarios en la red. Esto se validará instanciando diferentes escenarios y comparando los resultados con datos reales de uso. 
-5. Análisis de resultados: Se espera realizar un análisis exhaustivo de los resultados obtenidos a partir de la simulación, identificando patrones y tendencias que puedan informar futuras decisiones en la red de transporte.
+2. (OE1, OE2) Modelado de la red como grafo en base a datos de RED:
+Se creó un grafo agrupado y un grafo bipartito para la visualización y entrenamiento respectivamente.
 
-Antes de seguir, es importante dejar en claro la plataforma técnica del proyecto. 
+3. Para ambos modelos, el objetivo fue predecir el servicio a usar en la primera etapa del viaje, dado el origen, destino, hora y día de la semana. El camino elegido por el modelo será una parte probabilística, el primer servicio, y una parte determinista, el resto del viaje. Entonces, el objetivo del modelo fue predecir el primer abordaje.
+
+4. (OE3) MNL:
+Se implementó un modelo logit multinomial que aprendió a captar factores determinantes ajustando una función de probabilidad. Estos factores determinantes son el tiempo de viaje, el tiempo restante después del primer transbordo (coste restante de ahora en adelante) y  el tiempo de viaje hasta el primer transbordo.
 
 
-## Plataforma de desarrollo técnica
+5. (OE4) GNN + MNL 
+Se implementó una GNN heterogénea que aprendió embeddings tanto de paraderos como de servicios. Se agregó un indicador booleano para activar o desactivar atributos obtenidos por el MNL de la alternativa.
+
+
+
+6. (OE3, OE4) Entrenamiento y ajuste del modelo: 
+Utilizando datos históricos de demanda de transporte público, se ajustaron los parámetros del modelo de MNL y GNN para que el comportamiento simulado refleje lo más fielmente posible la realidad.
+
+7. (OE5) Ajustes a la oferta:
+Se introdujeron modificaciones a la oferta de transporte público. Precisamente, se hicieron cambios a frecuencias de recorridos, suspensiones de la línea 1 y la creación de la línea 7 del metro.
+
+8. (OE6) Generación de datos de demanda sintéticos: 
+Con los modelos se procedió a generar datos sintéticos de demanda bajo cambios de oferta dados.
+
+9. (OE7) Análisis de resultados:
+Finalmente, se realizará un análisis exhaustivo de los resultados obtenidos: se evaluó la transferencia de carga, la redistribución de probabildiades,  el número de viajes en el servicio y los alimentadores al nuevo servicio línea 7.
+
+
+
+## Plataforma técnica de desarrollo
 
 Debido a la mayor disponibilidad de paquetes y herramientas, y la familiaridad del lenguaje, se optó por usar Python como plataforma de desarrollo. A medida que se mencionarán los pasos seguidos, más adelante, se darán a conocer los paquetes y herramientas utilizadas.
 
-### Exploración del repositorio 
+Para efectos de visualización y/o inspección de los datos, podemos clonar el repositorio ubicado en https://github.com/Sebamon2/memoria-repo. La plataforma del proyecto es en Python. Detalles de la instalación de paquetes y librerías están en el README del repositorio. 
 
-Para efectos de visualización y/o inspección de los datos, podemos clonar el repositorio ubicado en https://github.com/Sebamon2/memoria-repo. La plataforma del proyecto es en Python. 
+## Parte 1: Datos
 
-### Instalación
+### Descarga y exploración de datos
 
-Este apartado es solo para quienes estén interesados en interactuar con los grafos y mapas generados. No es estrictamente necesario para entender la memoria, pero puede ser usado como una herramienta de exploración. Más información sobre la instalación se encuentra en el README.md del repositorio mismo el cual está alojado en GitHub. 
+Los materiales del proyecto lógicamente son los datos. Estos fueron descargados desde la página web de RED. 
 
+Una exploración de estos datos es necesaria para entender los datos, las tablas y las filas que poseen. Para ello, a modo de experimentación se obtuvieron los siguientes gráficos e histogramas, con ayuda de Polars para manejar los datos de red en formato csv. 
 
-### Notebooks de exploración
+- Subidas a un paradero durante el día. Esto se obtuvo filtrando todos los viajes de la tabla de etapas que tengan paradero inicial en cualquier etapa el paradero requerido. Esto para todas las horas. 
 
-La carpeta notebooks contiene todos los notebooks de jupyter para la exploración de los datos. 
+- Ocupación de un servicio durante el día. Esto se obtuvo sumando y restando las subidas y bajadas de los usuarios en cada paradero. Por ejemplo, si una entrada de la tabla de etapas es una subida y bajada de la 507 en un paradero dado, la hora de la bajada denota una resta de la cantidad de usuarios que están usando el servicio en cualquier vehículo en circulación. 
 
-
-
-## Parte 1: Exploración de Datos
-
-
-
-
-### Descarga y Exploración de datos
-
-Los materiales del proyecto lógicamente serán los datos. Estos serán descargados desde la página web de RED. 
-
-Una exploración de estos datos es necesaria. Para ello, a modo de experimentación se obtendrán los siguientes gráficos e histogramas, con ayuda de Polars para manejar los datos de red en formato csv. 
-
-- Subidas a un paradero durante el día. Esto se obtendrá filtrando todos los viajes de la tabla de etapas que tengan paradero inicial en cualquier etapa el paradero requerido. Esto para todas las horas. 
-
-- Ocupación de un servicio durante el día. Esto se obtendrá sumando y restando las subidas y bajadas de los usuarios en cada paradero. Por ejemplo, si una entrada de la tabla de etapas es una subida y bajada de la 507 en un paradero dado, la hora de la bajada denota una resta de la cantidad de usuarios que están usando el servicio en cualquier vehículo en circulación. 
-
-- Zonas 777: Se crearán visualizaciones para ilustrar los límites de las zonas777 en Santiago. 
-
-- Métricas de Demanda: Se entregarán todas las subidas de cualquier etapa en cualquier paradero en cualquier bin. Esto se hará usando Polars filtrando adecuadamente el dataset. 
+- Zonas 777: Se crearon visualizaciones para ilustrar los límites de las zonas777 en Santiago. 
+- Métricas de Demanda: Se entregaron todas las subidas de cualquier etapa en cualquier paradero en cualquier bin. Esto se hizo usando Polars filtrando adecuadamente el dataset. 
 
 ## Parte 2: Creación de los Grafos
 
-Para crear los grafos Agrupados y Bipartito, se realizará lo siguiente:
+En esta sección se explicará la creación de los grafos necesarios para la visualización y el entrenamiento de los modelos.
 
 
 ### Grafo Agrupado:
 
+Recordando que el grafo agrupado es un grafo dirigido donde los nodos son los paraderos y las aristas son las conexiones entre paraderos consecutivos en un servicio, se definen los siguientes elementos:
 
 #### Aristas
 
-En este caso, las aristas E son las conexiones entre dos paraderos en un recorrido. Por ejemplo, una arista conecta la estación Los Héroes con Moneda. Una arista, por lo tanto, debe de guardar, al menos, los servicios que la recorren. En este caso, sería la Línea 1 en ambas direcciones, por lo que aquí se tienen dos opciones, o tener dos aristas para ambas direcciones o una arista sin direcciones. 
+En este caso, las aristas E fueron las conexiones entre dos paraderos en un recorrido. Por ejemplo, una arista conecta la estación Los Héroes con Moneda. Una arista, por lo tanto, deben guardar los servicios que la recorren. En este caso, sería la Línea 1 en ambas direcciones, por lo que aquí se tienen dos opciones, o tener dos aristas para ambas direcciones o una arista sin direcciones. 
 
 Otro caso, son las aristas que unen paradas de servicios en superficie. Una arista va a representar la conexión entre dos paraderos consecutivos mediante un servicio.
 
-Si varios servicios paran en las mismas paradas consecutivas, podemos unir todos los recorridos en la misma arista. Es más simple computacionalmente, pero datos como la distancia o tiempo que toma al servicio recorrer la arista (el peso de la arista) no podría ser el mismo. 
+Si varios servicios paran en las mismas paradas consecutivas, se unieron todos los recorridos en la misma arista. Es más simple computacionalmente, pero datos como la distancia o tiempo que toma al servicio recorrer la arista (el peso de la arista) se pierden. 
 
 
 
 #### Vértices
 
-Los vértices V son las paradas. Cada parada tiene un par coordenado (lat, lon) que la posiciona en el grafo. Una parada se identifica con el código TS del paradero. Una parada contiene 1 o más servicios. 
+Los vértices V son las paradas. Cada parada tiene un par coordenado (latitud, longitud) que la posiciona en el grafo. Una parada se identifica con el código TS del paradero. Una parada contiene 1 o más servicios. 
 
 #### Algoritmo para crear el grafo agrupado
 
-Una primera aproximación para crear el grafo, consistirá en agrupar a todas las conexiones de dos paraderos consecutivos en una arista en común. Es decir:
+Una primera aproximación para crear el grafo, consistió en agrupar a todas las conexiones de dos paraderos consecutivos en una arista en común. Es decir:
 
 1. El servicio X tiene una secuencia de paraderos P~k~ , con k el número de paradero en el recorrido. P~0~ es el paradero inicial y P~N~ es el paradero final del recorrido.
 
@@ -538,18 +475,17 @@ Una primera aproximación para crear el grafo, consistirá en agrupar a todas la
 
 5. Esta arista direccionada desde V~l~ a V~m~ tendrá como información que los servicios X e Y pasan por ella. 
 
-Siguiendo estas reglas, se crea el grafo con el siguiente pseudocódigo:
+Siguiendo estas reglas, se creó el grafo con el siguiente pseudocódigo:
 
-1.  Se obtienen todos los servicios únicos en el dataframe polars (Se eligió Polars en vez de pandas gracias a su rapidez para cargar archivos .csv grandes. más información sobre polars en el siguiente enlace: https://pola.rs/).
+1.  Se obtuvieron todos los servicios únicos en el dataframe polars (Se eligió Polars en vez de pandas gracias a su rapidez para cargar archivos .csv grandes. más información sobre polars en el siguiente enlace: https://pola.rs/).
 
-2.  Se crea un diccionario con la información Código Usuario, Variante (PM o Normal), Sentido Servicio (Ida o Regreso).
+2.  Se creó un diccionario con la información Código Usuario, Variante (PM o Normal), Sentido Servicio (Ida o Regreso).
 
-3. Por cada servicio, se filtran del dataframe todos las filas que corresponden al servicio.
+3. Por cada servicio, se filtraron del dataframe todas las filas que corresponden al servicio.
 
-4. Se ordena el dataframe viendo la columna "orden_circ". Esta es la columna que denota el orden de circulación del servicio por los paraderos.
+4. Se ordenó el dataframe viendo la columna "orden_circ". Esta es la columna que denota el orden de circulación del servicio por los paraderos.
 
-5. Por cada fila (paradero) del dataframe, se crea o actualiza un diccionario que corresponde al paradero, con llave código paradero, con los siguientes datos:
-
+5. Por cada fila (paradero) del dataframe, se creó o actualizó un diccionario que corresponde al paradero, con llave código paradero, con los siguientes datos:
 - llave(codigo paradero)
 - lat
 - lon
@@ -558,7 +494,7 @@ Siguiendo estas reglas, se crea el grafo con el siguiente pseudocódigo:
 - nombre completo (código del paradero + nombre del paradero)
 - tipo (BUS o Metro)
 
-6. Por cada fila del dataframe, se revisa el parámetro "siguiente_parada" que contiene la siguiente parada desde la que se está revisando (un puntero básicamente). Se crea una arista E~l~ en un diccionario que une ambas paradas con la siguiente información:
+6. Por cada fila del dataframe, se revisó el parámetro "siguiente_parada" que contiene la siguiente parada desde la que se está revisando (un puntero básicamente). Se creó una arista E~l~ en un diccionario que une ambas paradas con la siguiente información:
 
 - conexion_id (llave formada por el par codigo_paradero_origen, codigo_paradero_siguiente)
 - servicios 
@@ -568,26 +504,25 @@ Siguiendo estas reglas, se crea el grafo con el siguiente pseudocódigo:
 
 Notar que al hacer esto por todos los servicios, se van a agregar a cada arista los servicios que recorren ambos nodos en el mismo orden. 
 
-7. Se realiza el mismo procedimiento para el Metro, pero las aristas son bidireccionales (es decir, por cada conexión, se hace una simétrica pero en sentido inverso).
+7. Se realizó el mismo procedimiento para el Metro, pero las aristas fueron bidireccionales (es decir, por cada conexión, se hizo una simétrica pero en sentido inverso).
 
-8. Con NetworkX se crea un grafo dirigido con DiGraph().
+8. Con NetworkX se creó un grafo dirigido con DiGraph().
 
-9. Se convierten los sets de servicios a listas para que GraphML la pueda procesar.
+9. Se convirtieron los sets de servicios a listas para que GraphML la pueda procesar.
+10. Se creó un nodo por cada paradero.
 
-10. Se crea un nodo por cada paradero.
+11. Se unieron los nodos con las aristas. 
 
-11. Se unen los nodos con las aristas. 
+Con ello, se creó un grafo interactivo con Gephi (software open source) que permite visualizar el grafo. Se utiliza el par lat, lon para generar un grafo configurado de manera visual con GeoLayout. 
 
-Con ello, se puede crear un grafo interactivo con Gephi (software open source) que permite visualizar el grafo. Se utiliza el par lat, lon para generar un grafo configurado de manera visual con GeoLayout. 
-
-De la misma forma, se creará un mapa interactivo con toda la red usando Plotly en python. 
+De la misma forma, se creó un mapa interactivo con toda la red usando Plotly en python. Este mapa se puede ver accediendo al archivo mapa_con_zonas.html en la carpeta output del repositorio.
 
 
 ### Grafo Bipartito
 
 
 Un grafo más sofisticado es necesario para capturar la información de la demanda. 
-Para ello, se creará un Grafo Bipartito. El grafo tendrá distintos tipos de aristas y nodos. Pero antes, es necesario establecer algunas fuentes de datos extra. 
+Para ello, se creó un Grafo Bipartito. El grafo tiene distintos tipos de aristas y nodos. Pero antes, es necesario establecer algunas fuentes de datos extra. 
 
 
 #### Notación y datos base
@@ -614,7 +549,7 @@ De ahora en adelante, se usará la siguiente notación para definir los elemento
 
 
 
-Esto nos permite definir lo siguiente:
+Esto permite definir lo siguiente:
 
 
 
@@ -626,10 +561,12 @@ Para cada tupla servicio, sentido, variante es necesario definir la frecuencia d
 
 $f(S,V,d,b)$
 
-Esta función $f$ retorna la frecuencia de la tupla $(S,V,d)$ en el bin temporal $b$. 
-Red provee de tablas de frecuencias para todos los servicios TS (es decir, los buses). 
+Esta función $f$ retorna la frecuencia de la tupla $(S,V,d)$ en el bin temporal $b$. Esta información la retorna el programa de operaciones de RED.
+RED provee de tablas de frecuencias para todos los servicios TS (es decir, los buses). 
 Esta frecuencia es por hora. Es decir, buses/hora. Si para una tupla $(S,V,d)$ la frecuencia es 6 buses/hora, esto significa que cada 10 minutos pasa un bus (si asumimos equipartición, que es lo que se asumirá desde ahora hasta que se diga lo contrario). 
 El tiempo está dividido en bins de 30 minutos de ahora en adelante, por lo tanto, tendremos 48 bins en un día, desde el 0 hasta el 47.
+
+No se encontraron datos de frecuencias del metro. Se decidió asumir una frecuencia fija de 3 minutos para todo el día durante su funcionamiento entre las 6:30 AM y las 11:00 PM. Esto equivale a una frecuencia de 20 vehículos/hora.
 
 
 ### Velocidades promedio de los servicios. 
@@ -640,11 +577,13 @@ $v_e(S,V,d,D, b)$
 Esta función $g$ retorna la velocidad promedio de la tupla $(S,V,d)$ en el bin temporal $b$.
 Notar que al ser promedio, para una tupla, es la misma por todo el recorrido, es decir, no influye la arista por la que circula el servicio.
 
-Ambas tablas (de frecuencias y velocidades) las provee red en su plan de operaciones. Revisar acá: https://www.dtpm.cl/index.php/programa-de-operacion 
+Para el metro, se decidió una velocidad promedio de 30km/h, debido a que no se encontraban en el programa de operaciones de RED. Esta estimación se basó en diversas fuentes externas.
+
+Ambas tablas (de frecuencias y velocidades) las provee RED en su plan de operaciones. Revisar acá: https://www.dtpm.cl/index.php/programa-de-operacion 
 
 ### Nodos
 
-Los tipos de nodos que tendrá el grafo son:
+Los tipos de nodos que tuvó el grafo son:
 
 
 **Paraderos**
@@ -662,13 +601,18 @@ Cada paradero es un nodo. Cada nodo tiene la siguiente información:
 
 Cada paradero tiene un conjunto de servicios que pasan por él. Por lo tanto, se define un nodo servicio por cada paradero y servicio que pasa por él. Estos nodos nos permiten cerrar la transición entre estar en un paradero y subirse a un servicio. 
 
+Por ejemplo, si un paradero P tiene los servicios 507 y 512 que pasan por él, se crean dos nodos servicio: Servicio 507 en paradero P y Servicio 512 en paradero P. Cada nodo servicio tiene la siguiente información:
+
+- Nodo paradero asociado (Paradero P)
+- Servicio
+- Sentido
+- Variante (PM o Normal)
+- Tipo (BUS o Metro)
 
 
-
-\clearpage
 ### Aristas 
 
-Los tipos de aristas que tendrá el grafo son: 
+Los tipos de aristas que tuvo el grafo son: 
 
 
 **VIAJAR**
@@ -685,7 +629,7 @@ Aristas que corren entre nodos *Servicio*. Representan la conexión dirigida ent
 - Tiempo a bordo (min) por bin y tipo de día (en un diccionario)
 - Tipo (BUS o Metro)
 
-Notamos que las aristas VIAJAR tienen peso, el cual es el tiempo a bordo. Estas aristas son temporalmente dependientes.
+Notar que las aristas VIAJAR tienen peso, el cual es el tiempo a bordo. Estas aristas son temporalmente dependientes.
 
 
 **CAMINAR**
@@ -725,14 +669,14 @@ Aristas que corren entre nodos *Servicio* y *Paradero*. Representan la acción d
 Estas aristas no tienen coste alguno. Bajarse es inmediato. 
 
 
-Todas las distancias son euclideanas en una geometría geodésica (WGS84). Representan una línea recta en una geodésica desde el punto de inicio al final. No tiene en cuenta la topología de la urbe. 
+Todas las distancias son proyectando líneas rectas entre ambos nodos. No tiene en cuenta la topología de la urbe. 
 
 
-### Algoritmo para la creación del Grafo Bipartito
+### Algoritmo para la creación del grafo bipartito
 
-Hacer el grafo de estado es fácil teniendo el grafo agrupado. Un algoritmo recorre cada nodo de tipo paradero y crea :
+Hacer el grafo de estado es directo teniendo el grafo agrupado. Un algoritmo recorre cada nodo de tipo paradero y crea :
 
-1. Aristas de tipo CAMINAR entre los k nodos PARADERO más cercanos. Se definió 10 paraderos a menos de 200 metros. Si un paradero no tiene ningun paradero a menos de 200 metros no tendrá aristas CAMINAR entrantes ni salientes. 
+1. Aristas de tipo CAMINAR entre los k nodos PARADERO más cercanos. Se definió 10 paraderos a menos de 200 metros. Si un paradero no tiene ningún paradero a menos de 200 metros no tendrá aristas CAMINAR entrantes ni salientes. 
 
 2. Nodos de tipo servicio por cada servicio que pase. 
 
@@ -740,60 +684,60 @@ Hacer el grafo de estado es fácil teniendo el grafo agrupado. Un algoritmo reco
 
 4. Aristas de tipo BAJAR desde cada nodo SERVICIO al PARADERO. 
 
-Luego, conecta todas los nodos de tipo servicio con aristas VIAJAR según el recorrido .
+Luego, se conectaron todos los nodos de tipo servicio con aristas VIAJAR según el recorrido .
 
-## Parte 3: Modelo de Regresión Lineal Simple
+## Parte 3: Modelo de regresión lineal simple
 
-Para comenzar, es interesante un modelo simple. Este no tendrá en cuenta hacia donde querrá ir el usuario. Simplemente tomará en cuenta cuanto tarda el bus. 
+Para comenzar, se implementó un modelo de regresión lineal simple. Este no tuvo en cuenta hacia donde querría ir el usuario. Simplemente tomó en cuenta cuanto tarda el bus.
+
+Esto es una enorme simplificación del problema, pero fue un buen punto de partida para manipular los datos eficientemente y entender la creación del dataset de entrenamiento.
 
 
 ### Dataset de entrenamiento
 
 
-La receta para construir el dataset de entrenamiento es el más complicado. El *pipeline* es el siguiente: 
+El proceso de creación del dataset de entrenamiento fue el siguiente: 
 
-1. Por cada fila en la tabla de viajes, obtener el paradero de origen, el servicio tomado y la hora. 
+1. Por cada fila en la tabla de viajes, se obtuvo el paradero de origen, el servicio tomado y la hora. Esta es la tabla de decisiones de los usuarios. 
 
-2. Expandir esta tabla de decisiones con las alternativas posibles disponibles para el usuario en ese paradero y bin. Esta expansión se hizo de la siguiente forma: 
+2. Se expandió esta tabla de decisiones con las alternativas posibles disponibles para el usuario en ese paradero y bin. Esta expansión se hizo de la siguiente forma: 
 
-- Obtener todas las aristas SUBIR que salgan del paradero en cuestión y que tengan tiempos de espera no infinitos. 
+- Se obtuvieron todas las aristas SUBIR que salían del paradero en cuestión y que tuvieran tiempos de espera no infinitos. 
 - Estas aristas proveen los servicios que el usuario puede tomar. 
-- Extraer de cada alternativa la velocidad promedio y el tiempo de espera. Estos son atributos relevantes para el modelo. 
+- Se extrajeron de cada alternativa la velocidad promedio y el tiempo de espera. Estos son atributos relevantes para el modelo. 
 
-3. Crear la variable dependiente *is_chosen*, que es 1 si el servicio es el que tomó el usuario y 0 en caso contrario.
+3. Se creó la variable dependiente *is_chosen*, que es 1 si el servicio es el que tomó el usuario y 0 en caso contrario.
 
-4. Entrenar el modelo. 
+4. Se entrenó el modelo. 
 
-5. Obtener Métricas
-
+5. Se obtuvieron métricas. 
 
 ### Algoritmo de entrenamiento: 
 
+El algoritmo de entrenamiento fue el siguiente:
 
-
-- Se eliminan valores o filas corruptas (se eliminan las decisiones mal formadas).
-- Se construyen las características. Estas son:
+- Se eliminaron valores o filas corruptas (se eliminaron las decisiones mal formadas).
+- Se construyeron las características. Estas son:
     - **Tiempo de espera** ($\text{wait\_time}$): 
       $$
       \text{wait\_time} = 0.5 \times \left(\frac{30}{\text{freq}_h}\right)
       $$
     - **Velocidad** ($\text{speed\_kmh}$): velocidad promedio del servicio en el bin y tipo de día correspondiente (más atractivo).
-- Se limpian infinitos o nulos.
-- Se construyen las matrices $X$ e $y$ con las características y la variable dependiente.
-- Se ajusta un modelo binario con `sklearn.linear_model.LogisticRegression`:
+- Se limpiaron infinitos o nulos.
+- Se construyeron las matrices $X$ e $y$ con las características y la variable dependiente.
+- Se ajustó un modelo binario con `sklearn.linear_model.LogisticRegression`:
   $$
   P(\text{abordar}=1 \mid \text{alternativa}) = \sigma(\beta_0 + \beta_1\,\text{wait\_time} + \beta_2\,\text{speed\_kmh})
   $$
   donde $\sigma(z) = \frac{1}{1 + e^{-z}}$.
-- Se reconstruye la utilidad:
+- Se reconstruyó la utilidad:
   $$
   U = \beta_0 + \beta_1\,\text{wait\_time} + \beta_2\,\text{speed\_kmh}
   $$
-- Se agrupa por $\text{decision\_id}$ y se aplica softmax estable:
+- Se agrupó por $\text{decision\_id}$ y se aplicó softmax estable:
   $$
   P_i = \frac{\exp(U_i - \max U_{\text{set}})}{\sum_j \exp(U_j - \max U_{\text{set}})}
   $$
-  (Esto simula un MNL post hoc).
 - **Top-1 accuracy**: porcentaje de decisiones donde la alternativa con mayor $P_i$ coincide con $\text{is\_abordado}=1$.
 - **Log-likelihood**: suma de $\log(P_i)$ de la alternativa elegida.
 - **Modelo nulo**: probabilidad uniforme $1/K_d \Rightarrow \text{loglik}_{\text{null}} = -\sum_d \log(K_d)$.
@@ -805,48 +749,48 @@ La receta para construir el dataset de entrenamiento es el más complicado. El *
 
 \clearpage
 
-## Parte 4: MNL con Destino 
+## Parte 4: MNL con destino 
 
 Un MNL con destino se refiere a incluir en los parámetros un coste llamado *coste restante* y *costo de viaje* dependiendo del destino final del usuario. Un ejemplo ilustrativo viene a continuación.
 
-Suponer que para ir a un destino $D$ desde un origen $O$ tiene dos opciones. Un servicio $S_1$ que le deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
+Suponer que para ir a un destino $D$ desde un origen $O$ tienen dos opciones. Un servicio $S_1$ que deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
 
 Si es que el tiempo de viaje de $S_1$ es menor y además deja directamente en su destino, es lógico que tomar este servicio es la decisión idónea u óptima. Ahora, si el costo de viaje de $S_1$ es mucho más alto, quizás convenga tomar un transbordo. Un ejemplo clásico de esto sería hacer transbordo al metro usando un bus alimentador para llegar al sistema subterráneo. A priori, dependiendo de la urgencia del usuario, deberá de elegir una de las dos alternativas. No todos los usuarios piensan igual. Algunos prefieren comodidad y no hacer transbordos, sobre todo si están con algo de tiempo de sobra. Otras personas confían más en servicios más rápidos que les obligan a hacer transbordo. Como no todo el mundo piensa igual, el MNL es muy útil para estos casos, ya que entrega una distribución de probabilidad sobre que servicio se va a tomar, sobre todo cuando las utilidades de ambos son parecidas. El objetivo de este modelo es descubrir que prefieren los usuarios, si viajes más directos con menos transbordos -pero más largos- , o viajes más rápidos pero con transbordos. Notar que los transbordos tienen tiempos de viajes más variables. Poca confianza en los headways de los buses de transbordo pueden inflar el tiempo de viaje real, ya que la variable de tiempo de espera suele tener más varianza que el tiempo de viaje. más transbordos implican más varianza en el tiempo de viaje total y por lo tanto menos confianza en el trayecto, o sea, menos comodidad. 
 
 Con esta reflexión, es directo darse cuenta que lo que se busca con este modelo es descubrir como se comparan el tiempo de viaje total v/s que tanto acerca el servicio inicial al destino. 
 
-### Métricas de Entrenamiento 
+### Métricas de entrenamiento 
 
-Esta sección aplicará tanto para la MNL como la próxima GNN. Las métricas de entrenamiento serán:
+Esta sección aplicó tanto para la MNL como la próxima GNN. Las métricas de entrenamiento fueron:
 
-- NLL (Loss): Indica que tan bien calibradas las probabilidades. Penaliza fuertemente la sobreconfianza cuando se falla. *más bajo es mejor*.
+- NLL (Loss): Indica que tan bien calibradas las probabilidades. Penaliza fuertemente la sobreconfianza cuando se falla. *Más bajo es mejor*.
 - NLL Normalizado: Normaliza NLL dependiendo del tamaño del set de alternativas. *0 es perfecto, 1.0 es uniforme*.
-- Acc (Accuracy TOP1): Indica la proporción de predicciones que acertaron en el primer rank de las probabilidades, es decir, si la elegida realmente fue la más alta probabilidad. *más alto es mejor*. 
-- AccNT (Accuracy Non Trivial): Precisión de decisiones no triviales (es decir, con set de alternativas mayor a 1). *más alto es mejor*. Esta métrica es más importante que Acc, debido a la gran proporción de decisiones con solo una posibilidad.
-- MRR (Mean Reciprocal Rank): Valora que la elegida esté alta en el ranking a pesar de que no esté top 1. *más alto es mejor*.
+- Acc (Accuracy TOP1): Indica la proporción de predicciones que acertaron en el primer rank de las probabilidades, es decir, si la elegida realmente fue la más alta probabilidad. *Más alto es mejor*. 
+- AccNT (Accuracy Non Trivial): Precisión de decisiones no triviales (es decir, con set de alternativas mayor a 1). *Más alto es mejor*. Esta métrica es más importante que Acc, debido a la gran proporción de decisiones con solo una posibilidad.
+- MRR (Mean Reciprocal Rank): Valora que la elegida esté alta en el ranking a pesar de que no esté top 1. *Más alto es mejor*.
 - LL (Log Likelihood): Se usa solo en el MNL. Suma de $log(p|elegida)$. *Cuanto más negativo y cercano a cero mejor*. 
 - LL_null: LL del modelo uniforme. Para medir ganancia sobre el azar. 
 - Pseudo‑R² de McFadden: 1 − LL_model/LL_null. Análogo a R²; 0 a <1 (mayor es mejor). En elección discreta, ~0.2–0.4 suele considerarse muy bueno.
 
-### Dataset
+### *Dataset*
 
 Para el modelo MNL con destino, se utilizó la tabla de etapas, ya que ya venía disgregada y permitía manejar con mayor facilidad los datos. 
 
 Los pasos para generar el dataset fueron los siguientes: 
 
-1. De la tabla de etapas, se obtienen todos los viajes que tienen bajada registrada gracias a ADATRAP.
+1. De la tabla de etapas, se obtuvieron todos los viajes que tienen bajada registrada gracias a ADATRAP.
 
-2. Por cada fila se obtiene el paradero de origen, el servicio tomado, el bin, el paradero de bajada observado, el tipo de día y el tipo de servicio.  Se agrega el destino final para cada etapa gracias a agrupar las etapas con el mismo ID.
+2. Por cada fila se obtiene el paradero de origen, el servicio tomado, el bin, el paradero de bajada observado, el tipo de día y el tipo de servicio.  Se agregó el destino final para cada etapa gracias a agrupar las etapas con el mismo ID.
 
 En este punto, se tiene un dataset muy parecido al anterior, pero con la información del destino. Lógicamente, la información del destino enriquece la cantidad de atributos observables que introduciremos al MNL. Entre ellos, el costo restante. 
 
 **Costo Restante** 
 
-El costo restante es la medida en tiempo que nos da al bajarnos en el paradero óptimo y los transbordos que le preceden. Tomar el siguiente ejemplo. Una persona que quiere ir desde PJ394 a PA433 (Beauchef) a las 10 de la mañana un día laboral.
+El costo restante es la medida en tiempo que el usuario le queda por pagar al bajarse en el paradero óptimo y los transbordos que le preceden. Tomar el siguiente ejemplo. Una persona que quiere ir desde PJ394 a PA433 (Beauchef) a las 10 de la mañana un día laboral.
 
 - En el paradero PJ394 se tienen las siguientes alternativas a las diez de la mañana un día LABORAL: 503, 504, 507, 517, 518 , B38.
 
-- Convenientemente también para el 507, así que el costo restante es cero, pues después de bajarse en la parada óptima, ya se llegó al destino. 
+- Convenientemente también para el 507 en el paradero destino, así que el costo restante es cero para esa alternativa, pues después de bajarse en la parada óptima, ya se llegó al destino. 
 
 - Para los otros servicios, el costo restante es mayor que cero, ya que ninguno deja directamente en PA433. Entonces, se debe calcular el costo restante desde el paradero de bajada óptimo. 
 
@@ -858,13 +802,13 @@ Para calcular el paradero óptimo y el costo restante al bajarse en ese paradero
 - Se marca el nodo origen como visitado.
 - Se selecciona el nodo no visitado con el costo más bajo y se repite el proceso hasta que todos los nodos hayan sido visitados o se haya alcanzado el nodo destino.
 
-En este caso, el AD se corre en sentido inverso, es decir, partimos del nodo destino y vamos hacia atrás. De esta forma, se obtiene el costo mínimo para llegar al destino desde cualquier otro nodo.
+En este caso, el AD se corre en sentido inverso, es decir, partimos del nodo destino y vamos hacia atrás. De esta forma, se obtiene el costo mínimo para llegar al destino desde cualquier otro nodo. Es esta razón por la que se usó Dijkstra y no A*, ya que se quiere una tabla completa de costos restantes para todos los paraderos.
 
 Entonces, para un paradero de destino, un bin y un día se obtiene una lista enorme de costos restantes para cada paradero de la red. Notar que es costoso ejecutar este algoritmo en un grafo tan grande, así que hay que ejecutar estrategias para evitar el sobrecoste. 
 
 Por ejemplo, se puede ejecutar el AD para PA433 y el costo restante para ir desde cada paradero hasta PA433 es el costo de viajar. Como se separaron los servicios (es decir, el grafo no es agrupado), cada camino es una combinacion de aristas. Lo bueno de este enfoque, es que penaliza fuertemente los transbordos, haciendo más realistas los caminos. 
 
-Entonces, se obtiene un camino C que tiene de extremos dos nodos PARADERO y una cantidad par de aristas SUBIR + BAJAR y un número arbitrario de aristas VIAJAR visitadas. Esto es, el costo restante tiene el costo de los transbordos, esperas, tiempo a bordo y todo lo incluído. 
+Entonces, se obtiene un camino C que tiene de extremos dos nodos PARADERO y una cantidad par de aristas SUBIR + BAJAR y un número arbitrario de aristas VIAJAR visitadas. Dicho de otra manera, el costo restante tiene el costo de los transbordos, esperas, tiempo a bordo y todo lo incluído. El coste restante representa la parte determinista del viaje después de la primera decisión.
 
 Si se ejecuta el AD para el origen y destino, se obtendrán paraderos de bajada óptimos para cada alternativa. Estos son , el destino para el 507, y paraderos de transbordo para los otros. 
 
@@ -878,7 +822,7 @@ Siguiendo con el pipeline...
 - Por cada alternativa, se calcula el costo de esperar el servicio más el costo de viajar al paradero óptimo (o el de bajada real en el caso del usado) y el costo restante ya obtenido por Dijkstra. 
 - Se agregan todos estos atributos a la fila por cada alternativa. 
 
-Ejecutar este código en un espacio de tiempo acotado fue algo a tener en cuenta. Al comienzo se obtenían tiempos de cómputo de días o semanas. Muchas optimizaciones fueron hechas, que nos permitió aplicar muchas técnicas de caché y de cursos teóricos de la carrera.
+Ejecutar este código en un espacio de tiempo acotado fue algo a tener en cuenta. Al comienzo se obtenían tiempos de cómputo de días o semanas. Muchas optimizaciones fueron hechas, las cuales permitieron aplicar muchas técnicas de caché y de cursos teóricos de la carrera.
 
 - Se agruparon todos los viajes que iban al mismo destino. Con ello, se calculaba solo una vez el algoritmo de Dijkstra para muchas decisiones a la vez, y estos resultados se cacheaban. 
 
@@ -921,15 +865,16 @@ La tabla de decisiones resultante tiene las siguientes columnas:
 \caption{Descripción de las columnas del dataset de decisiones para el modelo MNL con destino.}
 \end{table}
 
+Notar el último atributo, que indica si el usuario tuvo que caminar a otro paradero para tomar un servicio adecuado. Esto es relevante, pues implica un costo extra de caminata. Esto es la causa de muchos problemas que se verán mas adelante.
 
 #### Nota sobre el coste restante
 
-El coste restante tiene un problema. Asume que después de la primera decisión las personas son deterministas y no eligen con distribución de probabilidad. Esto es intencional. Modelar todo el trayecto como una concatenación de decisiones probabilísticas complica el modelo, cosa que para el desarrollo de la memoria puede ser perjudicial, teniendo en cuenta que se desarrollará el GNN después. Una pequeña intuición que no se desarrollará en este trabajo indica que posiblemente el costo restante sería una distribución o variable aleatoria más que un valor fijo escalar. Esto tiene más sentido real. Una persona sabe que hacer transbordo aumenta su varianza en su tiempo de viaje debido a que debe de esperar otro servicio, que induce una incerteza temporal. Aunque en el coste restante está incluído el tiempo de espera, realmente el tiempo de espera *esperado* debería de ser un tiempo que tenga en cuenta todos los tiempos de espera del paradero que le puedan servir al usuario. Lo mismo con los tiempos de viaje del servicio que pueda tomar el usuario. Es inmediato notar como se complica el problema, pues ahora cada decisión subsecuente tiene una distribución. 
+El coste restante tiene un problema. Asume que después de la primera decisión las personas son deterministas y no eligen con distribución de probabilidad. Esto es intencional. Modelar todo el trayecto como una concatenación de decisiones probabilísticas complica el modelo. Una pequeña intuición que no se desarrollará en este trabajo indica que posiblemente el costo restante sería una distribución o variable aleatoria más que un valor fijo escalar. Esto tiene más sentido real. Una persona sabe que hacer transbordo aumenta su varianza en su tiempo de viaje debido a que debe de esperar otro servicio, que induce una incerteza temporal. Aunque en el coste restante está incluído el tiempo de espera, realmente el tiempo de espera *esperado* debería de ser un tiempo que tenga en cuenta todos los tiempos de espera del paradero que le puedan servir al usuario. Lo mismo con los tiempos de viaje del servicio que pueda tomar el usuario. Es inmediato notar como se complica el problema, pues ahora cada decisión subsecuente tiene una distribución. 
 
 
 ### Entrenamiento
 
-#### Algoritmo de Entrenamiento
+#### Algoritmo de entrenamiento
 
 Para el entrenamiento, se considera lo siguiente: 
 
@@ -951,13 +896,13 @@ Para el entrenamiento, se considera lo siguiente:
 
 ## Parte 5: GNN 
 
-### Arquitectura de la Solución.
+### Arquitectura de la solución.
 
-Para ello, se implementa una GNN con la siguiente arquitectura mostrada en la figura \ref{fig:arquitectura_gnn}.
+Para ello, se implementó una GNN con la siguiente arquitectura mostrada en la figura \ref{fig:arquitectura_gnn}.
 
 ### Datos 
 
-Para los datos, se usará el grafo Bipartito ya mencionado anteriormente. Además, se utilizará la misma tabla de decisiones para entrenar al MNL para reutilizar datos. Se añadió la variante a la tabla de decisiones infiriéndola desde el bin, día y paradero en que tomó el servicio el usuario. Esto para homogeneizar los datos con respecto al grafo bipartito. 
+Para los datos, se usará el grafo Bipartito ya mencionado anteriormente. Además, se utilizó la misma tabla de decisiones para entrenar al MNL para reutilizar datos. Se añadió la variante a la tabla de decisiones infiriéndola desde el bin, día y paradero en que tomó el servicio el usuario. Esto para homogeneizar los datos con respecto al grafo bipartito. 
 
 Las aristas SUBIR, VIAJAR, BAJAR Y CAMINAR tienen tensores relacionados con los costes de transicionar de estado en el grafo bipartito. 
 
@@ -967,7 +912,7 @@ Las aristas SUBIR, VIAJAR, BAJAR Y CAMINAR tienen tensores relacionados con los 
 - CAMINAR: "run_scalar" un tensor de rango 0 (un escalar) que denota el tiempo de caminata calculando distancia euclidiana dividido por la velocidad. 
 
 
-### Embeddings Iniciales
+### *Embeddings* iniciales
 
 Los embeddings son atributos vectoriales aprendibles por la red locales a cada nodo. Hay embeddings para : 
 
@@ -977,20 +922,20 @@ Los embeddings son atributos vectoriales aprendibles por la red locales a cada n
 
 Una representación vectorial de un nodo es útil pues permite reducir la dimensionalidad, establecer similitudes y aprender localmente características de los nodos. Notar que la MNL no tiene esta característica espacial. Esto hace a la GNN más completa. Se podrían hacer embeddings para las aristas, pero esto hace al modelo menos interpretable. 
 
-### Bipartite GNN
+### GNN Bipartito
 
 Una GNN Bipartito tiene 4 capas de GraphConv (en un inicio se usó SageConv, pero SageConv daba resultados poco convincentes debido a que diluía los pesos de las aristas). GraphConv aplica una convolución que permite que cada nodo agregue información de sus vecinos, el *message passing*. 
 
 Se agrega un parámetro $\tau_e$ que es aprendible por relación. Esto para todas las aristas. Este $\tau_e$ modula la intensidad del paso de mensajes, lo que implica aristas más importantes que otras (en otras palabras, unos costes pueden ponderar más, básicamente lo que hace la MNL)
 
 
-### Normalización y Contexto
+### Normalización y contexto
 
 Se aplica una Normalizacíon L2 para que algunos embeddings dominen por magnitud, mejore la convergencia, facilita las comparaciones entre embeddings y previene el overfitting. 
 
-### Features y Concatenación
+### Features y concatenación
 
-Las features de Dijkstra son añadidas opcionalmente como una capa extra. Estos features se concatenan con todas las características ya aprendidas mediante los embeddings. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES DE Dijkstra (FEATURES). 
+Las features de Dijkstra (o las características de las alternativas) son añadidas opcionalmente como una capa extra. Estos features se concatenan con todas las características ya aprendidas mediante los embeddings. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES DE Dijkstra (FEATURES). 
 
 ### MLP (Perceptron Multi Capa) Scorer
 
@@ -1004,7 +949,7 @@ El scorer es dinámico, por lo que respeta las dimensiones del vector concatenad
 - CrossEntropyLoss: Penaliza predicciones incorrectas. 
 
 
-Las métricas de evaluación serán las mismas que las del MNL para poder compararlos efectivamente. 
+Las métricas de evaluación serán las mismas que las del MNL para poder compararlos efectivamente. La figura \ref{fig:arquitectura_gnn} muestra la arquitectura de la GNN.
 
 
 \clearpage
@@ -1025,21 +970,19 @@ Las métricas de evaluación serán las mismas que las del MNL para poder compar
 ## Parte 6:  Experimentos
 
 
-Para poner a prueba el modelo, un ejercicio interesante será exponerlo a cambios en la oferta . 
+Para poner a prueba el modelo, un ejercicio interesante fue exponerlo a cambios en la oferta. Para ello, se exponen tres casos.
 
-Para ello, se ponen dos casos locales y uno global. 
+### Caso 1: Disminución de la oferta de un servicio
 
-### Caso 1: Disminución de la Oferta de un Servicio
+Se disminuyó la oferta de un servicio modificando los tiempos de espera en el grafo. Con ello, ocurrirá una redistribución de la probabilidad en las alternativas que fue analizada comparando las probabilidades *baseline* (basales) y las *contrafactuales* (el nuevo grafo). En específico, se analizaron dos casos, uno en el que dos servicios compiten (tienen probabilidades comparables) y uno de ellos verá su tiempo de espera modificado, mientras que el otro caso se enfrenta un servicio dominante (probabilidad muy alta) versus el resto, analizando la redistribución de la demanda en los transbordos. Esto se hará de manera local en un paradero y no en todo el grafo.
 
-Se disminuirá la oferta de un servicio modificando los tiempos de espera en el grafo. Con ello, ocurrirá una redistribución de la probabilidad en las alternativas que será analizada comparando las probabilidades *baseline* (basales) y las *contrafactuales* (el nuevo grafo). En específico, se ilustrarán dos casos, uno en el que dos servicios compiten (tienen probabilidades comparables) y uno de ellos verá su tiempo de espera modificado, mientras que el otro caso se enfrenta un servicio dominante (probabilidad muy alta), versus el resto, analizando la redistribución de la demanda en los transbordos. Esto se hará de manera local en un paradero y no en todo el grafo.
+### Caso 2: Suspensión de un servicio.
 
-### Caso 2: Suspensión de un Servicio.
+Se suspendió la L1, colocando un indicador booleano en sus aristas para que Dijkstra no permita subir al servicio, y se ejecutó el modelo de predicción. Se realizó la misma comparación mencionada en el caso anterior.Esto se hizo de manera local, es decir, no se ejecutó el algoritmo de predicción sobre todo el día, ya que tardará demasiado.
 
-Se suspenderá la L1, colocando un indicador booleano en sus aristas para que Dijkstra no permita subir al servicio, y se ejecutará el modelo de predicción . Se realizará la misma comparación mencionada en el caso anterior, y como esta redistribución sobrecargará otros servicios aledaños. Específicamente, en Providencia.  Esto se hará de manera local, es decir, no se ejecutará el algoritmo de predicción sobre todo el día, ya que tardará demasiado.
+### Caso 3: Agregar línea 7
 
-### Caso 3: Agregar Línea 7
-
-Se obtendrá un trazado de la nueva Línea 7 pronta a construir. Los datos de esta nueva línea 7 siguen en la tabla \ref{tab:linea7}. El trazado se obtuvo desde [Metro](https://www.metro.cl/nuevos-proyectos/línea-7) y las coordenadas se aproximaron viendo google maps.
+Los datos de esta nueva línea 7 siguen en la tabla \ref{tab:linea7}. El trazado se obtuvo desde [Metro](https://www.metro.cl/nuevos-proyectos/línea-7) y las coordenadas se aproximaron viendo google maps.
 
 \begin{figure}[H]
     \centering
@@ -1080,15 +1023,15 @@ ESTORIL & -33.384047 & -70.533917 & Av. Keneddy esq Av. Estoril (Las Condes)\\
 \label{tab:linea7}
 \end{table}
 
-Se agregaron las estaciones al grafo con sus correspondientes Nodos SERVICIO, PARADERO y las aristas que le conectan al resto del grafo. El horario de funcionamiento será el mismo que el del resto de la red de Metro. La velocidad de 40km/h, ligeramente más rápido que los 35km/h de los otros servicios. La frecuencia de 5 minutos. Estos parámetros son aproximaciones basadas en las lineas nuevas y sus frecuencias. 
+Se agregaron las estaciones al grafo con sus correspondientes Nodos SERVICIO, PARADERO y las aristas que le conectan al resto del grafo. El horario de funcionamiento será el mismo que el del resto de la red de Metro. La velocidad de 40km/h, ligeramente más rápido que los 30km/h de los otros servicios, esto porque la línea tiene estaciones mas separadas entre sí que el resto de la red. La frecuencia de 5 minutos. Estos parámetros son aproximaciones basadas en las lineas nuevas y sus frecuencias. 
 
-Posteriormente, se ejecutará el predictor con todos los datos de etapas de un día, específicamente el lunes 24 de Abril de este año (2025). Para ello, se realizará el siguiente algoritmo:
+Posteriormente, se ejecutó el predictor con todos los datos de etapas de un día, específicamente el lunes 24 de Abril de este año (2025). Para ello, se realizó el siguiente algoritmo:
 
 - Eliminar las etapas intermedias, es decir, solo quedan las intenciones de viaje (paradero inicial, final, bin30, día)
 - Por cada intención de viaje, ejecutar el predictor, y tomar el camino con mayor probabilidad de ser elegido .
 - Expandir el camino en etapas. 
 
-Con esta tabla de demandas sintética, se comparan con la tabla de etapas original prestando atención específicamente a: 
+Con esta tabla de demandas sintética, se compararon con la tabla de etapas original prestando atención específicamente a: 
 
 - Servicios alimentadores a la L7.
 - Servicios que pierden demanda
@@ -1108,12 +1051,12 @@ Con esta tabla de demandas sintética, se comparan con la tabla de etapas origin
 
 
 
-# Resultados y Discusiones
+# Resultados y discusiones
 
-En la siguiente sección se mostrarán resultados e inmediatamente una discusión de ellos. Esta parte está estructurada de la misma manera que la metodología para relacionarlas directamente de manera más sencilla.
+En la siguiente sección se mostrarán resultados e inmediatamente una discusión de ellos para mayor comodidad. Esta parte está estructurada de la misma manera que la metodología para relacionarlas directamente de manera más sencilla.
 
 
-## Parte 1: Exploración de los Datos
+## Parte 1: Exploración de los datos
 
 En la siguiente sección se mostrarán los resultados de una exploración previa de los datos, fase importante para entender su estructura y trabajar de manera adecuada con ellos.
 
@@ -1157,7 +1100,7 @@ Una métrica clave a comparar cuando se realicen cambios en la oferta del transp
     \label{fig:uso_507}
 \end{figure}
 
-Algunos viajes no tenían hora de bajada (eran nulls). Cuando esto pasaba, se asumía que la persona se bajaba 30 minutos después de subirse. Es un valor arbitrario, pero razonable.
+
 
 \begin{figure}[H]
     \centering
@@ -1173,13 +1116,13 @@ Igualmente, no se tomó en cuenta los casos en los que las personas validan en t
 Una posible métrica interesante, sería obtener el porcentaje de uso de un servicio en un sentido con respecto a la cantidad de vehículos que tiene circulando el servicio en un período de tiempo. Esto permitiría ajustar la oferta de manera dinámica. Para ello habría que estimar la cantidad de personas máxima que cae dentro de un vehículo típico del servicio. Este análisis no se hará en esta memoria, pero queda como propuesto.
 
 
-### Métricas de Demanda
+### Métricas de demanda
 
 La idea de predecir la demanda conlleva saber exactamente la demanda de un par paradero, servicio, hora. 
 
-Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, debemos de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
+Sea P el paradero, S el servicio, T el espacio de tiempo y D la demanda, se debe de hacer una función D(P,S,T) la cual retorna la demanda de un paradero en funcion del servicio y la hora. 
 
-Haciendo esto, se puede obtener la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. Por ejemplo, al ejecutar la función en el paradero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
+Haciendo esto, se obtiene la demanda de todos las tuplas P,S,T. La idea es escoger una ventana de tiempo $\Delta$t y establecer una distribución acumulada que determine la demanda entre ambos tiempos. Por ejemplo, al ejecutar la función en el paradero **PJ394** con T~ini~= 8:00 y T~fin~= 10:00 , con el servicio **T507** obtenemos:
 
 
 
@@ -1243,13 +1186,13 @@ La ciudad de Santiago esta dividida en zonas tarifarias. Las zonas 777 son el no
 \end{figure}
 
 
-En el repositorio de GitHub en main_notebook.ipynb se encuentra un mapa interactivo con las zonas 777 de Santiago. Igualmente el mapa de la red tiene dibujadas las zonas.
 
 
-## Parte 2:  Grafos de la Red
+
+## Parte 2:  Grafos de la red
 
 
-### Grafo Agrupado
+### Grafo agrupado
 
 La creación del grafo agrupado dió como resultados un grafo con las siguientes características:
 
@@ -1260,7 +1203,7 @@ La creación del grafo agrupado dió como resultados un grafo con las siguientes
 - 272 conexiones de metro
 - 15737 conexiones totales
 
-El mapa está ubicado en /notebooks/mapa_con_zonas.html. Si se desea observar el grafo con Gephi, es necesario descargar el software, instalarlo,  cargar el grafo (ubicado en data/graphs/grafo.graphml) y en layout seleccionar Geo Layout y colocar la escala en 1E6 (10 a la 6). Si no se encuentra la opción, es necesario instalar el plugin en el mismo software desde el menú del mismo nombre.
+El mapa está ubicado en /output/mapa_con_zonas.html. 
 
 
 
@@ -1273,25 +1216,13 @@ El mapa está ubicado en /notebooks/mapa_con_zonas.html. Si se desea observar el
 \end{figure}
 
 
-Este mapa permite visualizar el grafo completo, pero carece de funcionalidad para agregarle información de la oferta. 
+Este mapa permite visualizar el grafo completo, pero carece de funcionalidad para el entrenamiento de los modelos.
 
 
-### Grafo Bipartito
+### Grafo bipartito
 
-A modo de recordatorio, se mostrará un esquema del grafo bipartito. 
 
 En la figura \ref{fig:grafo_estado} se muestra un ejemplo del grafo de estado en la misma zona que se mostró en la figura \ref{fig:mapa_plotly}.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/grafo_estado.png}
-    \caption{Esquema resumen del grafo bipartito}
-    \label{fig:grafo_estado}
-\end{figure}
-
-
-
 
 Si se audita el grafo para sanear errores, se obtiene lo siguiente: 
 
@@ -1315,7 +1246,7 @@ Aristas por tipo     :
 
 
 
-Se obtiene un grafo muy útil. Por ejemplo, ya con este grafo con pesos se puede correr un algoritmo de Dijkstra para encontrar la ruta más corta entre dos paraderos. Notar que esta ruta más corta es teniendo en cuenta que todos los pesos "pesan" lo mismo, es decir, da lo mismo recorrer 15 minutos caminando, que en bus o metro, ni que un minuto de espera vale lo mismo que un minuto a bordo. Esto es lo que se tiene que descubrir viendo los parámetros, en este caso, del MNL. 
+Se obtiene un grafo muy útil. Por ejemplo, ya con este grafo con pesos se puede ejecutar un algoritmo de Dijkstra para encontrar la ruta más corta entre dos paraderos. Notar que esta ruta más corta es teniendo en cuenta que todos los pesos "pesan" lo mismo, es decir, da lo mismo recorrer 15 minutos caminando, que en bus o metro, ni que un minuto de espera vale lo mismo que un minuto a bordo. Esto es lo que se tiene que descubrir viendo los parámetros, en este caso, del MNL. 
 
 Este grafo tiene toda la información de la OFERTA de transporte. Junto con las tablas de etapas y viajes tenemos la DEMANDA. 
 
@@ -1323,12 +1254,12 @@ Recordar que el objetivo es tener un grafo de estado artificial con OFERTA ARTIF
 
 \clearpage
 
-## Parte 3: Modelo de Regresión Lineal Simple
+## Parte 3: Modelo de regresión lineal simple
 
 
 
 
-### Estructura del Dataset
+### Estructura del *dataset*
 
 El modelo se entrenó con 8 millones de decisiones de los 7 días de la semana. Al expandirlo en alternativas, se obtienen 47 millones de decisiones. La figura \ref{fig:mnl_basic_summary} muestra el resumen de los datos de entrenamiento del modelo.
 
@@ -1341,7 +1272,7 @@ El modelo se entrenó con 8 millones de decisiones de los 7 días de la semana. 
 
 Notar que en promedio hay 5 decisiones por abordaje. También, se ve claramente la distribución de bins (notar las horas punta), las frecuencias (notar las frecuencias 0 que denotan servicios inactivos) y velocidades como una gaussiana centrada en 16 km/h con outliers en 0, mostrando a los servicios inactivos.  
 
-### Resultados del Entrenamiento
+### Resultados del entrenamiento
 
 Los resultados del entrenamiento se muestran a continuación:
 
@@ -1392,7 +1323,7 @@ Los resultados del entrenamiento se muestran a continuación:
 
 
 
-El modelo, para ser simple, sorprendentemente tiene una accuracy mejor que el azar, teniendo en cuenta que en promedio hay 5 decisiones. Se decide seguir explorando el MNL pero ahora teniendo en cuenta el destino de la persona. Esto debería de subir considerablemente las métricas.
+El modelo, para ser simple, sorprendentemente tiene una accuracy mejor que el azar, teniendo en cuenta que en promedio hay 5 decisiones.
 
 
 ## Parte 4: MNL con destino
@@ -1456,7 +1387,7 @@ Para *viajar_cost*, el coste de viajar es 0 cuando el usuario llega a un parader
 
 Para *cost_to_go* 0, es cuando es necesario solo una etapa para completar el viaje. Esto no es problema que sea 0.
 
-### Primeros Transbordos y la Penalización Inicial
+### Primeros transbordos y la penalización inicial
 
 Una solución elegida fue penalizar a las alternativas que requieran hacer transbordo inicial (es decir, cambiarse de paradero sin siquiera tomar el primer servicio), con un tiempo extra que se pueda configurar, esto por dos razones:
 
@@ -1471,11 +1402,11 @@ Se decide con aplicar una penalización de 5 minutos al tiempo inicial para evit
 
 
 
-### Entrenamiento Diario.
+### Entrenamiento diario.
 
-Primero, para agilizar el entrenamiento, se analizó día por día. El día miércoles no estaba disponible en red. Entrenar semanalmente nos permite identificar cambios en los parámetros dependiendo del día. Ver la tabla \ref{tab:params_dias_mnl} a modo resumen de los parámetros obtenidos.
+Primero, para agilizar el entrenamiento, se analizó día por día. El día miércoles no estaba disponible en los datos de RED. Entrenar semanalmente permite identificar cambios en los parámetros dependiendo del día. Ver la tabla \ref{tab:params_dias_mnl} a modo resumen de los parámetros obtenidos.
 
-En esta sección no se mostrarán las métricas diarias, pues consumirían mucho espacio, pero en la sección siguiente, se mostrarán las métricas de desempeño semanal. La precisión promedio de todos los días fue del 92% tanto en el split de validación como en el de entrenamiento.
+En esta sección no se mostrarán las métricas diarias, pues consumirían mucho espacio y no son atingentes, pero en la sección siguiente, se mostrarán las métricas de desempeño semanal. La precisión promedio de todos los días fue del 91% tanto en el split de validación como en el de entrenamiento.
 
 \begin{table}[H]
 \centering
@@ -1501,7 +1432,7 @@ domingo  & $7.59\times 10^{-13}$ & $-0.50$ & $-0.23$ & $-5.11$ & $-0.08$ & $-0.1
 
 
 
-### Entrenamiento Semanal completo.
+### Entrenamiento semanal completo.
 
 Para tener una vista general, se opta por hacer un entrenamiento general de la semana completa, tomando un split del 20% de los datos totales. La tabla \ref {tab:particionado} muestra la cantidad de decisiones. Con ello, se obtienen las siguientes métricas (\ref{tab:train_mnl}) y parámetros (\ref{tab:coeff_mnl}). 
 
@@ -1602,9 +1533,9 @@ No se logran observar diferencias sustanciales entre los días de semana y fines
 
 ### Resultados
 
-A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los embeddings los features de Dijkstra, y posteriormente cuando se omiten estos features. 
+A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los embeddings los features de Dijkstra, y posteriormente cuando se omiten estos features. Recordar que este entrenamiento se hizo de la misma manera que el MNL semanal, es decir, el split y el sampleo de datos (0.1 de los reales) con la misma semilla.
 
-#### GNN con Features de Dijkstra 
+#### GNN con features de Dijkstra 
 
 \begin{table}[H]
 \centering
@@ -1658,7 +1589,7 @@ Con ello se obtiene un modelo en que en su mejor época tiene unas métricas de 
 
 \clearpage
 
-#### GNN sin Features de Dijkstra.
+#### GNN sin features de dijkstra.
 
 
 \begin{table}[ht]
@@ -1722,11 +1653,11 @@ Test MRR & 0.850 \\
 \end{table}
 
 
-#### Discusión de los Resultados
+#### Discusión de los resultados
 
 - Claramente se observa una diferencia entre colocar una capa de Dijkstra versus no colocarla. Sin los datos de Dijkstra, el modelo no consigue buenos resultados. 
 
-- Comparado con el MNL, el cual tuvo una precisión NT del 90% (-1%) y una precisión del 93% (-3%), hay una leve mejora aportada por los embeddings. Se concluye que 
+- Comparado con el MNL, el cual tuvo una precisión NT del 90% (-1%) y una precisión del 93% (-3%), hay una leve mejora aportada por los embeddings. Se concluye que agregar los embeddings y los parametros tau ayudaron. 
 
 
 \clearpage
@@ -1734,11 +1665,12 @@ Test MRR & 0.850 \\
 
 ## Parte 6: Experimentos
 
-Se realizaron experimentos para mostrar redistribución de demanda. Para ello, se usarán los siguientes coeficientes obtenidos de un día viernes. No se usó la GNN debido a que tomaba más tiempo y que los resultados obtenidos eran muy parecidos a los de la MNL cuando tenía la capa de Dijkstra activada. Como ambos tienen resultados parecidos, la MNL es más interpretable y además tarda menos tiempo en generar resultados, se decide por usar la MNL como motor de utilidad.
+Se realizaron experimentos para mostrar redistribución de demanda. Para ello, se usaron los coeficientes de la tabla \ref{tab:exp_coeffs}  obtenidos de un día viernes. No se usó la GNN debido a que tomaba más tiempo y que los resultados obtenidos eran muy parecidos a los de la MNL cuando tenía la capa de Dijkstra activada. Como ambos tienen resultados parecidos, la MNL es más interpretable y además tarda menos tiempo en generar resultados, se decide por usar la MNL como motor de utilidad.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{lr}
+
 \toprule
 Coeficiente           & Valor         \\
 \midrule
@@ -1752,6 +1684,8 @@ zero\_onboard         & $2.13$       \\
 ASC\_metro            & $1.79 \times 10^{-13}$ \\
 \bottomrule
 \end{tabular}
+\caption{Coeficientes del modelo MNL usado para los experimentos}
+\label{tab:exp_coeffs}
 \end{table}
 
 Estos valores reflejan la importancia relativa de cada atributo en la elección de alternativas de viaje según el modelo MNL entrenado. Para el predictor solo se usarán los coeficientes wait_time, viajar_cost, cost_to_go y first_walk_min.
@@ -1767,7 +1701,7 @@ Ambos paraderos tienen de servicios disponibles que dejan directo en el destino,
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/exp1costs.png}
-    \caption{Costes para ir desde PJ394 a PA300. En azul se muestran los costes reales y en naranjo los cambios de oferta}
+    \caption{Costes para ir desde PJ394 a PA300. En azul se muestran los costes reales y en naranjo los cambios de oferta. Notar como el tiempo de espera del servicio 517 aumenta (la barra naranja es mas alta que la azul).}
     \label{fig:exp1costs}
 \end{figure}
 
@@ -1813,7 +1747,7 @@ Se observa que:
 
 - Cuando hay servicios que compiten, se obtiene una redistribución de la demanda más notoria como fue el caso del 503 vs el 517. En el caso del 507, al no tener ningun servicio que compita directamente, un mayor tiempo de espera no influye en lo atractivo del servicio.
 
-Se puede seguir aumentando el tiempo de espera, hasta un 1500% más grande que el original (esto haria que el tiempo de espera pase a 100 minutos). Se obtiene una redistribución de probabilidades como la que sigue en la figura \ref{fig:exp2probs15}.
+Se sigue aumentando el tiempo de espera, hasta un 1500% más grande que el original (esto hace que el tiempo de espera pase a 100 minutos). Se obtiene una redistribución de probabilidades como la que sigue en la figura \ref{fig:exp2probs15}.
 
 
 \begin{figure}[H]
@@ -1823,10 +1757,10 @@ Se puede seguir aumentando el tiempo de espera, hasta un 1500% más grande que e
     \label{fig:exp2probs15}
 \end{figure}
 
-Esto causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será determinístico. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que complicaría mucho el problema). 
+Esta redistribución de demanda causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será determinístico  tal como se ha asumido durante este trabajo. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que complicaría mucho el problema). 
 
 
-Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello , se verán los caminos de cada servicio obtenidos por Dijkstra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
+Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello, se verán los caminos de cada servicio obtenidos por Dijkstra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2 en Santa Ana, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
 
 Una vez se bajen en Parque Ohiggins, un efecto importante ocurre en el paradero aledaño a la estación de Metro. El AD predice que se tomará el 506, pero realmente es el servicio más probable a ser tomado, no necesariamente todos lo tomarán. Esta nueva demanda redistribuída se repartirá en los servicios que pasan por este paradero y que llevan a Beauchef, en este caso, el 506, 506v, 506e y el 507.  Ver la tabla \ref{tab:trayectos} para visualizar los trayectos y su cambio en su probabilidad.
 
@@ -1899,14 +1833,14 @@ Bajar en \texttt{T-20-177-PO-20} \\
 
 Notar que si hay 100 personas que quieren ir a Beauchef en un día, las 100 tomarían el 507 en el caso base. En el caso modificado, aumentaríamos la demanda del día en 80 para L2 y para 506. Esto es el efecto dominó del que se comentó al comienzo del informe que se debería de analizar.
 
-Cuantificar los cambios de demanda en cuando hay cambios de oferta se vuelven interesantes cuando se prueban situaciones más realistas. Podemos por ejemplo, cortar la línea 1. Esto es lo que se hará en el siguiente ejemplo.
+Cuantificar los cambios de demanda en cuando hay cambios de oferta se vuelven interesantes cuando se prueban situaciones más realistas. Se puede por ejemplo, cortar la línea 1. Esto es lo que se hizo en el siguiente ejemplo.
 
 ### Experimento 2: Suspensión de un servicio.
 
 
-Para el siguiente experimento, se colocará un indicador booleano que desactive todas las aristas SUBIR, BAJAR Y VIAJAR de la L1. Haciendo esto, tomemos el caso de alguien que quiera ir de San Pablo a Baquedano. 
+Para el siguiente experimento, se colocó un indicador booleano que desactivó todas las aristas SUBIR, BAJAR Y VIAJAR de la L1. Haciendo esto, tomar el caso de alguien que quiera ir de San Pablo a Baquedano. 
 
-Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las probabilidades y costes para cada alternativa. Notar como las probabilidades de usar la L1 bajan y las de la  L5 suben. Ojo que estas probabilidades están condicionadas a que el usuario haya decidido ir a Baquedano. 
+Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las probabilidades y costes para cada alternativa. Notar como las probabilidades de usar la L1 bajan y las de la  L5 suben. Nótese que estas probabilidades están condicionadas a que el usuario haya decidido ir a Baquedano. 
 
 \begin{figure}[H]
     \centering
@@ -1962,7 +1896,7 @@ Este análisis solo funciona para las personas que quieran tomar el metro en Baq
 
 Para el siguiente experimento, se agregó la L7 y se obtuvieron las siguientes métricas:
 
-#### Número de Etapas promedio
+#### Número de etapas promedio
 
 N° Etapas Promedio (Real):   1.73
 N° Etapas Promedio (Sintético): 2.15 
@@ -2019,7 +1953,7 @@ L7 & \num{40516} \\
 
 Se observa un aumento sustancial en el uso del Metro en general. Esto puede ser causa de los siguientes puntos:
 
-- L7 disminuye el uso del servicio de buses. Estos usuarios antes llegaban directamente a su destino usando una micro. Ahora, usando la L7, inyectan demanda directamente al servicio subterráneo, haciendo que la demanda nueva ganada por L7 se esparza por toda la red. 
+- L7 disminuye el uso del servicio de buses. Estos usuarios antes llegaban directamente a su destino usando una micro. Ahora, usando la L7, inyectan demanda directamente al servicio subterráneo, haciendo que la demanda nueva ganada por L7 se distribuya por toda la red. 
 
 - Las lineas de metro comienzan a alimentar la L7, ya que esta está bien conectada con el resto de la red, haciendo más apetecibles los viajes en metro en general. 
 
@@ -2028,7 +1962,7 @@ Se observa un aumento sustancial en el uso del Metro en general. Esto puede ser 
 
 No se registraron viajes con L7 en primera etapa, esto por la restricción del paradero inicial y el coste de transbordo inicial. Se ahondará más en esta decisión en la discusión final.
 
-#### Servicios Alimentadores de L7
+#### Servicios alimentadores de L7
 
 Los servicios alimentadores se definen como los que son transbordo directo a L7.
 
@@ -2061,7 +1995,7 @@ Servicios alimentadores como el J01 son del tipo que recogen a usuarios los cual
 
 
 
-#### Comparación de Carga Total (Número de Aristas VIAJAR recorridas por servicio)
+#### Comparación de carga total (número de aristas viajar recorridas por servicio)
 
 
 \begin{table}[H]
@@ -2094,24 +2028,26 @@ También se nota un aumento de usos de servicios alimentadores, tal como se menc
 
 
 
-## Limitaciones del Modelo
+## Discusión final de la solución y sus limitaciones
 
-Este modelo tiene varias limitaciones que no serán resueltas en esta memoria, pero vale la pena discutir. Por cada apartado se menciona entre paréntesis 
+Este modelo tiene varias limitaciones que no serán resueltas en esta memoria, pero vale la pena discutir. 
 
 *Transbordos determinísticos*
 
 Los transbordos o viajes con más de una etapa fueron tratados de manera determinista en sus etapas posteriores a la inicial, esto quiere decir que después de bajarse, el costo restante es definido de manera estricta. Una solución interesante puede ser concatenar varios MNL para cada etapa, pero esto complica mucho el problema. Notar que este enfoque habría hecho el valor *cost_to_go* no determinado, si no que una distribución o valor esperado. En esta memoria el cost_to_go es el mínimo dado que el usuario se baja en el paradero óptimo y elija el servicio óptimo. Es una simplificación fuerte, pero que funciona en gran parte de las decisiones (notar el 92% de precisión obtenido).
 
 
-*Correlación Espacial (Para el MNL)*
+*Correlación espacial (Para el MNL)*
 
 Tal como se mencionó al inicio de la memoria, un usuario puede decidir en base a clusters o paraderos cercanos que le proveen una mejor oferta. El caso de preferir paraderos con más servicios competitivos que otros puede ser un factor importante, tanto, que el usuario puede preferir a caminar más para tener un tiempo de espera más corto o confiable. Efectos como los de preferir el Metro por sobre otros modos de viaje debido a su fiabilidad y su alta frecuencia no son modelados.
 
-*Elección de Paradero Inicial*
+*Elección de paradero inicial y final*
 
-Esta limitación viene más por el lado del los datos. Lógicamente no se sabe donde vive la gente, solo su paradero de inicio del viaje y el del final de éste. Por ello, el viaje ya viene condicionado a que se eligió un paradero determinado desde el comienzo. Esto causa que nuevos servicios agregados nunca tengan demanda en la etapa 1, pues ningun viaje comienza en paraderos que recorren, a no ser que sean buses, caso que no se exploró en esta memoria. 
+Esta limitación viene más por el lado del los datos. Lógicamente no se sabe donde vive la gente, solo su paradero de inicio del viaje y el del final de éste. Por ello, el viaje ya viene condicionado a que se eligió un paradero determinado desde el comienzo. Esto causa que nuevos servicios agregados nunca tengan demanda en la etapa 1, pues ningun viaje comienza en paraderos que recorren, a no ser que sean buses, caso que no se exploró en esta memoria. También el paradero final actúa como una ancla, no tan fuerte como el paradero inicial, pues un usuario puede caminar hasta el paradero final para terminar el viaje. El hecho de que existan estas anclas, hace que sea complicado quitarle demanda a los servicios iniciales y finales, pues en el caso del metro, son el único servicio. 
 
-*Coste de la Primera Transferencia*
+Un ejemplo analizado fue ir desde Neptuno con Mapocho hasta Pedro de Valdivia (L7). En este caso, para el baseline un usuario probablemente tome un bus , sea el J01 o el J08 para llegar a San Pablo y tomar el metro que estime conveniente. Cuando se agrega la L7, teniendo en cuenta que en Neptuno con Mapocho se instalará la estación Cerro Navia (L7), el usuario podría preferir tomar la L7 desde Cerro Navia. Pero esto no se modela, pues el paradero inicial es fijo. Entonces, el usuario no puede elegir tomar la L7 en etapa 1, pues su paradero inicial no está en Cerro Navia (L7), entonces el modelo compara entre caminar (cinco minutos de penalización) o ir a San Pablo en J01 o J08. Esto es el mayor problema de la solución. Una forma de solucionarlo sería desanclar al usuario de su paradero inicial y dejarlo elegir un paradero inicial en un radio alrededor del paradero inicial real. Esto permitiría elegir un paradero no existente en los datos reales y comenzar con viajes en etapa 1 en L7. Probablemente esta solución es mas realista.
+
+*Coste de la primera transferencia*
 
 El modelo penaliza de la misma manera caminar diez minutos reales para elegir el paradero, que caminar un minuto. Esto causa que la elección de la Línea 7 sea más acotada, pues los usuarios comienzan su viaje en el paradero real que eligieron, y cambiar a la Línea 7, aunque quede a un par de metros, sea más costoso que tomar un servicio y combinar más adelante. Esto contamina la elección real más probable. 
 
@@ -2119,15 +2055,21 @@ El modelo penaliza de la misma manera caminar diez minutos reales para elegir el
 
 Un factor importante no modelado. La comodidad puede verse afectada dinámicamente según la hora y el momento del recorrido. Un servicio que va lleno es menos cómodo que uno que va vacío. Modelar el llenado de los buses  requeriría saber exactamente el tamaño de los buses, el tipo de flota que tiene cada servicio y que tipo de buses saca cada servicio dependiendo del bin. 
 
-*Velocidad promedio v/s Velocidad por arista*
+*Velocidad promedio v/s velocidad por arista*
 
-Los datos entregados por red nos muestran datos de velocidad promedio en todo el recorrido. Claramente hay trazos del recorrido más lentos que otros, probablemente los más lentos son en áreas céntricas mientras que los rápidos son en áreas suburbanas. Esto puede afectar localmente en viajes cortos, tomando costos de viaje más pequeños que los reales. Este efecto se puede amortiguar en viajes cortos cuando los servicios que compiten en las alternativas comparten el eje de circulación, pero por ejemplo un servicio que no usa avenidas puede verse perjudicado ante uno que alcanza velocidades mayores. 
+Los datos entregados por red muestran datos de velocidad promedio en todo el recorrido. Claramente hay trazos del recorrido más lentos que otros, probablemente los más lentos son en áreas céntricas mientras que los rápidos son en áreas suburbanas. Esto puede afectar localmente en viajes cortos, tomando costos de viaje más pequeños que los reales. Este efecto se puede amortiguar en viajes cortos cuando los servicios que compiten en las alternativas comparten el eje de circulación, pero por ejemplo un servicio que no usa avenidas puede verse perjudicado ante uno que alcanza velocidades mayores. 
 
 *Tarifas*
 
 No se tuvo en cuenta el coste del viaje. Esto afecta claramente el uso del servicio. Personas pueden preferir evitar el metro pues es más costoso.
 
+*ADATRAP*
 
+Al depender de las predicciones de ADATRAP, se heredan sus errores y sus casos de uso límites. Por ejemplo, aproximadamente el 60% de los viajes tenían el punto de bajada guardado, lo que ya limita los datos de entrenamiento. 
+
+*Evasión*
+
+El porcentaje de evasión del transporte público en Santiago es alto, aproximadamente del 30% en las últimas estimaciones. No se tienen distribuciones probables de evasión por paradero, lo que puede afectar la demanda real en ciertos servicios.
 
 
 # Conclusión
@@ -2140,51 +2082,30 @@ Para concluir, es importante recordar el Problema y el Objetivo general de esta 
 
 
 
-Partiendo desde el problema
+Partiendo desde el problema definido como *Generar datos sintéticos de demanda de transporte público*.
+
+Se tiene como objetivo *Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual.*
 
 
 
-*Predecir cambios en la demanda implica saber múltiples decisiones que no se pueden localizar, pues cambios de oferta pueden afectar de muchas maneras, casi como un efecto dominó*
-
-
-
-Se tiene como objetivo: 
-
-
-
-*Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual.*
-
-
-
-Desde ese contexto y objetivo, se abordan dos métodos. Uno del MNL y otro el MNL/GNN.
-
-
-
-Para ambos enfoques, la solución se enfocó en predecir una alternativa a usar. Esto, en base a su origen, destino (inamovibles) y el día. 
-
-
+Desde ese contexto y objetivo, se abordan dos métodos. Uno del MNL y otro el MNL/GNN. Para ambos enfoques, la solución se enfocó en predecir una alternativa a usar. Esto, en base a su origen, destino (inamovibles) y el día. 
 
 El MNL permitió un análisis cuantitativo interpretable acerca de las variables que el autor de la memoria consideró importantes. Estos son, el tiempo de viaje , el coste restante de viaje al transbordar y el tiempo de espera. En este ámbito, se observó algo interesante. Las personas prefieren viajar más tiempo si eso significa minimizar el coste restante, la variable que más pesaba al seleccionar una alternativa. En otras palabras, las personas evitan hacer transbordos. 
-
-
-
 
 
 El GNN presenta mejores resultados para predecir, en parte gracias a sus embeddings y su correlación espacial, aunque no se usó en los experimentos, debido a su lentitud. De todas maneras, la precisión del MNL es suficientemente parecida (uno por ciento de diferencia) como para poder generalizar sin preocupaciones. 
 
 
 
-Los experimentos muestran tanto las fortalezas y las debilidades de la solución expuesta. 
-
-Primero, no se observó una clara diferencia entre los coeficientes para distintos días. Un análisis de más semanas es necesario para ver una tendencia. Por otro lado, dos servicios compiten (tienen probabilidades parecidas) en general cuando tienen costes restantes parecidos. Servicios no compiten cuando uno tiene coste restante muy bajo y otro muy alto. Para que estos servicios se vuelvan competidores entre si, el coste de espera del dominante debe de aumentar bastante para que valga la pena hacer el transbordo del otro servicio. Esto resume la preferencia para minimizar el coste restante y su dominancia sobre los atributos necesarios para una decisión.
+Los experimentos muestran tanto las fortalezas y las debilidades de la solución expuesta. Primero, no se observó una clara diferencia entre los coeficientes para distintos días. Un análisis de más semanas es necesario para ver una tendencia. Por otro lado, dos servicios compiten (tienen probabilidades parecidas) en general cuando tienen costes restantes parecidos. Servicios no compiten cuando uno tiene coste restante muy bajo y otro muy alto. Para que estos servicios se vuelvan competidores entre si, el coste de espera del dominante debe de aumentar bastante para que valga la pena hacer el transbordo del otro servicio. Esto resume la preferencia para minimizar el coste restante y su dominancia sobre los atributos necesarios para una decisión.
 
 La redistribución de demanda es difícil de analizar de manera local. Esto debido a la determinancia de las decisiones después de seleccionar el primer transbordo. Un análisis local sobre la redistribución revela como hay un aumento de demanda en servicios que combinan con los servicios elegidos. 
 
-De manera global, la redistribución de demanda en el caso de la Línea 7 mostró resultados no esperados. Por un lado, el aumento del uso del metro en general, un hallazgo interesante. Esto gracias a la captación de demanda de buses que hacían el recorrido largo. Esto se puede ver reflejado en el aumento de etapas en promedio. Además, se lograron observar los alimentadores y como se relacionan con la L7. Estos eran los buses que se esperaba que aumentaran su demanda al llevar a personas hacia la L7. El aumento de carga en la L1 es un hallazgo fascinante. Se puede explicar por las restricciones del coste inicial de transferencia y como también las lineas del metro ahora son más llamativas para el usuario. 
+De manera global, la redistribución de demanda en el caso de la Línea 7 mostró resultados no esperados. Por un lado, el aumento del uso del metro en general, un hallazgo interesante. Esto gracias a la captación de demanda de buses que hacían el recorrido largo. Esto se puede ver reflejado en el aumento de etapas en promedio. Además, se lograron observar los alimentadores y como se relacionan con la L7. Estos eran los buses que se esperaba que aumentaran su demanda al llevar a personas hacia la L7. El aumento de carga en la L1 es un hallazgo que probablemente se deba a artefactos en la solución. Se puede explicar por las restricciones del coste inicial de transferencia y como también las lineas del metro ahora son más llamativas para el usuario. 
 
 
 
-Las limitaciones de este trabajo pasan por las condiciones de borde de los viajes (origen y destino fijos), el coste de transbordo inicial y por las predicciones de bajada de ADATRAP. Estas decisiones, algunas causadas por los datos y otras por errores en la planeación de la solución, deben de ser tomadas en cuenta para interpretar los resultados.
+Las limitaciones de este trabajo pasan por las condiciones de borde de los viajes (origen y destino fijos), el coste de transbordo inicial y por las predicciones de bajada de ADATRAP. Estas decisiones, algunas causadas por los datos y otras por errores en la planeación de la solución, deben de ser tomadas en cuenta para interpretar los resultados. Es interesante como decisiones de diseño de la solución pueden condicionar de tal manera los resultados obtenidos y su alcance analítico.
 
 
 
