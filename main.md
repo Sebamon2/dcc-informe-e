@@ -361,12 +361,13 @@ En el ámbito de predicción de demanda en transporte público, el modelo MNL se
 - No captura correlación espacial .
 - Depende fuertemente de las variables propuestas.
 
-Una evolución del MNL es el Logit Anidado, el cual resuelve el problema de la independencia de alternativas irrelevantes. Este modelo permite agrupar alternativas similares para correlacionar sus errores. 
+Una evolución del MNL es el Logit Anidado, el cual flexibiliza el supuesto de la independencia de alternativas irrelevantes. Este modelo permite agrupar alternativas similares para correlacionar entre los términos de error. 
 
-Este modelo requiere que el investigador defina a priori la estructura jerárquica. Un ejemplo de ello es elegir entre transporte público o privado, luego entre transporte público se puede elegir entre bus o metro.  
+Este modelo requiere que el investigador defina a priori la estructura jerárquica. Esta estructura jerárquica estática puede ser Modo Público/Privado > Tipo de Servicio (Metro, Bus, etc) 
 
-Ademas el logit anidado asume una estructura fija, el arbol de decisión es el mismo para todos los usuarios. Esto puede ser una limitación en escenarios donde las preferencias individuales varían significativamente.
+Además el logit anidado asume una estructura fija, el arbol de decisión es el mismo para todos los usuarios. Dado que el conjunto de alternativas es dinámico entre usuarios, definir una estructura de nidos universal que capture competencia entre miles de servicios resulta inviable.
 
+Por otro lado, modelos de Machine Learning como Random Forest o XGBoost han demostrado una buena capacidad predictiva, sin embargo, solo operan sobre datos tabulares, perdiendo la topología y las relaciones entre nodos. Adempas, los modelos de clasificación estándar asumen un número fijo de clases. En el contexto de elección de ruta, el conjunto de alternativas tiene cardinalidad variable según el origen, el destino, e incluso la hora.
 
 ### GNN
 
