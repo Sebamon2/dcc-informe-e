@@ -1,5 +1,5 @@
 ---
-titulo: "Modelamiento de cambios en la demanda de transporte público en Santiago de Chile usando técnicas de Aprendizaje de Máquina e Inteligencia Artificial"
+titulo: "Modelamiento de cambios en la demanda de transporte público en Santiago de Chile usando modelos de decisión discreta y redes neuronales de grafos"
 nombre: "Sebastián Alejandro Monteiro Parada"
 guia: "Eduardo Graells-Garrido"
 departamento: "Departamento de Ciencias de la Computación"
@@ -153,10 +153,77 @@ Asimismo, existen modelos de demanda agregada, como el desarrollado por Méndez 
 
 
 
-## Representación de los datos 
+## Origen y representación de los datos 
 
 
 Transformar los datos en una *estructura de datos* es un paso importante para que los algoritmos de ruteo entreguen características de cada alternativa del viaje. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu Et. Al[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. 
+
+### Red Metropolitana de Movilidad 
+
+Red Metropolitana de Movilidad es el sistema de transporte público de Santiago, el cual opera mediante empresas como Metro S.A, el tren urbano Estación Central-Nos y el sistema de Buses anteriormente llamado Transantiago .
+
+Su operación se basa en distintas unidades de negocio (UN) que trabajan en conjunto con un set de servicios acordados mediante licitaciones. Los datos necesarios para crear el grafo y enriquecerlo con costes para entrenar están disponibles de manera pública en los planes de operaciones y en las matrices de viaje. 
+
+Recalcar algunas características que impone el sistema de transporte a la solución. El usuario solo valida su tarjeta en el paradero de subida, esto implica que no se sabe con inequivocidad donde se baja el usuario. Además, el coste de un pasaje depende de la hora, siendo estas franjas tarifarias valle y peak. Otro caso borde incluye a las zonas paga, en las cuales se valida en un tótem fuera del servicio, por lo que se pierde información sobre el servicio a bordo real del usuario una vez se sube al vehículo. En estaciones de metro de combinación un usuario puede validar su tarjeta en el tótem de una de las lineas, pero combinar inmediatamente y subirse a la otra.  
+
+
+### Datos de ADATRAP
+
+
+ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el siguiente enlace: https://www.dtpm.cl/index.php/documentos/matrices-de-viaje. Cada viaje tiene n etapas, hasta 4 como máximo. 
+
+Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la Bip! o sus derivados al término de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Tomar el siguiente caso: 
+
+Un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad, entonces se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
+
+#### Tabla de viajes y etapas
+
+Las tablas de viajes y etapas serán las demandas históricas. 
+
+La tabla de viajes contiene la información de los viajes del usuario, registrando hasta 4 etapas o 3 combinaciones. Combinaciones en metro no cuentan, pues no se valida la tarjeta al cambiar de línea. Cada tabla de viajes o de etapas corresponde a un solo día de análisis. Las tablas de viajes y de etapas vienen generalmente en packs de una semana completa. 
+
+#### Código TS y código usuario
+
+Los servicios y paraderos se encuentran codificados en formato TS, esto es, un código interno usado por DTPM para identificar a los recorridos. La mayoría de los recorridos tiene un código TS que coincide con el de usuario. Por ejemplo, el servicio **T507 OOI** codifica al servicio 507 de ida (servicio en sentido ENEA- AV GRECIA). En algunas ocasiones no coincide, esto ocurre mayoritariamente en servicios locales con prefijo alfabético, casos como el servicio con código de usuario **J01** en código TS es en **T521**. Esta es la razón por la cual algunos recorridos nuevos tienen códigos de usuario que no siguen el numerado del usuario, ya que si lo siguieran, habrían colisiones de nombres.
+
+Por otro lado, los códigos de paradero también poseen esta distinción. Ningún código de paradero de usuario coincide con su versión en TS. En el set de datos de tabla de viajes y de etapas ambos códigos, tanto el de paraderos como el de servicios vienen en código TS.
+
+#### Paraderos subida y bajada
+Ambas en código TS, denotan, para las 4 posibles etapas, las subidas y bajadas del usuario. Máximo 8 (2 por cada etapa).
+
+#### Horas de subida y bajada
+Estimados con la velocidad promedio de los buses y los itinerarios, cada etapa tiene un horario de subida y bajada. Máximo 8 (2 por cada etapa). Estos se pueden separar en bins de 30 minutos cada uno. En resumen, 48 bins de tiempo. Se denominan en el lenguaje de ADATRAP como mediahora.
+
+#### Servicios de las 4 etapas
+En formato TS. Servicio de cada etapa. Máximo 4 (1 por cada etapa).
+
+Hay más columnas, pero para el análisis posterior no son de relevancia. La tabla de etapas contiene la misma información pero de manera disgregada, es decir, cada fila es una etapa. 
+
+#### Consolidado de recorridos
+Para crear el grafo, lógicamente es necesario el trazado de todos los recorridos de RED. Para ello, se RED tiene en su página web el trazado activo hasta ahora. Este archivo contiene en sus columnas:
+
+1. Los códigos de los servicios y paraderos en TS y en formato usuario.
+
+2. El nombre del paradero.
+
+3. Excepciones del paradero.
+
+4. Las posiciones X e Y del paradero.(UTGSM)
+
+Cada fila contiene una parada de un trazado de un servicio. 
+
+Algo importante a notar es la fecha de esta tabla de recorridos. Es válida desde el 31/05/2025 hasta a fin de año (al momento de hacer este informe)
+
+#### Zonas 777
+
+Red delimita Santiago en zonas, llamadas Zonas777. Estas están accesibles tanto desde la tabla de etapas (es decir, la subida y bajada denota en que zona ocurrieron), como también en el consolidado en cada paradero. Además, RED entrega archivos SHAPE que pueden analizarse con GEOPANDAS (paquete del lenguaje de programación Python) para visualizar las zonas 777.
+
+Con todo esto presente, se hacen las siguientes afirmaciones:
+
+- La demanda de origen y destino es inamovible en esta solución, es decir, cada usuario tiene que comenzar y terminar su viaje en los paraderos reales históricos. Esto debido a que no se sabe donde vive exactamente cada usuario, ni donde trabaja o estudia. 
+
+- La demanda de transición (las bajadas y subidas interetapas) pueden cambiar si es que la oferta cambia, es decir, si es que el usuario decide que es mejor hacer transbordo en un paradero P en la zona777 z1 en vez del paradero Q en la zona777 z2. Esto es perfectamente posible. La idea de la redistribución de la demanda propuesta en esta memoria, es mover el trayecto de una persona con dos puntos fijos, el origen y el destino final. 
+
 
 
 ### Grafo
@@ -244,11 +311,20 @@ Gracias a que el grafo indirectamente penaliza los transbordos, el algoritmo de 
 
 
 
+
+\clearpage
+
+## Modelos de predicción
+
+Para predecir una decisión de un usuario, se exploraron distintos métodos, algunos son el MNL, el Logit Anidado, modelos de Machine Learning como Random Forests, XGBoost y Redes Neuronales como la GNN. 
+
+Se ahondará en dos modelos, el MNL y la GNN, pues son los que mejores resultados arrojaron en las pruebas preliminares.
+
 ### MNL
 
 El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.  
 
-Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el propio ingeniero. En este sentido, el ingeniero(a) de software propone variables que él (ella) considera importantes para la toma de decisiones, pero no se ponderan aún. El modelo será encargado de decir que variable pondera más que otra en el proceso de entrenamiento.Notar que todas estas variables son *atributos* de la alternativa.
+Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el investigador, las cuales considera importantes para la toma de decisiones, pero no se ponderan aún. El modelo será encargado de decir que variable pondera más que otra en el proceso de entrenamiento.Notar que todas estas variables son *atributos* de la alternativa.
 
 Una Utilidad $U_n$ se define como la suma de la parte determinística (los atributos) y una parte aleatoria $\epsilon_n$ que captura la incertidumbre del modelo.
 
@@ -285,7 +361,11 @@ En el ámbito de predicción de demanda en transporte público, el modelo MNL se
 - No captura correlación espacial .
 - Depende fuertemente de las variables propuestas.
 
+Una evolución del MNL es el Logit Anidado, el cual resuelve el problema de la independencia de alternativas irrelevantes. Este modelo permite agrupar alternativas similares para correlacionar sus errores. 
 
+Este modelo requiere que el investigador defina a priori la estructura jerárquica. Un ejemplo de ello es elegir entre transporte público o privado, luego entre transporte público se puede elegir entre bus o metro.  
+
+Ademas el logit anidado asume una estructura fija, el arbol de decisión es el mismo para todos los usuarios. Esto puede ser una limitación en escenarios donde las preferencias individuales varían significativamente.
 
 
 ### GNN
@@ -309,71 +389,7 @@ Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos para
 
 Para el caso preciso de Santiago de Chile, es importante tener en cuenta el contexto de los datos y de la ciudad.
 
-### Red Metropolitana de Movilidad 
 
-Red Metropolitana de Movilidad es el sistema de transporte público de Santiago, el cual opera mediante empresas como Metro S.A, el tren urbano Estación Central-Nos y el sistema de Buses anteriormente llamado Transantiago .
-
-Su operación se basa en distintas unidades de negocio (UN) que trabajan en conjunto con un set de servicios acordados mediante licitaciones. Los datos necesarios para crear el grafo y enriquecerlo con costes para entrenar están disponibles de manera pública en los planes de operaciones y en las matrices de viaje. 
-
-Recalcar algunas características que impone el sistema de transporte a la solución. El usuario solo valida su tarjeta en el paradero de subida, esto implica que no se sabe con inequivocidad donde se baja el usuario. Además, el coste de un pasaje depende de la hora, siendo estas franjas tarifarias valle y peak. Otro caso borde incluye a las zonas paga, en las cuales se valida en un tótem fuera del servicio, por lo que se pierde información sobre el servicio a bordo real del usuario una vez se sube al vehículo. En estaciones de metro de combinación un usuario puede validar su tarjeta en el tótem de una de las lineas, pero combinar inmediatamente y subirse a la otra.  
-
-
-### Datos de ADATRAP
-
-
-ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el siguiente enlace: https://www.dtpm.cl/index.php/documentos/matrices-de-viaje. Cada viaje tiene n etapas, hasta 4 como máximo. 
-
-Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la Bip! o sus derivados al término de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Tomar el siguiente caso: 
-
-Un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad, entonces se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
-
-#### Tabla de viajes y etapas
-
-Las tablas de viajes y etapas serán las demandas históricas. 
-
-La tabla de viajes contiene la información de los viajes del usuario, registrando hasta 4 etapas o 3 combinaciones. Combinaciones en metro no cuentan, pues no se valida la tarjeta al cambiar de línea. Cada tabla de viajes o de etapas corresponde a un solo día de análisis. Las tablas de viajes y de etapas vienen generalmente en packs de una semana completa. 
-
-#### Código TS y código usuario
-
-Los servicios y paraderos se encuentran codificados en formato TS, esto es, un código interno usado por DTPM para identificar a los recorridos. La mayoría de los recorridos tiene un código TS que coincide con el de usuario. Por ejemplo, el servicio **T507 OOI** codifica al servicio 507 de ida (servicio en sentido ENEA- AV GRECIA). En algunas ocasiones no coincide, esto ocurre mayoritariamente en servicios locales con prefijo alfabético, casos como el servicio con código de usuario **J01** en código TS es en **T521**. Esta es la razón por la cual algunos recorridos nuevos tienen códigos de usuario que no siguen el numerado del usuario, ya que si lo siguieran, habrían colisiones de nombres.
-
-Por otro lado, los códigos de paradero también poseen esta distinción. Ningún código de paradero de usuario coincide con su versión en TS. En el set de datos de tabla de viajes y de etapas ambos códigos, tanto el de paraderos como el de servicios vienen en código TS.
-
-#### Paraderos subida y bajada
-Ambas en código TS, denotan, para las 4 posibles etapas, las subidas y bajadas del usuario. Máximo 8 (2 por cada etapa).
-
-#### Horas de subida y bajada
-Estimados con la velocidad promedio de los buses y los itinerarios, cada etapa tiene un horario de subida y bajada. Máximo 8 (2 por cada etapa). Estos se pueden separar en bins de 30 minutos cada uno. En resumen, 48 bins de tiempo. Se denominan en el lenguaje de ADATRAP como mediahora.
-
-#### Servicios de las 4 etapas
-En formato TS. Servicio de cada etapa. Máximo 4 (1 por cada etapa).
-
-Hay más columnas, pero para el análisis posterior no son de relevancia. La tabla de etapas contiene la misma información pero de manera disgregada, es decir, cada fila es una etapa. 
-
-#### Consolidado de recorridos
-Para crear el grafo, lógicamente es necesario el trazado de todos los recorridos de RED. Para ello, se RED tiene en su página web el trazado activo hasta ahora. Este archivo contiene en sus columnas:
-
-1. Los códigos de los servicios y paraderos en TS y en formato usuario.
-
-2. El nombre del paradero.
-
-3. Excepciones del paradero.
-
-4. Las posiciones X e Y del paradero.(UTGSM)
-
-Cada fila contiene una parada de un trazado de un servicio. 
-
-Algo importante a notar es la fecha de esta tabla de recorridos. Es válida desde el 31/05/2025 hasta a fin de año (al momento de hacer este informe)
-
-#### Zonas 777
-
-Red delimita Santiago en zonas, llamadas Zonas777. Estas están accesibles tanto desde la tabla de etapas (es decir, la subida y bajada denota en que zona ocurrieron), como también en el consolidado en cada paradero. Además, RED entrega archivos SHAPE que pueden analizarse con GEOPANDAS (paquete del lenguaje de programación Python) para visualizar las zonas 777.
-
-Con todo esto presente, se hacen las siguientes afirmaciones:
-
-- La demanda de origen y destino es inamovible en esta solución, es decir, cada usuario tiene que comenzar y terminar su viaje en los paraderos reales históricos. Esto debido a que no se sabe donde vive exactamente cada usuario, ni donde trabaja o estudia. 
-
-- La demanda de transición (las bajadas y subidas interetapas) pueden cambiar si es que la oferta cambia, es decir, si es que el usuario decide que es mejor hacer transbordo en un paradero P en la zona777 z1 en vez del paradero Q en la zona777 z2. Esto es perfectamente posible. La idea de la redistribución de la demanda propuesta en esta memoria, es mover el trayecto de una persona con dos puntos fijos, el origen y el destino final. 
 
 
 
