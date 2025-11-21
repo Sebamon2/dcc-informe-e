@@ -18,9 +18,9 @@ resumen: |
 
   Para ello, se utilizaron los datos de viajes proporcionados por Red Metropolitana de Movilidad, enriquecidos por ADATRAP para modelar la elección de ruta pasando por tres ejes (o componentes) fundamentales del trabajo, el modelado del mundo, en este caso, un grafo bipartito que simula a la red completa, un motor de utilidades, en este caso, el GNN/MNL y experimentos para comprobar y poner a prueba estos modelos.
 
-  El modelo MNL resultó ser interpretable y preciso, con un 89% de precisión. El hallazgo principal en cuanto a las características fue la preferencia de los usuarios a viajes sin transbordo aunque eso signifique un tiempo de viaje mayor.
+  El modelo MNL resultó ser interpretable y preciso, con un 89% de precisión no trivial. El hallazgo principal en cuanto a las características fue la preferencia de los usuarios a viajes sin transbordo aunque eso signifique un tiempo de viaje mayor.
 
-  El modelo GNN logró una mejoría al tener un 91 % de precisión. Se comparan GNN con capas de decisión discreta activadas y desactivadas. Debido a la leve mejoría del GNN, se opta por hacer experimentos con el MNL gracias a su velocidad e interpretabilidad.
+  El modelo GNN logró una mejoría al tener un 91 % de precisión no trivial. Se comparan GNN con capas de decisión discreta activadas y desactivadas. Debido a la leve mejoría del GNN, se opta por hacer experimentos con el MNL gracias a su velocidad e interpretabilidad.
 
   Finalmente, se realizan experimentos para poner a prueba el modelo del MNL, en este caso, se cambian frecuencias de servicios y se suspenden otros, analizando localmente la redistribución de la demanda, observando una redistribución de la demanda en servicios varios. Para terminar, se agrega la Línea 7 del Metro de Santiago pronta a inaugurarse, para analizar los cambios de la demanda. Se observa un aumento de carga general en el metro, especialmente en la L1; un aumento de la cantidad de transbordos y  un aumento en la demanda de servicios alimentadores a la linea en cuestión.
 
@@ -322,11 +322,11 @@ Se ahondará en dos modelos, el MNL y la GNN, pues son los que mejores resultado
 
 ### MNL
 
-El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.  
+El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.
 
 Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el investigador, las cuales considera importantes para la toma de decisiones, pero no se ponderan aún. El modelo será encargado de decir que variable pondera más que otra en el proceso de entrenamiento.Notar que todas estas variables son *atributos* de la alternativa.
 
-Una Utilidad $U_n$ se define como la suma de la parte determinística (los atributos) y una parte aleatoria $\epsilon_n$ que captura la incertidumbre del modelo.
+Tal como lo definen Ortuzar & Willumsen [@ortuzar2011modelling], una utilidad $U_n$ se define como la suma de la parte determinística (los atributos) y una parte aleatoria $\epsilon_n$ que captura la incertidumbre del modelo.
 
 $$U_n = V_n + \epsilon_n
 $$
@@ -371,11 +371,12 @@ Por otro lado, modelos de Machine Learning como Random Forest o XGBoost han demo
 
 ### GNN
 
-Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura más rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. 
+Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura más rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. Wu et. Al [@wu_gnn] hacen una revisión exhaustiva de las GNN y sus aplicaciones. 
 
 Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. Se explora la solución de una GNN Heterogénea que aproveche la riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
 
-Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. 
+Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. Entre estos paraderos y servicios, se propagan mensajes que permiten capturar la correlación espacial. GraphConv, construído sobre el trabajo de Morris et. Al[@morris2021weisfeilerlemanneuralhigherorder] , es una capa de convolución de grafos que permite capturar la información local de los nodos y sus vecinos. Existen otros tipos de capas, como SageConv construído por Morris Hamilton et. Al [@hamilton2018inductiverepresentationlearninglarge], el cual aplana los mensajes con promedios.
+
 
 #### Ventajas
 
@@ -387,8 +388,6 @@ Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos para
 - Menos resistente a outliers (embeddings de recorridos corruptos o desviados afectan localmente)
 - Menos interpretabilidad debido a lo abstracto que son los vectores de embeddings. 
 - Requiere reentrenar para escenarios ficticios de servicios que no existen (ya que hay que obtener los embeddings)
-
-Para el caso preciso de Santiago de Chile, es importante tener en cuenta el contexto de los datos y de la ciudad.
 
 
 
@@ -414,7 +413,7 @@ Se creó un grafo agrupado y un grafo bipartito para la visualización y entrena
 3. Para ambos modelos, el objetivo fue predecir el servicio a usar en la primera etapa del viaje, dado el origen, destino, hora y día de la semana. El camino elegido por el modelo será una parte probabilística, el primer servicio, y una parte determinista, el resto del viaje. Entonces, el objetivo del modelo fue predecir el primer abordaje.
 
 4. (OE3) MNL:
-Se implementó un modelo logit multinomial que aprendió a captar factores determinantes ajustando una función de probabilidad. Estos factores determinantes son el tiempo de viaje, el tiempo restante después del primer transbordo (coste restante de ahora en adelante) y  el tiempo de viaje hasta el primer transbordo.
+Se implementó un modelo logit multinomial que aprendió a captar factores determinantes ajustando una función de probabilidad. Estos factores determinantes son el tiempo de viaje, el tiempo restante después del primer transbordo (coste restante de ahora en adelante) y  el tiempo de viaje hasta el primer transbordo. Debido a la naturaleza variable de la cardinalidad de las alternativas y la ausencia de jerarquía en ellas, se descartó hacer un Logit Anidado o un modelo de Machine Learning. 
 
 
 5. (OE4) GNN + MNL 
@@ -943,7 +942,7 @@ Una representación vectorial de un nodo es útil pues permite reducir la dimens
 
 ### GNN Bipartito
 
-Una GNN Bipartito tiene 4 capas de GraphConv (en un inicio se usó SageConv, pero SageConv daba resultados poco convincentes debido a que diluía los pesos de las aristas). GraphConv aplica una convolución que permite que cada nodo agregue información de sus vecinos, el *message passing*. 
+Una GNN Bipartito tiene 4 capas de GraphConv (en un inicio se usó SageConv, pero SageConv daba resultados poco convincentes debido a que aplanaba los mensajes de los vecinos). GraphConv aplica una convolución que permite que cada nodo agregue información de sus vecinos, el *message passing*. 
 
 Se agrega un parámetro $\tau_e$ que es aprendible por relación. Esto para todas las aristas. Este $\tau_e$ modula la intensidad del paso de mensajes, lo que implica aristas más importantes que otras (en otras palabras, unos costes pueden ponderar más, básicamente lo que hace la MNL)
 
@@ -1001,7 +1000,7 @@ Se suspendió la L1, colocando un indicador booleano en sus aristas para que Dij
 
 ### Caso 3: Agregar línea 7
 
-Los datos de esta nueva línea 7 siguen en la tabla \ref{tab:linea7}. El trazado se obtuvo desde [Metro](https://www.metro.cl/nuevos-proyectos/línea-7) y las coordenadas se aproximaron viendo google maps.
+Los datos de esta nueva línea 7 siguen en la tabla \ref{tab:linea7}. El trazado se obtuvo desde [Metro](https://www.metro.cl/nuevos-proyectos/línea-7) y las coordenadas se aproximaron viendo Google Maps.
 
 \begin{figure}[H]
     \centering
@@ -2048,7 +2047,7 @@ De manera global, la redistribución de demanda en el caso de la Línea 7 mostr�
 
 
 
-Las limitaciones de este trabajo pasan por las condiciones de borde de los viajes (origen y destino fijos), el coste de transbordo inicial y por las predicciones de bajada de ADATRAP. Estas decisiones, algunas causadas por los datos y otras por errores en la planeación de la solución, deben de ser tomadas en cuenta para interpretar los resultados. Es interesante como decisiones de diseño de la solución pueden condicionar de tal manera los resultados obtenidos y su alcance analítico.
+Las limitaciones de este trabajo pasan por las condiciones de borde de los viajes (origen y destino fijos), el coste de transbordo inicial y por las predicciones de bajada de ADATRAP. Estas decisiones, consecuencia de las condiciones de los datos y su extensibilidad , deben de ser tomadas en cuenta para interpretar los resultados. Es interesante como decisiones de diseño de la solución pueden condicionar de tal manera los resultados obtenidos y su alcance analítico.
 
 
 
@@ -2080,7 +2079,9 @@ Para trabajo futuro, sería interesante desacoplar a los usuarios de los parader
 
 \section*{Bibliografía}
 <div id="refs"></div>
-\section*{Anexos}
+
+
+
 
 
 
