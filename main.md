@@ -14,7 +14,7 @@ citecolor: purple
 
 
 resumen: |
-  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un trabajo arduo, pues estos cambios provocan efectos en cadena en toda la red. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y así tomar decisiones con mejores datos.
+  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un desafío complejo, pues estos cambios provocan efectos en cadena en toda la red. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y así tomar decisiones con mejores datos.
 
   Para ello, se utilizaron los datos de viajes proporcionados por Red Metropolitana de Movilidad, enriquecidos por ADATRAP para modelar la elección de ruta pasando por tres ejes (o componentes) fundamentales del trabajo, el modelado del mundo, en este caso, un grafo bipartito que simula a la red completa, un motor de utilidades, en este caso, el GNN/MNL y experimentos para comprobar y poner a prueba estos modelos.
 
@@ -1434,7 +1434,7 @@ domingo  & $7.59\times 10^{-13}$ & $-0.50$ & $-0.23$ & $-5.11$ & $-0.08$ & $-0.1
 
 ### Entrenamiento semanal completo.
 
-Para tener una vista general, se opta por hacer un entrenamiento general de la semana completa, tomando un split del 20% de los datos totales. La tabla \ref {tab:particionado} muestra la cantidad de decisiones. Con ello, se obtienen las siguientes métricas (\ref{tab:train_mnl}) y parámetros (\ref{tab:coeff_mnl}). 
+Para tener una vista general, se opta por hacer un entrenamiento general de la semana completa, tomando un split del 20% de los datos totales. La tabla \ref {tab:particionado} muestra la cantidad de decisiones. Con ello, se obtienen las siguientes métricas (\ref{fig:mnl_destino}) y parámetros (\ref{tab:coeff_mnl}). 
 
 
 
@@ -1455,30 +1455,14 @@ Decisiones (train) & 814\,793 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[h]
-\centering
-\caption{Historial de optimización (iteraciones)}
-\begin{tabular}{r r r r r r r r}
-\hline
-Iter & NLL & $\lVert\text{grad}\rVert$ & Acc & AccNT & MRR & NLLn & $R^2$ \\
-\hline
-pre & 942\,424.1203 & 7.395e+05 & -- & -- & -- & -- & -- \\
-001 & 514\,839.8027 & 2.153e+05 & 0.762 & 0.680 & 0.861 & 0.400 & 0.454 \\
-002 & 435\,046.4608 & 1.410e+05 & 0.778 & 0.702 & 0.872 & 0.338 & 0.538 \\
-003 & 333\,427.0366 & 6.856e+04 & 0.918 & 0.890 & 0.953 & 0.259 & 0.644 \\
-004 & 284\,922.6559 & 3.608e+04 & 0.916 & 0.887 & 0.951 & 0.223 & 0.695 \\
-005 & 259\,999.6626 & 1.618e+04 & 0.917 & 0.889 & 0.952 & 0.205 & 0.720 \\
-006 & 250\,318.8548 & 8.243e+03 & 0.919 & 0.891 & 0.953 & 0.199 & 0.730 \\
-007 & 247\,499.3992 & 4.732e+03 & 0.919 & 0.892 & 0.953 & 0.198 & 0.733 \\
-008 & 246\,881.7824 & 6.201e+02 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
-009 & 246\,841.4710 & 2.107e+02 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
-010 & 246\,833.2999 & 9.714e+01 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
-011 & 246\,831.8212 & 1.026e+01 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
-012 & 246\,831.8212 & 1.026e+01 & 0.921 & 0.893 & 0.954 & 0.198 & 0.733 \\
-\hline
-\label{tab:train_mnl}
-\end{tabular}
-\end{table}
+\clearpage
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../memoria-repo/data/plots/mnl_destino_plot.png}
+    \caption{Resultados del modelo MNL con destino. En todos los gráficos, el eje x es la época y el eje y la métrica correspondiente.}
+    \label{fig:mnl_destino}
+\end{figure}
 
 \begin{table}[H]
 \centering
@@ -1518,12 +1502,11 @@ $R^2$ & 0.738 & 0.733 \\
 \end{tabular}
 \end{table}
 
-
+Se observa que el modelo fue entrenado exitosamente, con una precisión del 92% en ambas particiones. La precisión no trivial es del 89%, evidenciando que el modelo supera significativamente la predicción aleatoria. 
 
 Notar como afecta más a la utilidad tener un *cost_to_go* alto que un tiempo de viaje alto. Con esto se puede concluir que los usuarios prefieren alternativas que le acerquen lo más que puedan al destino, inclusive pagando más coste de viaje que otro servicio alimentador. 
 
-
-Se obtienen constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si se mira desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es más directo. Entonces, un coste restante menor es más atractivo. Para tener un costo restante menor, es necesario viajar más tiempo en el primer servicio. 
+Se obtuvieron constantes positivas en el coste de viajar. Una colinealidad entre el coste restante (cost to go) y el tiempo de viajar puede ser una señal de esto. Si se mira desde un punto de vista de comodidad, un coste restante menor indica que el viaje tiene menos transbordos probablemente y es más directo. Entonces, un coste restante menor es más atractivo. Para tener un costo restante menor, es necesario viajar más tiempo en el primer servicio. 
 
 No se logran observar diferencias sustanciales entre los días de semana y fines de semana. Un análisis usando más semanas debe de ser imperativo para extraer conclusiones en cuanto a este tema.
 
@@ -1552,38 +1535,12 @@ Parámetros entrenables & $\approx$ 1\,717\,765 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
-\centering
-\caption{Historial de entrenamiento por época}
-\label{tab:training_epochs}
-\begin{tabular}{r r r r r r r r r}
-\toprule
-Época & Train NLL & Train Acc & Train AccNT & Train MRR & Val NLL & Val Acc & Val AccNT & Val MRR \\
-\midrule
-01 & 0.1166 & 0.948 & 0.870 & 0.970 & 0.0924 & 0.960 & 0.900 & 0.977 \\
-02 & 0.0839 & 0.956 & 0.890 & 0.975 & 0.0856 & 0.961 & 0.901 & 0.977 \\
-03 & 0.0806 & 0.956 & 0.891 & 0.975 & 0.0852 & 0.961 & 0.902 & 0.978 \\
-04 & 0.0800 & 0.957 & 0.892 & 0.975 & 0.0838 & 0.961 & 0.903 & 0.978 \\
-05 & 0.0799 & 0.957 & 0.891 & 0.975 & 0.0833 & 0.961 & 0.902 & 0.978 \\
-06 & 0.0793 & 0.957 & 0.892 & 0.975 & 0.0842 & 0.961 & 0.902 & 0.978 \\
-07 & 0.0793 & 0.957 & 0.891 & 0.975 & 0.0829 & 0.961 & 0.902 & 0.978 \\
-08 & 0.0790 & 0.957 & 0.892 & 0.975 & 0.0831 & 0.961 & 0.903 & 0.978 \\
-09 & 0.0788 & 0.957 & 0.891 & 0.975 & 0.0830 & 0.961 & 0.903 & 0.978 \\
-10 & 0.0787 & 0.957 & 0.891 & 0.975 & 0.0822 & 0.961 & 0.902 & 0.978 \\
-11 & 0.0786 & 0.957 & 0.891 & 0.975 & 0.0812 & 0.961 & 0.902 & 0.978 \\
-12 & 0.0785 & 0.957 & 0.892 & 0.975 & 0.0822 & 0.962 & 0.903 & 0.978 \\
-13 & 0.0784 & 0.957 & 0.892 & 0.975 & 0.0816 & 0.961 & 0.902 & 0.978 \\
-14 & 0.0786 & 0.957 & 0.892 & 0.975 & 0.0815 & 0.961 & 0.903 & 0.978 \\
-15 & 0.0788 & 0.957 & 0.891 & 0.975 & 0.0826 & 0.961 & 0.903 & 0.978 \\
-16 & 0.0786 & 0.957 & 0.891 & 0.975 & 0.0825 & 0.962 & 0.903 & 0.978 \\
-17 & 0.0784 & 0.957 & 0.892 & 0.975 & 0.0810 & 0.961 & 0.903 & 0.978 \\
-18 & 0.0783 & 0.957 & 0.892 & 0.975 & 0.0811 & 0.962 & 0.903 & 0.978 \\
-19 & 0.0783 & 0.957 & 0.892 & 0.975 & 0.0813 & 0.961 & 0.903 & 0.978 \\
-20 & 0.0780 & 0.957 & 0.892 & 0.976 & 0.0817 & 0.962 & 0.903 & 0.978 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../memoria-repo/data/plots/gnn_con_dijkstra.png}
+    \caption{Resultados de entrenamiento de la GNN con atributos de Dijkstra activados}
+    \label{fig:gnn_con_dijkstra}
+\end{figure}
 
 Con ello se obtiene un modelo en que en su mejor época tiene unas métricas de Precisión del 96.2% y Precisión No Trivial del 90.3%.
 
@@ -1606,36 +1563,12 @@ Parámetros entrenables & $\approx$ 1{,}716{,}613 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[ht]
-\centering
-\caption{Historial de entrenamiento por época}
-\begin{tabular}{r r r r r r r r r}
-\hline
-Epoch & Train NLL & Train Acc & Train AccNT & Train MRR & Val NLL & Val Acc & Val AccNT & Val MRR \\
-\hline
-01 & 0.5828 & 0.737 & 0.342 & 0.827 & 0.5810 & 0.742 & 0.352 & 0.831 \\
-02 & 0.5724 & 0.740 & 0.348 & 0.829 & 0.5717 & 0.745 & 0.359 & 0.833 \\
-03 & 0.5672 & 0.741 & 0.351 & 0.830 & 0.5652 & 0.746 & 0.362 & 0.834 \\
-04 & 0.5640 & 0.743 & 0.356 & 0.831 & 0.5594 & 0.752 & 0.377 & 0.838 \\
-05 & 0.5497 & 0.748 & 0.367 & 0.835 & 0.5453 & 0.756 & 0.388 & 0.842 \\
-06 & 0.5361 & 0.751 & 0.376 & 0.838 & 0.5371 & 0.759 & 0.394 & 0.844 \\
-07 & 0.5275 & 0.752 & 0.379 & 0.839 & 0.5258 & 0.761 & 0.400 & 0.846 \\
-08 & 0.5239 & 0.754 & 0.382 & 0.841 & 0.5333 & 0.762 & 0.401 & 0.847 \\
-09 & 0.5211 & 0.754 & 0.384 & 0.841 & 0.5221 & 0.764 & 0.408 & 0.849 \\
-10 & 0.5190 & 0.755 & 0.385 & 0.842 & 0.5272 & 0.764 & 0.408 & 0.849 \\
-11 & 0.5178 & 0.755 & 0.387 & 0.842 & 0.5273 & 0.763 & 0.405 & 0.848 \\
-12 & 0.5162 & 0.756 & 0.388 & 0.842 & 0.5222 & 0.765 & 0.410 & 0.849 \\
-13 & 0.5152 & 0.756 & 0.389 & 0.843 & 0.5234 & 0.764 & 0.408 & 0.849 \\
-14 & 0.5150 & 0.757 & 0.390 & 0.843 & 0.5238 & 0.765 & 0.410 & 0.849 \\
-15 & 0.5142 & 0.757 & 0.390 & 0.843 & 0.5170 & 0.766 & 0.412 & 0.850 \\
-16 & 0.5134 & 0.757 & 0.391 & 0.844 & 0.5196 & 0.767 & 0.414 & 0.851 \\
-17 & 0.5115 & 0.758 & 0.392 & 0.844 & 0.5193 & 0.766 & 0.412 & 0.850 \\
-18 & 0.5121 & 0.758 & 0.393 & 0.844 & 0.5152 & 0.767 & 0.414 & 0.851 \\
-19 & 0.5118 & 0.758 & 0.392 & 0.844 & 0.5163 & 0.767 & 0.415 & 0.851 \\
-20 & 0.5109 & 0.758 & 0.394 & 0.844 & 0.5117 & 0.767 & 0.415 & 0.851 \\
-\hline
-\end{tabular}
-\end{table}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../memoria-repo/data/plots/gnn_sin_dijkstra.png}
+    \caption{Resultados de entrenamiento de la GNN sin atributos de Dijkstra}
+    \label{fig:gnn_sin_dijkstra}
+\end{figure}
 
 \begin{table}[ht]
 \centering
@@ -1655,9 +1588,9 @@ Test MRR & 0.850 \\
 
 #### Discusión de los resultados
 
-- Claramente se observa una diferencia entre colocar una capa de Dijkstra versus no colocarla. Sin los datos de Dijkstra, el modelo no consigue buenos resultados. 
+- Claramente se observa una diferencia entre colocar una capa de Dijkstra versus no colocarla. Sin los datos de Dijkstra, el modelo no consigue buenos resultados. Una precisión no trivial del 41.5% es mejor que el azar, pero peor que el MNL y que el GNN con Dijkstra.
 
-- Comparado con el MNL, el cual tuvo una precisión NT del 90% (-1%) y una precisión del 93% (-3%), hay una leve mejora aportada por los embeddings. Se concluye que agregar los embeddings y los parametros tau ayudaron. 
+- Comparado con el MNL, la GNN con Dijkstra tuvo una precisión no trivial del 90% (+1% en comparación con el MNL con destino) y una precisión del 96% (+3% en comparación con el MNL con destino), hay una leve mejora aportada por los embeddings. Se concluye que agregar los embeddings y los parametros tau ayudaron, pero estos por si solos no son suficientes para conseguir buenas métricas con el set de datos que se tiene.
 
 
 \clearpage
