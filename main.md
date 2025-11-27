@@ -48,17 +48,17 @@ La solución propuesta en este proyecto se basa en el uso de técnicas de aprend
 
 #### Objetivo general
 
-Es por ello, que el objetivo de esta memoria se reduce a: *Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual.*
+Es por ello, que el objetivo de esta memoria es: *Diseñar e implementar un modelo que prediga demanda de transporte dado un escenario (definido como una configuración de red y su respectiva infraestructura urbana); y usar este modelo para predecir demanda en distintos escenarios para medir el impacto de intervenciones en el escenario actual.*
 
 #### Objetivos específicos a cumplir
 
-1. (OE1) Construir una representación topológica y computacional de la red de transporte público de Santiago en un grafo, integrando datos de operacion, transacciones y datos de demanda de ADATRAP.
+1. (OE1) Construir una representación topológica de la red de transporte público de Santiago en un grafo, integrando datos de operacion como velocidades, frecuencias y trazados.
 
-2. (OE2) Diseñar, implementar y evaluar modelos de elección discreta y de aprendizaje profundo, determinando la arquitectura mas adecuada para simular la toma de decisiones de los usuarios.
+2. (OE2) Diseñar, entrenar y evaluar modelos de elección discreta y de aprendizaje profundo, determinando la arquitectura mas adecuada para simular la toma de decisiones de los usuarios, usando como datos la demanda histórica de viajes en transporte público de ADATRAP.
 
-3. (OE3) Evaluar el impacto eventos de reconfiguración de la red mediante la generación de datos de demanda sintéticos.
+3. (OE3) Evaluar el impacto eventos de reconfiguración de la red de transporte público mediante la generación de datos de demanda de viajes sintéticos.
 
-El cuerpo de la memoria comienza con el Capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el Capitulo 3 se presenta una metodología basada en exploracion de los datos y su modelado; datos y entrenamiento del MNL/GNN y termina con los experimentos. El Capítulo 4 presenta los resultados y discusión inmediata de ellos. El capítulo 5 presenta la conclusión de la memoria.
+El cuerpo de la memoria comienza con el Capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el Capitulo 3 se presenta una metodología para construir una representación de los datos e implementación y entrenamiento del MNL/GNN para luego terminar con los experimentos. El Capítulo 4 presenta los resultados y discusión inmediata de ellos. El capítulo 5 presenta la conclusión de la memoria.
 
 
 
@@ -409,7 +409,7 @@ En la presente sección, primero se dará a conocer la solución propuesta y  fi
 ## Solución propuesta
 
 
-La solución se basa en dos pilares fundamentales, el primero, la *representación de los datos* en una estructura topológica, en donde se creó el grafo agrupado y bipartito usando el programa de operaciones de red y el segundo, el *modelado del proceso de decisión de los usuarios*, en donde se entrenaron dos modelos, el MNL y el GNN, usando datos históricos de demanda de ADATRAP, esta solución cumple los objetivos específicos (OE1, OE2 ). La figura \ref{fig:diagrama_general_solucion} muestra un diagrama general de la solución propuesta.
+La solución se basa en dos pilares fundamentales, el primero, la *representación de los datos* en una estructura topológica, en donde se creó el grafo agrupado y bipartito usando el programa de operaciones de red y el segundo, el *modelado del proceso de decisión de los usuarios*, en donde se entrenaron dos modelos, el MNL y el GNN, usando datos históricos de demanda de ADATRAP. Esta solución cumple los objetivos específicos (OE1, OE2 ). La figura \ref{fig:diagrama_general_solucion} muestra un diagrama general de la solución propuesta.
 
 \begin{figure}[H]
     \centering
@@ -419,11 +419,11 @@ La solución se basa en dos pilares fundamentales, el primero, la *representaci�
 \end{figure}
 
 
-El objetivo del MNL es modelar el proceso de decisión de un usuario al elegir entre N alternativas de viaje, entendiendo las alternativas como los servicios que paran en el paradero de origen del usuario a la hora y día que se sube. Cada alternativa tendrá un set de atributos, los cuales definen el coste total del viaje si es que el usuario elige esa alternativa. Este set de atributos o características de cada alternativa son:
+El objetivo del MNL es modelar el proceso de decisión de un usuario al elegir entre N alternativas de viaje en la primera etapa del viaje, entendiendo las alternativas como los servicios que paran en el paradero de origen del usuario a la hora y día que se sube. Cada alternativa tendrá un set de atributos, los cuales definen el coste total del viaje si es que el usuario elige esa alternativa. Este set de atributos o características de cada alternativa son:
 
 - **Tiempo de espera** del servicio:  Obtenido desde el programa de operaciones de RED, es el tiempo promedio que un usuario espera para abordar el servicio, asumiendo que el usuario puede llegar en cualquier momento al paradero. Se toma una distribución uniforme de llegada, por lo que el tiempo de espera promedio es la mitad del *headway* (frecuencia) del servicio en ese paradero.
 
-- **Tiempo restante** de viaje desde el primer transbordo hasta el destino final: Obtenido usando un algoritmo de ruteo en el grafo bipartito. Este algoritmo debe encontrar el paradero óptimo en el que el usuario debe de bajarse dado que 
+- **Tiempo restante** de viaje desde el primer transbordo hasta el destino final: Obtenido usando un algoritmo de ruteo en el grafo bipartito. Este algoritmo debe encontrar el paradero óptimo en el que el usuario debe de bajarse dado que quiera ir al destino dado.
 
 - **Tiempo de viaje** en el servicio hasta el primer transbordo en el paradero óptimo.
 
@@ -445,9 +445,7 @@ Recordando que el grafo agrupado es un grafo dirigido donde los nodos son los pa
 
 #### Aristas
 
-En este caso, las aristas E fueron las conexiones entre dos paraderos en un recorrido. Por ejemplo, una arista conecta la estación Los Héroes con Moneda. Una arista, por lo tanto, deben guardar los servicios que la recorren. En este caso, sería la Línea 1 en ambas direcciones, por lo que aquí se tienen dos opciones, o tener dos aristas para ambas direcciones o una arista sin direcciones. 
-
-Otro caso, son las aristas que unen paradas de servicios en superficie. Una arista va a representar la conexión entre dos paraderos consecutivos mediante un servicio.
+En este caso, las aristas E fueron las conexiones entre dos paraderos en un recorrido. Por ejemplo, una arista conecta la estación Los Héroes con Moneda. Una arista, por lo tanto, deben guardar los servicios que la recorren. Otro caso, son las aristas que unen paradas de servicios en superficie. Una arista va a representar la conexión entre dos paraderos consecutivos mediante un servicio.
 
 Si varios servicios paran en las mismas paradas consecutivas, se unieron todos los recorridos en la misma arista. Es más simple computacionalmente, pero datos como la distancia o tiempo que toma al servicio recorrer la arista (el peso de la arista) se pierden. 
 
@@ -473,7 +471,7 @@ El primer paso, consistió en agrupar a todas las conexiones de dos paraderos co
 
 Siguiendo estas reglas, se creó el grafo con el siguiente pseudocódigo:
 
-1.  Se obtuvieron todos los servicios únicos en el dataframe.
+1.  Se obtuvieron todos los servicios únicos en el dataframe del programa de operaciones de red.
 
 2.  Se creó un diccionario con la información Código Usuario, Variante (PM o Normal), Sentido Servicio (Ida o Regreso).
 
@@ -504,7 +502,7 @@ Notar que al hacer esto por todos los servicios, se agregaron a cada arista los 
 
 8. Se unieron los nodos con las aristas. 
 
-Es inmediato notar que las aristas de este grafo están degeneradas, es decir, tienen información de múltiples servicios, pero no tienen un peso definido, esto hace que este grafo sea inviable para obtener las características.
+Es inmediato notar que las aristas de este grafo están degeneradas, es decir, tienen información de múltiples servicios, pero no tienen un peso definido, esto hace que este grafo sea inviable para obtener las características de un servicio (el tiempo de viaje).
 
 ### Grafo Bipartito
 
@@ -565,7 +563,7 @@ $v_e(S,V,d,D, b)$
 Esta función $g$ retorna la velocidad promedio de la tupla $(S,V,d)$ en el bin temporal $b$.
 Notar que al ser promedio, para una tupla, es la misma por todo el recorrido, es decir, no influye la arista por la que circula el servicio.
 
-Para el metro, se decidió una velocidad promedio de 30km/h, debido a que no se encontraban en el programa de operaciones de RED. Esta estimación se basó en diversas fuentes externas.
+Para el metro, se decidió una velocidad promedio de 30km/h, debido a que no se encontraban en el programa de operaciones de RED. Esta estimación se basó en los tiempos que tarda el metro en ir de una estación a otra en Google Maps.
 
 Ambas tablas (de frecuencias y velocidades) las provee RED en su plan de operaciones. Revisar acá: https://www.dtpm.cl/index.php/programa-de-operacion 
 
@@ -579,7 +577,7 @@ Los tipos de nodos que tuvo el grafo son:
 Cada paradero es un nodo. Cada nodo tiene la siguiente información:
 
 - Código de paradero (TS y Usuario)
-- Latitud y longitud (WGS84)
+- Latitud y longitud 
 - Nombre del paradero
 - Tipo (BUS o Metro)
 - Servicios que pasan por el paradero (lista) en cualquier bin b y día D.
@@ -674,7 +672,7 @@ Hacer el grafo de estado es directo teniendo el grafo agrupado. Un algoritmo rec
 
 Luego, se conectaron todos los nodos de tipo servicio con aristas VIAJAR según el recorrido .
 
-Para el grafo bipartito solo se tuvo en cuenta el Metro y los servicios de superficie como los buses. No se consideró el Metro Tren Nos pues no posee plan de operaciones.
+Para el grafo bipartito solo se tuvo en cuenta el Metro y los servicios de superficie como los buses. No se consideró el Metro Tren Nos pues no posee plan de operaciones en la página de RED.
 
 ## MNL
 
@@ -682,7 +680,7 @@ El MNL se entrenó para predecir la probabilidad de que un usuario elija una alt
 
 Suponer que para ir a un destino $D$ desde un origen $O$ tienen dos opciones. Un servicio $S_1$ que deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
 
-Si es que el tiempo de viaje de $S_1$ es menor y además deja directamente en su destino, es lógico que tomar este servicio es la decisión idónea u óptima. Ahora, si el costo de viaje de $S_1$ es mucho más alto, quizás convenga tomar un transbordo. Un ejemplo clásico de esto sería hacer transbordo al metro usando un bus alimentador para llegar al sistema subterráneo. A priori, dependiendo de la urgencia del usuario, deberá de elegir una de las dos alternativas. No todos los usuarios piensan igual. Algunos prefieren comodidad y no hacer transbordos, sobre todo si están con algo de tiempo de sobra. Otras personas confían más en servicios más rápidos que les obligan a hacer transbordo. Como no todo el mundo piensa igual, el MNL es muy útil para estos casos, ya que entrega una distribución de probabilidad sobre que servicio se va a tomar, sobre todo cuando las utilidades de ambos son parecidas. El objetivo de este modelo es descubrir que prefieren los usuarios, si viajes más directos con menos transbordos -pero más largos- , o viajes más rápidos pero con transbordos. Notar que los transbordos tienen tiempos de viajes más variables. Poca confianza en los headways de los buses de transbordo pueden inflar el tiempo de viaje real, ya que la variable de tiempo de espera suele tener más varianza que el tiempo de viaje. más transbordos implican más varianza en el tiempo de viaje total y por lo tanto menos confianza en el trayecto, o sea, menos comodidad. 
+Si es que el tiempo de viaje de $S_1$ es menor y además deja directamente en su destino, es lógico que tomar este servicio es la decisión idónea u óptima. Ahora, si el costo de viaje de $S_1$ es mucho más alto, quizás convenga tomar un transbordo. Un ejemplo clásico de esto sería hacer transbordo al metro usando un bus alimentador para llegar al sistema subterráneo. A priori, dependiendo de la urgencia del usuario, deberá de elegir una de las dos alternativas. No todos los usuarios piensan igual. Algunos prefieren comodidad y no hacer transbordos, sobre todo si están con algo de tiempo de sobra. Otras personas confían más en servicios más rápidos que les obligan a hacer transbordo. Como no todo el mundo piensa igual, el MNL es muy útil para estos casos, ya que entrega una distribución de probabilidad sobre que servicio se va a tomar, sobre todo cuando las utilidades de ambos son parecidas. El objetivo de este modelo es descubrir que prefieren los usuarios, si viajes más directos con menos transbordos -pero más largos- , o viajes más rápidos pero con transbordos. Notar que los transbordos tienen tiempos de viajes más variables. Poca confianza en los headways de los buses de transbordo pueden inflar el tiempo de viaje real, ya que la variable de tiempo de espera suele tener más varianza que el tiempo de viaje. Más transbordos implican más varianza en el tiempo de viaje total y por lo tanto menos confianza en el trayecto, o sea, menos comodidad. 
 
 Con esta reflexión, es directo darse cuenta que lo que se busca con este modelo es descubrir como se comparan el tiempo de viaje total v/s que tanto acerca el servicio inicial al destino. 
 
@@ -849,7 +847,7 @@ Se implementó una GNN con la siguiente arquitectura mostrada en la figura \ref{
 
 ### Datos 
 
-Para los datos, se usó el grafo Bipartito ya mencionado anteriormente. Además, se utilizó la misma tabla de decisiones para entrenar al MNL para reutilizar datos. Se añadió la variante a la tabla de decisiones infiriéndola desde el bin, día y paradero en que tomó el servicio el usuario. Esto para homogeneizar los datos con respecto al grafo bipartito. 
+Para los datos, se usó el grafo Bipartito ya mencionado anteriormente. Además, se utilizó la misma tabla de decisiones para entrenar al MNL para poder compararlos justamente. Se añadió la variante a la tabla de decisiones infiriéndola desde el bin, día y paradero en que tomó el servicio el usuario. Esto para homogeneizar los datos con respecto al grafo bipartito. 
 
 Las aristas SUBIR, VIAJAR, BAJAR Y CAMINAR tienen tensores relacionados con los costes de transicionar de estado en el grafo bipartito. 
 
@@ -896,7 +894,7 @@ El scorer es dinámico, por lo que respeta las dimensiones del vector concatenad
 - CrossEntropyLoss: Penaliza predicciones incorrectas. 
 
 
-Las métricas de evaluación serán las mismas que las del MNL para poder compararlos efectivamente. La figura \ref{fig:arquitectura_gnn} muestra la arquitectura de la GNN.
+Las métricas de evaluación serán las mismas que las del MNL para poder compararlos efectivamente. 
 
 
 \clearpage
@@ -912,7 +910,7 @@ Las métricas de evaluación serán las mismas que las del MNL para poder compar
 ## Experimentos
 
 
-Para exponer los modelos a distintos cambios topológicos, y así cumplir el objetivo específico OE3, se realizacon los siguientes experimentos:
+Para exponer los modelos a distintos cambios topológicos, y así cumplir el objetivo específico OE3, se realizaron los siguientes experimentos:
 
 ### Disminución de la oferta de un servicio
 
@@ -920,7 +918,7 @@ Se disminuyó la oferta de un servicio (el servicio 517 y el 507) modificando lo
 
 ### Suspensión de un servicio
 
-Se suspendió la L1, colocando un indicador booleano en sus aristas para que Dijkstra no permita subir al servicio, y se ejecutó el modelo de predicción. Se realizó la misma comparación mencionada en el caso anterior.Esto se hizo de manera local, es decir, no se ejecutó el algoritmo de predicción sobre todo el día, ya que tardará demasiado.
+Se suspendió la L1, colocando un indicador booleano en sus aristas para que Dijkstra no permita subir al servicio, y se ejecutó el modelo de predicción. Se realizó la misma comparación mencionada en el caso anterior. Esto se hizo de manera local, es decir, no se ejecutó el algoritmo de predicción sobre todo el día, ya que tardará demasiado.
 
 ### Agregar línea 7
 
@@ -1125,7 +1123,7 @@ Es decir, hay un problema. La respuesta a esto está en la figura \ref{fig:hist}
 
 La cantidad de 0's en *viajar_cost* y en *cost_to_go* tienen distintas razones.
 
-Para *viajar_cost*, el coste de viajar es 0 cuando el usuario llega a un paradero, y una de las alternativas decide en hacer transbordo a otro paradero, ya que la ruta más corta comienza en ese paradero. 
+Para *viajar_cost*, el coste de viajar es 0 cuando el usuario llega a un paradero, y una de las alternativas decide en hacer transbordo a otro paradero, ya que la ruta más corta comienza en ese paradero. Esto es un problema, pues hace que el modelo no converja.
 
 Para *cost_to_go* 0, es cuando es necesario solo una etapa para completar el viaje. Esto no es problema que sea 0.
 
@@ -1148,7 +1146,7 @@ Se decide con aplicar una penalización de 5 minutos al tiempo inicial para evit
 
 Primero, para agilizar el entrenamiento, se analizó día por día. El día miércoles no estaba disponible en los datos de RED. Entrenar semanalmente permite identificar cambios en los parámetros dependiendo del día. Ver la tabla \ref{tab:params_dias_mnl} a modo resumen de los parámetros obtenidos.
 
-En esta sección no se mostrarán las métricas diarias, pues consumirían mucho espacio y no son atingentes, pero en la sección siguiente, se mostrarán las métricas de desempeño semanal. La precisión promedio de todos los días fue del 91% tanto en el split de validación como en el de entrenamiento.
+En esta sección no se mostrarán las métricas diarias, pues consumirían mucho espacio y no son atingentes, pero en la sección siguiente, se mostrarán las métricas de desempeño semanal. La precisión promedio trivial (es decir, contando a los sets de alternativas con cardinalidad uno) de todos los días fue del 91% tanto en el split de validación como en el de entrenamiento. La precisión no trivial fue del 89%.
 
 \begin{table}[H]
 \centering
@@ -1363,7 +1361,7 @@ ASC\_metro            & $1.79 \times 10^{-13}$ \\
 \label{tab:exp_coeffs}
 \end{table}
 
-Estos valores reflejan la importancia relativa de cada atributo en la elección de alternativas de viaje según el modelo MNL entrenado. Para el predictor solo se usarán los coeficientes wait_time, viajar_cost, cost_to_go y first_walk_min.
+Estos valores reflejan la importancia relativa de cada atributo en la elección de alternativas de viaje según el modelo MNL entrenado. Para el predictor solo se usarán los coeficientes wait_time, viajar_cost, cost_to_go y first_walk_min, debido a que los otros valores son constantes, muy cercanos a cero, o derivados de los coeficientes principales.
 
 ### Disminución de oferta de un servicio
 
@@ -1709,11 +1707,12 @@ A continuación se discuten aciertos y limitaciones de los aspectos claves de la
 
 *Transbordos determinísticos*
 
-Los transbordos o viajes con más de una etapa fueron tratados de manera determinista en sus etapas posteriores a la inicial, esto quiere decir que después de bajarse, el costo restante es definido de manera estricta. Una solución interesante puede ser concatenar varios MNL para cada etapa, pero esto complica mucho el problema. Notar que este enfoque habría hecho el valor *cost_to_go* no determinado, si no que una distribución o valor esperado. En esta memoria el cost_to_go es el mínimo dado que el usuario se baja en el paradero óptimo y elija el servicio óptimo. Es una simplificación fuerte, pero que funciona en gran parte de las decisiones, ya que el entrenamiento incluyó a etapas intermedias, es decir, que se obtuvo un 91% de precisión no trivial en todas las etapas, por lo que es seguro decir que el modelo predice correctamente cualquier etapa del viaje. Además recordar que gran parte de los viajes son de una etapa (el promedio de 1.75 etapas en los datos históricos lo demuestran), por lo que el determinismo de los transbordos es menos común de lo que se podría esperar.
+Los transbordos o viajes con más de una etapa fueron tratados de manera determinista en sus etapas posteriores a la inicial, esto quiere decir que después de bajarse, el costo restante es definido de manera estricta. Una solución interesante puede ser concatenar varios MNL para cada etapa, pero esto complica mucho el problema. Notar que este enfoque habría hecho el valor *cost_to_go* no determinado, si no que una distribución o valor esperado. En esta memoria el cost_to_go es el mínimo dado que el usuario se baja en el paradero óptimo y elija el servicio óptimo. Es una simplificación fuerte, pero que funciona en gran parte de las decisiones, ya que el entrenamiento incluyó a etapas intermedias, es decir, que se obtuvo un 89% de precisión no trivial en todas las etapas, por lo que es seguro decir que el modelo predice correctamente cualquier etapa del viaje. Además recordar que gran parte de los viajes son de una etapa (el promedio de 1.75 etapas en los datos históricos lo demuestran), por lo que los transbordos son menos comunes de lo que se podría esperar.
+
 
 *Distribución probabilística*
 
-Un acierto claro fue la inclusión de probabilidades en la elección de alternativas. Esto permite modelar la incertidumbre y variabilidad de los usuarios al elegir alternativas que tengan utilidades parecidas. Ejemplos de ello se observan en los experimentos, donde servicios que compiten directamente, como lo son la L1 y L5 en San Pablo a Baquedano, o el 503 y 517 en PJ394 a PA300, muestran redistribuciones de demanda más notorias.
+Un acierto claro fue la inclusión de probabilidades en la elección de alternativas. Esto permite modelar la incertidumbre y variabilidad de los usuarios al elegir alternativas que tengan utilidades parecidas. Ejemplos de ello se observan en los experimentos, donde servicios que compiten directamente, como lo son la L1 y L5 en San Pablo a Baquedano, o el 503 y 517 en PJ394 a PA300, muestran redistribuciones de demanda más equiprobables.
 
 Algunos usuarios prefieren esperar mas para llegar directamente, otros prefieren tomar el primer bus que llegue para esperar menos. Todas estas decisiones modifican el parámetro beta que acompaña a estas características, haciendo que el MNL incluya muchas formas de decisión de los usuarios.
 
@@ -1773,7 +1772,7 @@ Se tiene como objetivo *Diseñar e implementar un modelo que prediga demanda de 
 
 
 
-Desde ese contexto y objetivo, se abordan dos métodos. Uno del MNL y otro el MNL/GNN. Para ambos enfoques, la solución se enfocó en predecir una alternativa a usar. Esto, en base a su origen, destino (inamovibles) y el día. 
+Desde ese contexto y objetivo, se abordan dos métodos. Uno del MNL y otro el MNL/GNN. Para ambos enfoques, la solución se enfocó en predecir una alternativa a usar. Esto, en base a su origen, destino (inamovibles) y el día. Para ello fue necesaria una representación de los datos cómoda y versátil. El grafo bipartito permitió modelar de buena manera la red de transporte, separando paraderos y servicios, y permitiendo modelar tiempos de espera y costos de viaje de manera clara y transparente al enrutador, no teniendo que agregar costes de transbordo de manera artificial.
 
 El MNL permitió un análisis cuantitativo interpretable acerca de las variables que el autor de la memoria consideró importantes. Estos son, el tiempo de viaje , el coste restante de viaje al transbordar y el tiempo de espera. En este ámbito, se observó algo interesante. Las personas prefieren viajar más tiempo si eso significa minimizar el coste restante, la variable que más pesaba al seleccionar una alternativa. En otras palabras, las personas evitan hacer transbordos. 
 
