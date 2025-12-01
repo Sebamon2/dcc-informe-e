@@ -1440,7 +1440,7 @@ Una vez se bajen en Parque Ohiggins, un efecto importante ocurre en el paradero 
 
 \begin{table}[H]
 \centering
-\small
+\scriptsize
 \begin{tabular}{@{}l p{0.78\textwidth}@{}}
 \toprule
 Alternativa (Porcentaje en comparación al *baseline*) & Itinerario \\ \midrule
@@ -1450,50 +1450,55 @@ Subir al servicio \textbf{B38} (Ida) en \texttt{T-11-64-PO-30} \newline
 Bajar en \texttt{T-8-64-PO-30} \newline
 Subir al servicio \textbf{507} (Ida) en \texttt{T-8-64-PO-30} \newline
 Bajar en \texttt{T-20-177-PO-20} \\[0.5em]
+\midrule
 503 (+ 22\% de probabilidades) &
 Inicia en paradero \texttt{T-11-64-PO-30} \newline
 Subir al servicio \textbf{503} (Ida) en \texttt{T-11-64-PO-30} \newline
 Bajar en \texttt{E-20-289-PO-5} \newline
-Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO} \newline
-Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_CAL Y CANTO} \newline
-Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
-Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO CAL Y CANTO} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO CAL Y CANTO} \newline
+Bajar en \texttt{METRO PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
 Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
 Bajar en \texttt{T-20-177-OP-8} \newline
-Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em] 
+\midrule
 504 (+ 20\% de probabilidades) &
 Inicia en paradero \texttt{T-11-64-PO-30} \newline
 Subir al servicio \textbf{504} (Ida) en \texttt{T-11-64-PO-30} \newline
 Bajar en \texttt{T-20-188-NS-10} \newline
-Caminar de \texttt{T-20-188-NS-10} a \texttt{METRO\_SANTA ANA} \newline
-Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_SANTA ANA} \newline
-Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
-Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Caminar de \texttt{T-20-188-NS-10} a \texttt{METRO SANTA ANA} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO SANTA ANA} \newline
+Bajar en \texttt{METRO PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
 Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
 Bajar en \texttt{T-20-177-OP-8} \newline
 Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+\midrule
 517 (+ 19\% de probabilidades) &
 Inicia en paradero \texttt{T-11-64-PO-30} \newline
 Subir al servicio \textbf{517} (Ida) en \texttt{T-11-64-PO-30} \newline
 Bajar en \texttt{E-20-289-PO-5} \newline
-Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO\_CAL Y CANTO} \newline
-Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_CAL Y CANTO} \newline
-Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
-Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Caminar de \texttt{E-20-289-PO-5} a \texttt{METRO CAL Y CANTO} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO CAL Y CANTO} \newline
+Bajar en \texttt{METRO PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
 Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
 Bajar en \texttt{T-20-177-OP-8} \newline
 Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+\midrule
 518 (+ 22\% de probabilidades) &
 Inicia en paradero \texttt{T-11-64-PO-30} \newline
 Subir al servicio \textbf{518} (Ida) en \texttt{T-11-64-PO-30} \newline
 Bajar en \texttt{T-20-203-NS-20} \newline
-Caminar de \texttt{T-20-203-NS-20} a \texttt{METRO\_SANTA ANA} \newline
-Subir al servicio \textbf{L2} (Metro) en \texttt{METRO\_SANTA ANA} \newline
-Bajar en \texttt{METRO\_PARQUE OHIGGINS} \newline
-Caminar de \texttt{METRO\_PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
+Caminar de \texttt{T-20-203-NS-20} a \texttt{METRO SANTA ANA} \newline
+Subir al servicio \textbf{L2} (Metro) en \texttt{METRO SANTA ANA} \newline
+Bajar en \texttt{METRO PARQUE OHIGGINS} \newline
+Caminar de \texttt{METRO PARQUE OHIGGINS} a \texttt{E-20-189-OP-40} \newline
 Subir al servicio \textbf{506} (Ret) en \texttt{E-20-189-OP-40} \newline
 Bajar en \texttt{T-20-177-OP-8} \newline
 Caminar de \texttt{T-20-177-OP-8} a \texttt{T-20-177-PO-20} \\[0.5em]
+\midrule
 507 (- 86\% de probabilidades) &
 Inicia en paradero \texttt{T-11-64-PO-30} \newline
 Subir al servicio \textbf{507} (Ida) en \texttt{T-11-64-PO-30} \newline
