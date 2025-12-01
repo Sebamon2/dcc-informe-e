@@ -881,7 +881,7 @@ Se aplica una Normalizacíon L2 para que algunos *embeddings* dominen por magnit
 
 ### *Features* y concatenación
 
-Las *features* de Dijkstra (o las características de las alternativas) son añadidas opcionalmente como una capa extra. Estos *features* se concatenan con todas las características ya aprendidas mediante los *embeddings*. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES DE Dijkstra (*FEATURES*). 
+Las *features* del MNL (o las características de las alternativas) son añadidas opcionalmente como una capa extra. Estos *features* se concatenan con todas las características ya aprendidas mediante los *embeddings*. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES de características del MNL (*FEATURES*). 
 
 ### MLP (Perceptron Multi Capa) Scorer
 
@@ -1257,7 +1257,7 @@ No se logran observar diferencias sustanciales entre los días de semana y fines
 
 ### Resultados
 
-A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los *embeddings* las características de Dijkstra, y posteriormente cuando se omiten estas características. Recordar que este entrenamiento se hizo de la misma manera que el MNL semanal, es decir, el split y el sampleo de datos (0.1 de los reales) con la misma semilla.
+A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los *embeddings* las características del MNL, y posteriormente cuando se omiten estas características. Recordar que este entrenamiento se hizo de la misma manera que el MNL semanal, es decir, el split y el sampleo de datos (0.1 de los reales) con la misma semilla.
 
 #### GNN con características del MNL
 
@@ -1339,7 +1339,7 @@ Test MRR & 0.850 \\
 
 ## Experimentos
 
-Se realizaron experimentos para mostrar redistribución de demanda. Para ello, se usaron los coeficientes de la tabla \ref{tab:exp_coeffs}  obtenidos de un día viernes. No se usó la GNN debido a que tomaba más tiempo y que los resultados obtenidos eran muy parecidos a los de la MNL cuando tenía la capa de Dijkstra activada. Como ambos tienen resultados parecidos, la MNL es más interpretable y además tarda menos tiempo en generar resultados, se decide por usar la MNL como motor de utilidad.
+Se realizaron experimentos para mostrar redistribución de demanda. Para ello, se usaron los coeficientes de la tabla \ref{tab:exp_coeffs}  obtenidos de un día viernes. No se usó la GNN debido a que tomaba más tiempo y que los resultados obtenidos eran muy parecidos a los de la MNL cuando tenía la capa de las características del MNL activada. Como ambos tienen resultados parecidos, la MNL es más interpretable y además tarda menos tiempo en generar resultados, se decide por usar la MNL como motor de utilidad.
 
 \begin{table}[H]
 \centering
