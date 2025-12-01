@@ -214,7 +214,7 @@ Algo importante a notar es la fecha de esta tabla de recorridos. Es válida desd
 
 #### Zonas 777
 
-Red delimita Santiago en zonas, llamadas Zonas777. Estas están accesibles tanto desde la tabla de etapas (es decir, la subida y bajada denota en que zona ocurrieron), como también en el consolidado en cada paradero. Además, RED entrega archivos SHAPE que pueden analizarse con GEOPANDAS (paquete del lenguaje de programación Python) para visualizar las zonas 777. La figura \ref{fig:zonas777} muestra las zonas 777 de Santiago.
+Red delimita Santiago en zonas, llamadas Zonas777. Estas están accesibles tanto desde la tabla de etapas (es decir, la subida y bajada denota en que zona ocurrieron), como también en el consolidado en cada paradero. Además, RED entrega archivos SHAPE que pueden analizarse con GEOPANDAS (paquete del lenguaje de programación Python) para visualizar las zonas 777. La Figura \ref{fig:zonas777} muestra las zonas 777 de Santiago.
 
 
 \begin{figure}[H]
@@ -281,7 +281,7 @@ Pero, cada cambio de fase o arista debe de mostrar la transición de un estado a
 
 Entonces, entre dos estados EN PARADERO pueden haber aristas CAMINAR y aristas VIAJAR. En cambio, entre un PARADERO y un SERVICIO, pueden haber aristas SUBIR o BAJAR. La direccionalidad de las aristas es importante. Lógicamente la arista BAJAR irá desde el SERVICIO hasta el PARADERO. En cambio, la arista CAMINAR es bidireccional. Una arista VIAJAR es de un solo sentido en el caso de los buses, pero bidireccional en el METRO. 
 
-El diagrama de la figura \ref{fig:grafo_estado} muestra un esquema resumen del grafo Bipartito.
+El diagrama de la Figura \ref{fig:grafo_estado} muestra un esquema resumen del grafo Bipartito.
 
 
 \begin{figure}[H]
@@ -409,7 +409,7 @@ En la presente sección, primero se dará a conocer la solución propuesta y  fi
 ## Solución propuesta
 
 
-La solución se basa en dos pilares fundamentales, el primero, la *representación de los datos* en una estructura topológica, en donde se creó el grafo agrupado y bipartito usando el programa de operaciones de red y el segundo, el *modelado del proceso de decisión de los usuarios*, en donde se entrenaron dos modelos, el MNL y el GNN, usando datos históricos de demanda de ADATRAP. Esta solución cumple los objetivos específicos (OE1, OE2 ). La figura \ref{fig:diagrama_general_solucion} muestra un diagrama general de la solución propuesta.
+La solución se basa en dos pilares fundamentales, el primero, la *representación de los datos* en una estructura topológica, en donde se creó el grafo agrupado y bipartito usando el programa de operaciones de red y el segundo, el *modelado del proceso de decisión de los usuarios*, en donde se entrenaron dos modelos, el MNL y el GNN, usando datos históricos de demanda de ADATRAP. Esta solución cumple los objetivos específicos (OE1, OE2 ). La Figura \ref{fig:diagrama_general_solucion} muestra un diagrama general de la solución propuesta.
 
 \begin{figure}[H]
     \centering
@@ -819,7 +819,7 @@ Para el entrenamiento, se consideró lo siguiente:
 6. 300 iteraciones máximas por época. tol = 1e-7 y l2_reg= 1e-3. 
 7. Métricas las ya anteriormente mencionadas. 
 
-La figura \ref{fig:diagrama_solucion_mnl} resume el proceso de entrenamiento del MNL.
+La Figura \ref{fig:diagrama_solucion_mnl} resume el proceso de entrenamiento del MNL.
 
 \begin{figure}[H]
     \centering
@@ -835,7 +835,7 @@ La figura \ref{fig:diagrama_solucion_mnl} resume el proceso de entrenamiento del
 
 ### Arquitectura de la solución
 
-Se implementó una GNN con la siguiente arquitectura mostrada en la figura \ref{fig:arquitectura_gnn}.
+Se implementó una GNN con la siguiente arquitectura mostrada en la Figura \ref{fig:arquitectura_gnn}.
 
 
 \begin{figure}[H]
@@ -1013,7 +1013,7 @@ La creación del grafo agrupado dió como resultados un grafo con las siguientes
 - 272 conexiones de metro
 - 15737 conexiones totales
 
-Para visualzar el grafo, se puede descargar el archivo en el [link](https://github.com/Sebamon2/memoria-repo/blob/master/output/mapa_con_zonas.html), haciendo *clic* en el ícono de descarga cerca de "Raw" llamado "download raw file" y abrirlo en un navegador. La figura \ref{fig:mapa_plotly} muestra un zoom a un barrio de Cerro Navia en este mismo mapa.
+Para visualzar el grafo, se puede descargar el archivo en el [link](https://github.com/Sebamon2/memoria-repo/blob/master/output/mapa_con_zonas.html), haciendo *clic* en el ícono de descarga cerca de "Raw" llamado "download raw file" y abrirlo en un navegador. La Figura \ref{fig:mapa_plotly} muestra un zoom a un barrio de Cerro Navia en este mismo mapa.
 
 
 
@@ -1032,7 +1032,7 @@ Este mapa permite visualizar el grafo completo, pero carece de funcionalidad par
 ### Grafo bipartito
 
 
-En la figura \ref{fig:grafo_estado} se muestra un ejemplo del grafo de estado en la misma zona que se mostró en la figura \ref{fig:mapa_plotly}.
+En la Figura \ref{fig:grafo_estado} se muestra un ejemplo del grafo de estado en la misma zona que se mostró en la Figura \ref{fig:mapa_plotly}.
 
 Si se audita el grafo para sanear errores, se obtiene lo siguiente: 
 
@@ -1112,12 +1112,12 @@ El entrenamiento dio los siguientes resultados.
 
 Como se observa en las tablas, todos los coeficientes resultaron nulos y las métricas de log-likelihood y pseudo-$R^2$ no son numéricas (NaN), lo que indica que el modelo no logró aprender una relación significativa entre las variables y la elección observada. Sin embargo, la \textit{top-1 accuracy} se mantiene en torno al 43\%, lo que sugiere que, pese a la falta de ajuste en los coeficientes, el modelo logra predecir la alternativa elegida en una proporción considerable de los casos, posiblemente debido a la estructura de los datos o a la presencia de alternativas dominantes.
 
-Es decir, hay un problema. La respuesta a esto está en la figura \ref{fig:hist}.
+La Figura \ref{fig:hist} ilustra la razón de este problema. Hay muchas alternativas con *viajar_cost* cero.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\textwidth]{../memoria-repo/data/plots/costs_hist.png}
-    \caption{Histograma de Pesos}
+    \caption{Histograma de Pesos. El eje x representa el tiempo y el eje y la frecuencia}
     \label{fig:hist}
 \end{figure}
 
@@ -1369,7 +1369,7 @@ Se tiene un paradero P y Q conectados por un set de servicios {S} para un bin b.
 
 **Ejemplo 1: Ir desde PJ394 a PA300**
 
-Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero. El experimento consiste en aumentar al doble el tiempo de espera del 517. 
+Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver Figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero. El experimento consiste en aumentar al doble el tiempo de espera del 517. 
 
 \begin{figure}[H]
     \centering
@@ -1378,7 +1378,7 @@ Ambos paraderos tienen de servicios disponibles que dejan directo en el destino,
     \label{fig:exp1costs}
 \end{figure}
 
-Si se ejecuta el predictor, se obtiene una redistribución de probabilidades como la mostrada en la figura \ref{fig:exp1probs}. 
+Si se ejecuta el predictor, se obtiene una redistribución de probabilidades como la mostrada en la Figura \ref{fig:exp1probs}. 
 
 
 
@@ -1393,9 +1393,9 @@ Notar como el servicio 503 pierde probabilidad y el 517 la gana. Pero no es una 
 
 **Ejemplo 2: Ir desde PJ394 a PA433**
 
-Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servicio llega directamente al destino, el 507. El resto entonces, tiene un costo restante mayor que cero. Ver figura \ref{fig:exp2costs} que ilustra los tiempos de cada servicio del paradero.
+Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servicio llega directamente al destino, el 507. El resto entonces, tiene un costo restante mayor que cero. Ver Figura \ref{fig:exp2costs} que ilustra los tiempos de cada servicio del paradero.
 
-Al ejecutar el MNL, se obtuvo una redistribución de probabilidades como la mostrada en la figura \ref{fig:exp2probs}.
+Al ejecutar el MNL, se obtuvo una redistribución de probabilidades como la mostrada en la Figura \ref{fig:exp2probs}.
 
 Notar que no cambia mucho la probabilidad del servicio 507. A pesar de que su tiempo de espera se duplica, sigue siendo la mejor alternativa. 
 
@@ -1420,7 +1420,7 @@ Se observa que:
 
 - Cuando hay servicios que compiten, se obtiene una redistribución de la demanda más notoria como fue el caso del 503 vs el 517. En el caso del 507, al no tener ningun servicio que compita directamente, un mayor tiempo de espera no influye en lo atractivo del servicio.
 
-Se sigue aumentando el tiempo de espera, hasta un 1500% más grande que el original (esto hace que el tiempo de espera pase a 100 minutos). Se obtiene una redistribución de probabilidades como la que sigue en la figura \ref{fig:exp2probs15}.
+Se sigue aumentando el tiempo de espera, hasta un 1500% más grande que el original (esto hace que el tiempo de espera pase a 100 minutos). Se obtiene una redistribución de probabilidades como la que sigue en la Figura \ref{fig:exp2probs15}.
 
 
 \begin{figure}[H]
