@@ -739,7 +739,7 @@ Entonces, se obtiene un camino C que tiene de extremos dos nodos PARADERO y una 
 
 Si se ejecuta el AD para el origen y destino, se obtendrán paraderos de bajada óptimos para cada alternativa. Estos son , el destino para el 507, y paraderos de transbordo para los otros. 
 
-Siguiendo con el pipeline...
+Volviendo al proceso de la creación del dataset:
 
 3. Se expandió esta tabla de decisiones con las alternativas posibles disponibles para el usuario en ese paradero y bin. Esta expansión se hizo de la siguiente forma: 
 
