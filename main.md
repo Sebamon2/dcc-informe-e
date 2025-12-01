@@ -14,7 +14,7 @@ citecolor: purple
 
 
 resumen: |
-  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile, debido a cambios de oferta es un desafío complejo, pues estos cambios provocan efectos en cadena en toda la red. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y así tomar decisiones con mejores datos.
+  Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile debido a cambios de oferta es un desafío complejo, pues estos cambios provocan efectos en cadena en toda la red. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda sintéticos, y así tomar decisiones con mejores datos.
 
   Para ello, se utilizaron los datos de viajes proporcionados por Red Metropolitana de Movilidad, enriquecidos por ADATRAP para modelar la elección de ruta pasando por tres ejes (o componentes) fundamentales del trabajo, el modelado del mundo, en este caso, un grafo bipartito que simula a la red completa, un motor de utilidades, en este caso, el GNN/MNL y experimentos para comprobar y poner a prueba estos modelos.
 
@@ -22,7 +22,7 @@ resumen: |
 
   El modelo GNN logró una mejoría al tener un 91 % de precisión no trivial. Se comparan GNN con capas de decisión discreta activadas y desactivadas. Debido a la leve mejoría del GNN, se opta por hacer experimentos con el MNL gracias a su velocidad e interpretabilidad.
 
-  Finalmente, se realizan experimentos para poner a prueba el modelo del MNL, en este caso, se cambian frecuencias de servicios y se suspenden otros, analizando localmente la redistribución de la demanda, observando una redistribución de la demanda en servicios varios. Para terminar, se agrega la Línea 7 del Metro de Santiago pronta a inaugurarse, para analizar los cambios de la demanda. Se observa un aumento de carga general en el metro, especialmente en la L1; un aumento de la cantidad de transbordos y  un aumento en la demanda de servicios alimentadores a la linea en cuestión.
+  Finalmente, se realizan experimentos para poner a prueba el modelo del MNL, en este caso, se cambian frecuencias de servicios y se suspenden otros, analizando localmente la redistribución de la demanda, observando una redistribución de la demanda en servicios varios. Para terminar, se agrega la Línea 7 del Metro de Santiago pronta a inaugurarse, para analizar los cambios de la demanda. Se observa un aumento de carga general en el metro, especialmente en la L1; un aumento de la cantidad de transbordos y  un aumento en la demanda de servicios alimentadores a la lísnea en cuestión.
 
   Se concluye que los experimentos evidencian fortalezas de la solución, como su capacidad de generar datos sintéticos, pero también limitaciones debido a los datos disponibles.
 ---
@@ -52,13 +52,13 @@ Es por ello, que el objetivo de esta memoria es: *Diseñar e implementar un mode
 
 #### Objetivos específicos a cumplir
 
-1. (OE1) Construir una representación topológica de la red de transporte público de Santiago en un grafo, integrando datos de operacion como velocidades, frecuencias y trazados.
+1. (OE1) Construir una representación topológica de la red de transporte público de Santiago en un grafo, integrando datos de operación como velocidades, frecuencias y trazados.
 
-2. (OE2) Diseñar, entrenar y evaluar modelos de elección discreta y de aprendizaje profundo, determinando la arquitectura mas adecuada para simular la toma de decisiones de los usuarios, usando como datos la demanda histórica de viajes en transporte público de ADATRAP.
+2. (OE2) Diseñar, entrenar y evaluar modelos de elección discreta y de aprendizaje profundo, determinando la arquitectura más adecuada para simular la toma de decisiones de los usuarios, usando como datos la demanda histórica de viajes en transporte público de ADATRAP.
 
 3. (OE3) Evaluar el impacto eventos de reconfiguración de la red de transporte público mediante la generación de datos de demanda de viajes sintéticos.
 
-El cuerpo de la memoria comienza con el Capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el Capitulo 3 se presenta una metodología para construir una representación de los datos e implementación y entrenamiento del MNL/GNN para luego terminar con los experimentos. El Capítulo 4 presenta los resultados y discusión inmediata de ellos. El capítulo 5 presenta la conclusión de la memoria.
+El cuerpo de la memoria comienza con el capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el capítulo 3 se presenta una metodología para construir una representación de los datos e implementación y entrenamiento del MNL/GNN para luego terminar con los experimentos. El capítulo 4 presenta los resultados y discusión inmediata de ellos. El capítulo 5 presenta la conclusión de la memoria.
 
 
 
@@ -70,18 +70,18 @@ La siguiente sección se dividirá en dos, la primera, una revisión de literatu
 
 ## Contexto 
 
-Siguiendo el trabajo de Torrepadula más a fondo [@diTorrepadula2024], un paper review sobre este sujeto de estudio, se abren muchas soluciones y consideraciones: 
-La primera , el sujeto de la predicción. 
+Siguiendo el trabajo de Torrepadula más a fondo [@diTorrepadula2024], un paper review sobre este objeto de estudio, se abren muchas soluciones y consideraciones: 
+La primera , el objeto de la predicción. 
 
-### Sujeto de la predicción 
+### Objeto de la predicción 
 Diversos trabajos se enfocan tanto en: 
 
-1. Cantidad de personas en una parada en la ruta. Trabajos como el de Wei et. al [@wei2022nonlinear] usan enfoques no lineales para estimar la demanda en algunas estaciones de metro.
+1. Cantidad de personas en una parada en la ruta. Trabajos como el de Wei et al. [@wei2022nonlinear] usan enfoques no lineales para estimar la demanda en algunas estaciones de metro.
 2. Cantidad de personas en la ruta. El trabajo de Zhao [@zhao] utiliza Prophet para estimar las personas en la ruta 320 de Zhengzhou, China
-3. Cantidad de personas en un vehículo. Algunos trabajos lo predicen , como el de Wang et. al[@li2022deep] con un Support Vector Machine más un filtro de Kalman.
-4. Cantidad de personas en un área. El trabajo de Wang et al [@wang2021passenger] explora predicciones espacio temporales con un modelo llamado GALLAT (GrAphic preddiction with ALL ATtention), que modela la red como un grafo 
+3. Cantidad de personas en un vehículo. Algunos trabajos lo predicen , como el de Wang et al.[@li2022deep] con un Support Vector Machine más un filtro de Kalman.
+4. Cantidad de personas en un área. El trabajo de Wang et al. [@wang2021passenger] explora predicciones espacio temporales con un modelo llamado GALLAT (GrAphic preddiction with ALL ATtention), que modela la red como un grafo 
 
-Notar que cada enfoque o sujeto requiere un set de datos distintos, por ejemplo, para saber cuanta gente hay en un momento dado en un vehículo, se deben usar cámaras o sensores, en cambio, para saber un estimado de gente en la ruta, se usan los datos de las validaciones de la tarjeta bip! de la ruta.
+Notar que cada enfoque u objeto requiere un set de datos distintos, por ejemplo, para saber cuanta gente hay en un momento dado en un vehículo, se deben usar cámaras o sensores, en cambio, para saber un estimado de gente en la ruta, se usan los datos de las validaciones de la tarjeta bip! en la ruta.
 
 
 ### Tipo de datos
@@ -140,7 +140,7 @@ El más destacado es ADATRAP, desarrollado por la Universidad de Chile y el Inst
 
 ADATRAP [@adatrap2025] es un software que utiliza la información geotemporal referenciada (GPS) en buses de Transantiago, en conjunto con la información que entrega la tarjeta Bip!, con el objetivo de estimar desempeño de transporte público, velocidades de traslado, hacinamiento, perfiles de carga, etc. Logra crear perfiles de velocidad por servicio y por tramo de ruta, perfiles de carga por servicio, matrices origen-destino, indicadores de calidad de servicio. El software está registrado a nombre de la Universidad de Chile y transferido mediante acuerdo de licencia a la Subsecretaría de Transportes. Se utiliza diariamente para tomar decisiones tales como la definición semanal de programas de operación, modificación de servicios y decisiones de infraestructura
 
-Estos fenómenos (el cambio de demanda) han sido objeto de análisis en trabajos previos. Un ejemplo representativo es el de Ramírez [@tesisanalisismetro], quien estudia el cambio espacial en la demanda de transporte público tras la apertura de una nueva línea de metro, empleando un enfoque estadístico. Si bien su análisis es útil para evaluar efectos pasados y preveer algunos eventos futuros, su falta de generalización da una ventana de oportunidad. 
+Estos fenómenos (el cambio de demanda) han sido objeto de análisis en trabajos previos. Un ejemplo representativo es el de Ramírez [@tesisanalisismetro], quien estudia el cambio espacial en la demanda de transporte público tras la apertura de una nueva línea de metro, empleando un enfoque estadístico. Si bien su análisis es útil para evaluar efectos pasados y prever algunos eventos futuros, su falta de generalización da una ventana de oportunidad. 
 
 Por otra parte, el trabajo de Camus [@tesiscamus] propone una simulación basada en agentes dentro de la red de transporte público. Sin embargo, dicho modelo considera la oferta como un elemento estático y no contempla escenarios en los que esta pueda ser modificada.
 
@@ -154,7 +154,7 @@ Asimismo, existen modelos de demanda agregada, como el desarrollado por Méndez 
 ## Origen y representación de los datos 
 
 
-Transformar los datos en una *estructura de datos* es un paso importante para que los algoritmos de ruteo entreguen características de cada alternativa del viaje. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu Et. Al[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. 
+Transformar los datos en una *estructura de datos* es un paso importante para que los algoritmos de ruteo entreguen características de cada alternativa del viaje. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu et al.[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. 
 
 ### Red Metropolitana de Movilidad 
 
@@ -162,7 +162,7 @@ Red Metropolitana de Movilidad es el sistema de transporte público de Santiago,
 
 Su operación se basa en distintas unidades de negocio (UN) que trabajan en conjunto con un set de servicios acordados mediante licitaciones. Los datos necesarios para crear el grafo y enriquecerlo con costes para entrenar están disponibles de manera pública en los planes de operaciones y en las matrices de viaje. 
 
-Recalcar algunas características que impone el sistema de transporte a la solución. El usuario solo valida su tarjeta en el paradero de subida, esto implica que no se sabe con inequivocidad donde se baja el usuario. Además, el coste de un pasaje depende de la hora, siendo estas franjas tarifarias valle y peak. Otro caso borde incluye a las zonas paga, en las cuales se valida en un tótem fuera del servicio, por lo que se pierde información sobre el servicio a bordo real del usuario una vez se sube al vehículo. En estaciones de metro de combinación un usuario puede validar su tarjeta en el tótem de una de las lineas, pero combinar inmediatamente y subirse a la otra.  
+Recalcar algunas características que impone el sistema de transporte a la solución. El usuario solo valida su tarjeta en el paradero de subida, esto implica que no se sabe con inequivocidad donde se baja el usuario. Además, el coste de un pasaje depende de la hora, siendo estas franjas tarifarias valle y peak. Otro caso borde incluye a las zonas paga, en las cuales se valida en un tótem fuera del servicio, por lo que se pierde información sobre el servicio a bordo real del usuario una vez se sube al vehículo. En estaciones de metro de combinación un usuario puede validar su tarjeta en el tótem de una de las líneas, pero combinar inmediatamente y subirse a la otra.  
 
 
 ### Datos de RED y ADATRAP
@@ -172,7 +172,7 @@ ADATRAP entrega datos de viajes y etapas. Los datos están públicos en el sigui
 
 Cada viaje tiene un origen y un destino. El sistema de transportes capitalino no posee validación de la Bip! o sus derivados al término de la etapa, por lo que la estimación de este parámetro fue realizada por el software ADATRAP. ADATRAP analiza los patrones de viaje de usuarios para detectar donde se sube y baja. Tomar el siguiente caso: 
 
-Un usuario sube a las 7:00 AM en el servicio X en el paradero P, y se sube a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad, entonces se concluye que en la mañana el usuario se bajo cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
+Un usuario sube a las 7:00 AM en el servicio X en el paradero P, y aborda a las 19:00 en el servicio Y en el paradero P', esto con cierta regularidad, entonces se concluye que en la mañana el usuario se bajó cerca del paradero P' usando el sevicio X, y que en la tarde el usuario se bajó cerca del paradero P en el servicio Y.
 
 #### Tabla de viajes y etapas
 
@@ -272,7 +272,7 @@ Para cada cambio de fase, se asocia un coste, estos son:
 - COSTE DE BAJAR : Es cero, pues bajar del servicio es un acto puntual.
 - COSTE DE VIAJAR  : Es el tiempo que tarda en recorrer un servicio entre dos paraderos de una etapa de viaje. 
 
-Como los cambios de fase con costes, es directo entender que los cambios de fases definen los tipos de aristas que habrán en el grafo. 
+Como los cambios de fase con costes, es directo entender que los cambios de fases definen los tipos de aristas que habrá en el grafo. 
 
 Pero, cada cambio de fase o arista debe de mostrar la transición de un estado al otro. Se definen los siguientes dos estados (nodos): 
 
@@ -330,7 +330,7 @@ Se ahondará en dos modelos, el MNL y la GNN, pues son los que mejores resultado
 
 El modelo MNL (Multinomial Logit Model) es un modelo de elección discreta que se utiliza para predecir la probabilidad de que un individuo elija una alternativa dentro de un set de ellas.
 
-Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el investigador, las cuales considera importantes para la toma de decisiones, pero no se ponderan aún. El modelo será encargado de decir que variable pondera más que otra en el proceso de entrenamiento.Notar que todas estas variables son *atributos* de la alternativa.
+Por ejemplo, si un usuario tiene N *alternativas* de servicio en un paradero, sean $S1, S2 .. S_n$ en un paradero de origen P y un destino Q, el modelo MNL permite predecir la probabilidad de que el usuario elija cada una de las alternativas en base a variables propuestas como *determinantes* por el investigador, las cuales considera importantes para la toma de decisiones, pero no se ponderan aún. El modelo será encargado de decir qué variable pondera más que otra en el proceso de entrenamiento.Notar que todas estas variables son *atributos* de la alternativa.
 
 Tal como lo definen Ortuzar & Willumsen [@ortuzar2011modelling], una utilidad $U_n$ se define como la suma de la parte determinística (los atributos) y una parte aleatoria $\epsilon_n$ que captura la incertidumbre del modelo.
 
@@ -357,10 +357,10 @@ En el ámbito de predicción de demanda en transporte público, el modelo MNL se
 
 #### Ventajas
 
-- Fácil de interpretar, pues se obtienen valores para cada feature de los costes, permitiendo interpretar que considera más valioso el usuario en términos de utilidad. 
+- Fácil de interpretar, pues se obtienen valores para cada característica de los costes, permitiendo interpretar que considera más valioso el usuario en términos de utilidad. 
 - Más rápida de entrenar, pues requiere menos datos. 
 - Resistente a outliers. Al ser una función global la obtenida, servicios que tengan desvíos o datos corruptos no se verán afectados por esto. 
-- Facil de crear escenarios ficticios de nuevos servicios pues no es necesario reentrenar.
+- Fácil de crear escenarios ficticios de nuevos servicios pues no es necesario reentrenar.
 
 #### Desventajas
 
@@ -377,23 +377,23 @@ Por otro lado, modelos de Machine Learning como Random Forest o XGBoost han demo
 
 ### GNN
 
-Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura más rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. Wu et. Al [@wu_gnn] hacen una revisión exhaustiva de las GNN y sus aplicaciones. 
+Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibir como inputs grafos. A diferencia de redes neuronales como las LSTM o las convolucionales, las cuales reciben datos con una estructura más rígida (una secuencia o una grilla), las GNN reciben datos en grafos abstractos. Entonces, se puede pensar a las GNN como una abstracción general de un set de datos relacionados entre sí. Wu et al. [@wu_gnn] hacen una revisión exhaustiva de las GNN y sus aplicaciones. 
 
 Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. Se explora la solución de una GNN Heterogénea que aproveche la riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
 
-Una GNN tiene embeddings o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. Entre estos paraderos y servicios, se propagan mensajes que permiten capturar la correlación espacial. GraphConv, construído sobre el trabajo de Morris et. Al[@morris2021weisfeilerlemanneuralhigherorder] , es una capa de convolución de grafos que permite capturar la información local de los nodos y sus vecinos. Existen otros tipos de capas, como SageConv construído por Morris Hamilton et. Al [@hamilton2018inductiverepresentationlearninglarge], el cual aplana los mensajes con promedios.
+Una GNN tiene *embeddings* o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. Entre estos paraderos y servicios, se propagan mensajes que permiten capturar la correlación espacial. GraphConv, construído sobre el trabajo de Morris et al.[@morris2021weisfeilerlemanneuralhigherorder] , es una capa de convolución de grafos que permite capturar la información local de los nodos y sus vecinos. Existen otros tipos de capas, como SageConv construído por Morris Hamilton et al.[@hamilton2018inductiverepresentationlearninglarge], el cual aplana los mensajes con promedios.
 
 
 #### Ventajas
 
 - Captura correlación espacial
-- más riqueza local gracias a los embeddings
+- más riqueza local gracias a los *embeddings*
 
 #### Desventajas
 - Más tiempo de entrenamiento y más datos necesarios.
-- Menos resistente a outliers (embeddings de recorridos corruptos o desviados afectan localmente)
-- Menos interpretabilidad debido a lo abstracto que son los vectores de embeddings. 
-- Requiere reentrenar para escenarios ficticios de servicios que no existen (ya que hay que obtener los embeddings)
+- Menos resistente a outliers (*embeddings* de recorridos corruptos o desviados afectan localmente)
+- Menos interpretabilidad debido a lo abstracto que son los vectores de *embeddings*. 
+- Requiere reentrenar para escenarios ficticios de servicios que no existen (ya que hay que obtener los *embeddings*)
 
 
 
@@ -431,7 +431,7 @@ Para los tres costes, es necesario tener una representación del programa de ope
 
 Para entrenar al modelo, por cada intención de etapa de un viaje (es decir, un origen, destino, hora y día), se obtuvieron las N alternativas posibles en el paradero usando el grafo bipartito y se calcularon los atributos de cada una de ellas usando el algoritmo enrutador en el mismo grafo. Una de esas alternativas fue la elegida realmente (la demanda histórica), mientras que las otras no. Con ello, se entrenó al MNL, tomando como acierto del modelo elegir a la alternativa real tomada como la que tiene menor utilidad según la función lineal y se obtuvieron los coeficientes $\beta_i$ que ponderan la importancia de cada atributo en la decisión del usuario. Esto es, un modelo de elección discreto. 
 
-La fase dos consistió en enriquecer el proceso de elección sumando la contextualización espacial, para ello, una GNN que utilice los embeddings de los paraderos y servicios fue implementada. Esta GNN aprovecha el motor de costes obtenido por el MNL para crear un set de atributos enriquecido para cada alternativa. 
+La fase dos consistió en enriquecer el proceso de elección sumando la contextualización espacial, para ello, una GNN que utilice los *embeddings* de los paraderos y servicios fue implementada. Esta GNN aprovecha el motor de costes obtenido por el MNL para crear un set de atributos enriquecido para cada alternativa. 
 
 A continuación se detallan los pasos seguidos para cumplir cada fase de la solución propuesta.
 
@@ -459,15 +459,15 @@ Los vértices V son las paradas. Cada parada tiene un par coordenado (latitud, l
 
 El primer paso, consistió en agrupar a todas las conexiones de dos paraderos consecutivos en una arista en común. Es decir:
 
-1. El servicio X tiene una secuencia de paraderos P~k~ , con k el número de paradero en el recorrido. P~0~ es el paradero inicial y P~N~ es el paradero final del recorrido.
+1. El servicio $X$ tiene una secuencia de paraderos $P_k$ , con $k$ el número de paradero en el recorrido. $P_0$ es el paradero inicial y $P_N$ es el paradero final del recorrido.
 
-2. Los paraderos se configuran en nodos V. Cada nodo V tiene como llave su código de usuario C,  una lista de servicios S[] y un par coordenado (lat, lon) para ubicarlo geográficamente.
+2. Los paraderos se configuran en nodos $V$. Cada nodo $V$ tiene como llave su código de usuario $C$,  una lista de servicios $S[]$ y un par coordenado (lat, lon) para ubicarlo geográficamente.
 
-3. Cada servicio tiene una secuencia de nodos que visita en orden. Por ejemplo, la secuencia de paraderos que visita un recorrido X es P[]. Si el set de nodos es V[], se puede hacer una biyección entre P~k~ y V~i~. Siendo k el k-ésimo paradero en orden e i el i-ésimo paradero de toda la red. Obviamente i no tiene por que ser igual a k.
+3. Cada servicio tiene una secuencia de nodos que visita en orden. Por ejemplo, la secuencia de paraderos que visita un recorrido $X$ es $P[]$. Si el set de nodos es $V[]$, se puede hacer una biyección entre $P_k$ y $V_i$. Siendo $k$ el $k$-ésimo paradero en orden e $i$ el $i$-ésimo paradero de toda la red. Obviamente $i$ no tiene por que ser igual a $k$.
 
-4. Si hay dos servicios, X e Y, que tienen secuencias de paraderos P~k~ y Q~k~ y tienen dos paraderos consecutivos que coinciden, es decir, P~k~ = Q~i~ y P~k+1~= Q~i+1~, luego se puede decir que desde P~k~=Q~i~=V~l~ a P~k+1~=Q~i+1~=V~m~ habrá una arista en esa dirección, con m y l no necesariamente consecutivos.
+4. Si hay dos servicios, $X$ e $Y$, que tienen secuencias de paraderos $P_k$ y $Q_i$ y tienen dos paraderos consecutivos que coinciden, es decir, $P_k = Q_i$ y $P_{k+1} = Q_{i+1}$, luego se puede decir que desde $P_k = Q_i = V_l$ a $P_{k+1} = Q_{i+1} = V_m$ habrá una arista en esa dirección, con $m$ y $l$ no necesariamente consecutivos.
 
-5. Esta arista direccionada desde V~l~ a V~m~ tendrá como información que los servicios X e Y pasan por ella. 
+5. Esta arista direccionada desde $V_l$ a $V_m$ tendrá como información que los servicios $X$ e $Y$ pasan por ella. 
 
 Siguiendo estas reglas, se creó el grafo con el siguiente pseudocódigo:
 
@@ -488,7 +488,7 @@ Siguiendo estas reglas, se creó el grafo con el siguiente pseudocódigo:
 - nombre completo (código del paradero + nombre del paradero)
 - tipo (BUS o Metro)
 
-6. Por cada fila del dataframe, se revisó el parámetro "siguiente_parada" que contiene la siguiente parada desde la que se está revisando (un puntero básicamente). Se creó una arista E~l~ en un diccionario que une ambas paradas con la siguiente información:
+6. Por cada fila del dataframe, se revisó el parámetro "siguiente_parada" que contiene la siguiente parada desde la que se está revisando (básicamente un puntero). Se creó una arista E~l~ en un diccionario que une ambas paradas con la siguiente información:
 
 - conexion_id (llave formada por el par codigo_paradero_origen, codigo_paradero_siguiente)
 - servicios 
@@ -587,9 +587,9 @@ Cada paradero es un nodo. Cada nodo tiene la siguiente información:
 
 Cada paradero tiene un conjunto de servicios que pasan por él. Por lo tanto, se define un nodo servicio por cada paradero y servicio que pasa por él. Estos nodos permiten cerrar la transición entre estar en un paradero y subirse a un servicio. 
 
-Por ejemplo, si un paradero P tiene los servicios 507 y 512 que pasan por él, se crean dos nodos servicio: Servicio 507 en paradero P y Servicio 512 en paradero P. Cada nodo servicio tiene la siguiente información:
+Por ejemplo, si un paradero $P$ tiene los servicios 507 y 512 que pasan por él, se crean dos nodos servicio: Servicio 507 en paradero $P$ y Servicio 512 en paradero $P$. Cada nodo servicio tiene la siguiente información:
 
-- Nodo paradero asociado (Paradero P)
+- Nodo paradero asociado (Paradero $P$)
 - Servicio
 - Sentido
 - Variante (PM o Normal)
@@ -610,8 +610,8 @@ Aristas que corren entre nodos *Servicio*. Representan la conexión dirigida ent
 - Servicio
 - Sentido
 - Variante (PM o Normal)
-- Distancia (m)
-- Velocidad promedio (km/h) por bin y tipo de día (en un diccionario)
+- Distancia (metros)
+- Velocidad promedio (kilómetros/hora) por bin y tipo de día (en un diccionario)
 - Tiempo a bordo (min) por bin y tipo de día (en un diccionario)
 - Tipo (BUS o Metro)
 
@@ -622,9 +622,10 @@ Notar que las aristas VIAJAR tienen peso, el cual es el tiempo a bordo. Estas ar
 
 Aristas que corren entre nodos *Paradero*. Representan la conexión no dirigida entre dos paraderos cercanos. Estas aristas tienen la siguiente información:
 
-- Nodo origen (Paradero P)
-- Nodo destino (Paradero Q)
-- Distancia (m)
+
+- Nodo origen (Paradero $P$)
+- Nodo destino (Paradero $Q$)
+- Distancia (metros)
 - Tiempo estimado (min). Son iguales para ambas direcciones y son atemporales. Dependen de la velocidad promedio del usuario.
 
 
@@ -633,8 +634,8 @@ Aristas que corren entre nodos *Paradero*. Representan la conexión no dirigida 
 
 Aristas que corren entre nodos *Paradero* y *Servicio*. Representan la acción de subirse a un servicio en un paradero. Estas aristas tienen la siguiente información:
 
-- Nodo origen (Paradero P)
-- Nodo destino (Servicio en paradero P)
+- Nodo origen (Paradero $P$)
+- Nodo destino (Servicio en paradero $P$)
 - Servicio
 - Sentido
 - Variante (PM o Normal)
@@ -645,8 +646,8 @@ Aristas que corren entre nodos *Paradero* y *Servicio*. Representan la acción d
 
 Aristas que corren entre nodos *Servicio* y *Paradero*. Representan la acción de bajarse de un servicio en un paradero. Estas aristas tienen la siguiente información:
 
-- Nodo origen (Servicio en paradero P)
-- Nodo destino (Paradero P)
+- Nodo origen (Servicio en paradero $P$)
+- Nodo destino (Paradero $P$)
 - Servicio
 - Sentido
 - Variante (PM o Normal)
@@ -676,13 +677,13 @@ Para el grafo bipartito solo se tuvo en cuenta el Metro y los servicios de super
 
 ## MNL
 
-El MNL se entrenó para predecir la probabilidad de que un usuario elija una alternativa entre N alternativas en un paradero de origen O, dado un destino D, una hora y un día. Para ello utiliza tres atributos principales, el tiempo de espera, el tiempo de viaje en el servicio y el tiempo restante desde el primer transbordo hasta el destino final.
+El MNL se entrenó para predecir la probabilidad de que un usuario elija una alternativa entre $N$ alternativas en un paradero de origen $O$, dado un destino $D$, una hora y un día. Para ello utiliza tres atributos principales, el tiempo de espera, el tiempo de viaje en el servicio y el tiempo restante desde el primer transbordo hasta el destino final.
 
 Suponer que para ir a un destino $D$ desde un origen $O$ tienen dos opciones. Un servicio $S_1$ que deja directamente en el destino, con un coste de viaje asociado $Cv_1$ y un servicio $S_2$ que tiene un coste de viaje $Cv_2$ hasta el primer transbordo, para luego tener un costo de viaje de ese servicio de transbordo $Cr_2$. 
 
 Si es que el tiempo de viaje de $S_1$ es menor y además deja directamente en su destino, es lógico que tomar este servicio es la decisión idónea u óptima. Ahora, si el costo de viaje de $S_1$ es mucho más alto, quizás convenga tomar un transbordo. Un ejemplo clásico de esto sería hacer transbordo al metro usando un bus alimentador para llegar al sistema subterráneo. A priori, dependiendo de la urgencia del usuario, deberá de elegir una de las dos alternativas. No todos los usuarios piensan igual. Algunos prefieren comodidad y no hacer transbordos, sobre todo si están con algo de tiempo de sobra. Otras personas confían más en servicios más rápidos que les obligan a hacer transbordo. Como no todo el mundo piensa igual, el MNL es muy útil para estos casos, ya que entrega una distribución de probabilidad sobre que servicio se va a tomar, sobre todo cuando las utilidades de ambos son parecidas. El objetivo de este modelo es descubrir que prefieren los usuarios, si viajes más directos con menos transbordos -pero más largos- , o viajes más rápidos pero con transbordos. Notar que los transbordos tienen tiempos de viajes más variables. Poca confianza en los headways de los buses de transbordo pueden inflar el tiempo de viaje real, ya que la variable de tiempo de espera suele tener más varianza que el tiempo de viaje. Más transbordos implican más varianza en el tiempo de viaje total y por lo tanto menos confianza en el trayecto, o sea, menos comodidad. 
 
-Con esta reflexión, es directo darse cuenta que lo que se busca con este modelo es descubrir como se comparan el tiempo de viaje total v/s que tanto acerca el servicio inicial al destino. 
+Con esta reflexión, es directo darse cuenta que lo que se busca con este modelo es descubrir como se comparan el tiempo de viaje total v/s qué tanto acerca el servicio inicial al destino. 
 
 ### Métricas de entrenamiento 
 
@@ -857,15 +858,15 @@ Las aristas SUBIR, VIAJAR, BAJAR Y CAMINAR tienen tensores relacionados con los 
 - CAMINAR: "run_scalar" un tensor de rango 0 (un escalar) que denota el tiempo de caminata calculando distancia euclidiana dividido por la velocidad. 
 
 
-### *Embeddings* iniciales
+### **Embeddings** iniciales
 
-Los embeddings son atributos vectoriales aprendibles por la red locales a cada nodo. Hay embeddings para : 
+Los *embeddings* son atributos vectoriales aprendibles por la red locales a cada nodo. Hay *embeddings* para : 
 
 - Paraderos
 - Servicios
 - Destinos
 
-Una representación vectorial de un nodo es útil pues permite reducir la dimensionalidad, establecer similitudes y aprender localmente características de los nodos. Notar que la MNL no tiene esta característica espacial. Esto hace a la GNN más completa. Se podrían hacer embeddings para las aristas, pero esto hace al modelo menos interpretable. 
+Una representación vectorial de un nodo es útil pues permite reducir la dimensionalidad, establecer similitudes y aprender localmente características de los nodos. Notar que la MNL no tiene esta característica espacial. Esto hace a la GNN más completa. Se podrían hacer *embeddings* para las aristas, pero esto hace al modelo menos interpretable. 
 
 ### GNN Bipartito
 
@@ -876,11 +877,11 @@ Se agrega un parámetro $\tau_e$ que es aprendible por relación. Esto para toda
 
 ### Normalización y contexto
 
-Se aplica una Normalizacíon L2 para que algunos embeddings dominen por magnitud, mejore la convergencia, facilita las comparaciones entre embeddings y previene el overfitting. 
+Se aplica una Normalizacíon L2 para que algunos *embeddings* dominen por magnitud, mejore la convergencia, facilita las comparaciones entre *embeddings* y previene el overfitting. 
 
-### Features y concatenación
+### *Features* y concatenación
 
-Las features de Dijkstra (o las características de las alternativas) son añadidas opcionalmente como una capa extra. Estos features se concatenan con todas las características ya aprendidas mediante los embeddings. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES DE Dijkstra (FEATURES). 
+Las *features* de Dijkstra (o las características de las alternativas) son añadidas opcionalmente como una capa extra. Estos *features* se concatenan con todas las características ya aprendidas mediante los *embeddings*. El vector final entonces tendrá dimensión 64, 64, 64 + DIMENSIONES DE Dijkstra (*FEATURES*). 
 
 ### MLP (Perceptron Multi Capa) Scorer
 
@@ -963,7 +964,7 @@ ESTORIL & -33.384047 & -70.533917 & Av. Keneddy esq Av. Estoril (Las Condes)\\
 \label{tab:linea7}
 \end{table}
 
-Se agregaron las estaciones al grafo con sus correspondientes Nodos SERVICIO, PARADERO y las aristas que le conectan al resto del grafo. El horario de funcionamiento será el mismo que el del resto de la red de Metro. La velocidad de 40km/h, ligeramente más rápido que los 30km/h de los otros servicios, esto porque la línea tiene estaciones mas separadas entre sí que el resto de la red. La frecuencia de 5 minutos. Estos parámetros son aproximaciones basadas en las lineas nuevas y sus frecuencias. 
+Se agregaron las estaciones al grafo con sus correspondientes Nodos SERVICIO, PARADERO y las aristas que le conectan al resto del grafo. El horario de funcionamiento será el mismo que el del resto de la red de Metro. La velocidad de 40km/h, ligeramente más rápido que los 30km/h de los otros servicios, esto porque la línea tiene estaciones más separadas entre sí que el resto de la red. La frecuencia de 5 minutos. Estos parámetros son aproximaciones basadas en las líneas nuevas y sus frecuencias. 
 
 Posteriormente, se ejecutó el predictor con todos los datos de etapas de un día, específicamente el lunes 24 de Abril de este año (2025). Para ello, se realizó el siguiente algoritmo:
 
@@ -1004,7 +1005,7 @@ En la siguiente sección se mostrarán resultados e inmediatamente una discusió
 
 ### Grafo agrupado
 
-La creación del grafo agrupado dió como resultados un grafo con las siguientes características:
+La creación del grafo agrupado dio como resultados un grafo con las siguientes características:
 
 
 - 11890 paraderos de bus
@@ -1013,7 +1014,7 @@ La creación del grafo agrupado dió como resultados un grafo con las siguientes
 - 272 conexiones de metro
 - 15737 conexiones totales
 
-Para visualzar el grafo, se puede descargar el archivo en el [link](https://github.com/Sebamon2/memoria-repo/blob/master/output/mapa_con_zonas.html), haciendo *clic* en el ícono de descarga cerca de "Raw" llamado "download raw file" y abrirlo en un navegador. La Figura \ref{fig:mapa_plotly} muestra un zoom a un barrio de Cerro Navia en este mismo mapa.
+Para visualizar el grafo, se puede descargar el archivo en el [link](https://github.com/Sebamon2/memoria-repo/blob/master/output/mapa_con_zonas.html), haciendo *clic* en el ícono de descarga cerca de "Raw" llamado "download raw file" y abrirlo en un navegador. La Figura \ref{fig:mapa_plotly} muestra un zoom a un barrio de Cerro Navia en este mismo mapa.
 
 
 
@@ -1256,9 +1257,9 @@ No se logran observar diferencias sustanciales entre los días de semana y fines
 
 ### Resultados
 
-A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los embeddings los features de Dijkstra, y posteriormente cuando se omiten estos features. Recordar que este entrenamiento se hizo de la misma manera que el MNL semanal, es decir, el split y el sampleo de datos (0.1 de los reales) con la misma semilla.
+A continuación se presentan los resultados de la GNN en sus dos modos, el primero para cuando se agrega a los *embeddings* las características de Dijkstra, y posteriormente cuando se omiten estas características. Recordar que este entrenamiento se hizo de la misma manera que el MNL semanal, es decir, el split y el sampleo de datos (0.1 de los reales) con la misma semilla.
 
-#### GNN con features de MNL
+#### GNN con características del MNL
 
 \begin{table}[H]
 \centering
@@ -1278,7 +1279,7 @@ Parámetros entrenables & $\approx$ 1\,717\,765 \\
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{../memoria-repo/data/plots/gnn_con_dijkstra.png}
-    \caption{Resultados de entrenamiento de la GNN con atributos de Dijkstra activados}
+    \caption{Resultados de entrenamiento de la GNN con características del MNL activadas}
     \label{fig:gnn_con_dijkstra}
 \end{figure}
 
@@ -1286,7 +1287,7 @@ Con ello se obtiene un modelo en que en su mejor época tiene unas métricas de 
 
 \clearpage
 
-#### GNN sin features de MNL
+#### GNN sin características del MNL
 
 
 \begin{table}[ht]
@@ -1306,7 +1307,7 @@ Parámetros entrenables & $\approx$ 1{,}716{,}613 \\
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{../memoria-repo/data/plots/gnn_sin_dijkstra.png}
-    \caption{Resultados de entrenamiento de la GNN sin features de MNL}
+    \caption{Resultados de entrenamiento de la GNN sin características del MNL}
     \label{fig:gnn_sin_dijkstra}
 \end{figure}
 
@@ -1328,9 +1329,9 @@ Test MRR & 0.850 \\
 
 #### Discusión de los resultados
 
-- Claramente se observa una diferencia entre colocar una capa de MNL versus no colocarla. Sin los datos del motor de costes del MNL, el modelo no consigue buenos resultados. Una precisión no trivial del 41.5% es mejor que el azar, pero peor que el MNL y que el GNN con MNL.
+- Claramente se observa una diferencia entre colocar una capa de MNL versus no colocarla. Sin los datos del motor de costes del MNL, el modelo no consigue buenos resultados. Una precisión no trivial del 41.5% es mejor que el azar, pero peor que el MNL y que el GNN con las características del MNL.
 
-- Comparado con el MNL, la GNN con MNL tuvo una precisión no trivial del 90% (+1% en comparación con el MNL) y una precisión del 96% (+3% en comparación con el MNL), hay una leve mejora aportada por los embeddings. Se concluye que agregar los embeddings y los parametros tau ayudaron, pero estos por si solos no son suficientes para conseguir buenas métricas con el set de datos que se tiene.
+- Comparado con el MNL, la GNN con las características del MNL tuvo una precisión no trivial del 90% (+1% en comparación con el MNL) y una precisión del 96% (+3% en comparación con el MNL), hay una leve mejora aportada por los *embeddings*. Se concluye que agregar los *embeddings* y los parametros tau ayudaron, pero estos por si solos no son suficientes para conseguir buenas métricas con el set de datos que se tiene.
 
 
 \clearpage
@@ -1433,7 +1434,7 @@ Se sigue aumentando el tiempo de espera, hasta un 1500% más grande que el origi
 Esta redistribución de demanda causará un efecto dominó que cambiará los transbordos siguientes. Por un efecto de simplicidad, el siguiente paso de decisión será determinístico  tal como se ha asumido durante este trabajo. Cuando un usuario se baje en un paradero dado para hacer transbordo, se tomará el siguiente servicio de manera segura, y no con probabilidades. (Si no , sería una cadena de probabilidades condicionales que complicaría mucho el problema). 
 
 
-Para cada alternativa, no solo aumentará la demanda del servicio dado, si no que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello, se verán los caminos de cada servicio obtenidos por Dijkstra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2 en Santa Ana, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
+Para cada alternativa, no solo aumentará la demanda del servicio dado, sino que su transbordo aumentará también de demanda. En el caso de ir de PJ394 a PA433, los servicios que aumentaron su demanda alimentarán a los siguientes servicios en su transbordo. Para ello, se verán los caminos de cada servicio obtenidos por Dijkstra. La tabla \ref{tab:trayectos} muestra los caminos que toma cada alternativa junto con la diferencia de probabilidad entre el *baseline* y el cambio de oferta. Un análisis indica que los servicios que aumentaron su demanda propagaran este aumento de demanda a los transbordos, en este caso, fijarse en 503, 504, 517 y 518. Estos recorridos dejan a usuarios en L2 en Santa Ana, por lo que es sensato concluir que un aumento de tiempo de espera en 507 provoca un aumento de demanda de L2 sujeto a que las personas se suban a PJ394.  
 
 Una vez se bajen en Parque Ohiggins, un efecto importante ocurre en el paradero aledaño a la estación de Metro. El AD predice que se tomará el 506, pero realmente es el servicio más probable a ser tomado, no necesariamente todos lo tomarán. Esta nueva demanda redistribuída se repartirá en los servicios que pasan por este paradero y que llevan a Beauchef, en este caso, el 506, 506v, 506e y el 507.  Ver la tabla \ref{tab:trayectos} para visualizar los trayectos y su cambio en su probabilidad.
 
@@ -1628,7 +1629,7 @@ Se observa un aumento sustancial en el uso del Metro en general. Esto puede ser 
 
 - L7 disminuye el uso del servicio de buses. Estos usuarios antes llegaban directamente a su destino usando una micro. Ahora, usando la L7, inyectan demanda directamente al servicio subterráneo, haciendo que la demanda nueva ganada por L7 se distribuya por toda la red. 
 
-- Las lineas de metro comienzan a alimentar la L7, ya que esta está bien conectada con el resto de la red, haciendo más apetecibles los viajes en metro en general. 
+- Las líneas de metro comienzan a alimentar la L7, ya que esta está bien conectada con el resto de la red, haciendo más apetecibles los viajes en metro en general. 
 
 
 #### Uso de la L7 como primera etapa
@@ -1777,7 +1778,7 @@ Desde ese contexto y objetivo, se abordan dos métodos. Uno del MNL y otro el MN
 El MNL permitió un análisis cuantitativo interpretable acerca de las variables que el autor de la memoria consideró importantes. Estos son, el tiempo de viaje , el coste restante de viaje al transbordar y el tiempo de espera. En este ámbito, se observó algo interesante. Las personas prefieren viajar más tiempo si eso significa minimizar el coste restante, la variable que más pesaba al seleccionar una alternativa. En otras palabras, las personas evitan hacer transbordos. 
 
 
-El GNN presenta mejores resultados para predecir, en parte gracias a sus embeddings y su correlación espacial, aunque no se usó en los experimentos, debido a su lentitud. De todas maneras, la precisión del MNL es suficientemente parecida (uno por ciento de diferencia) como para poder generalizar sin preocupaciones. 
+El GNN presenta mejores resultados para predecir, en parte gracias a sus *embeddings* y su correlación espacial, aunque no se usó en los experimentos, debido a su lentitud. De todas maneras, la precisión del MNL es suficientemente parecida (uno por ciento de diferencia) como para poder generalizar sin preocupaciones. 
 
 
 
@@ -1785,7 +1786,7 @@ Los experimentos muestran tanto las fortalezas y las debilidades de la solución
 
 La redistribución de demanda es difícil de analizar de manera local. Esto debido a la determinancia de las decisiones después de seleccionar el primer transbordo. Un análisis local sobre la redistribución revela como hay un aumento de demanda en servicios que combinan con los servicios elegidos. 
 
-De manera global, la redistribución de demanda en el caso de la Línea 7 mostró resultados no esperados. Por un lado, el aumento del uso del metro en general, un hallazgo interesante. Esto gracias a la captación de demanda de buses que hacían el recorrido largo. Esto se puede ver reflejado en el aumento de etapas en promedio. Además, se lograron observar los alimentadores y como se relacionan con la L7. Estos eran los buses que se esperaba que aumentaran su demanda al llevar a personas hacia la L7. El aumento de carga en la L1 es un hallazgo que probablemente se deba a artefactos en la solución. Se puede explicar por las restricciones del coste inicial de transferencia y como también las lineas del metro ahora son más llamativas para el usuario. 
+De manera global, la redistribución de demanda en el caso de la Línea 7 mostró resultados no esperados. Por un lado, el aumento del uso del metro en general, un hallazgo interesante. Esto gracias a la captación de demanda de buses que hacían el recorrido largo. Esto se puede ver reflejado en el aumento de etapas en promedio. Además, se lograron observar los alimentadores y como se relacionan con la L7. Estos eran los buses que se esperaba que aumentaran su demanda al llevar a personas hacia la L7. El aumento de carga en la L1 es un hallazgo que probablemente se deba a artefactos en la solución. Se puede explicar por las restricciones del coste inicial de transferencia y como también las líneas del metro ahora son más llamativas para el usuario. 
 
 
 
