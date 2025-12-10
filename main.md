@@ -970,15 +970,15 @@ Posteriormente, se ejecutó el predictor con todos los datos de etapas de un dí
 
 - Eliminar las etapas intermedias, es decir, solo quedan las intenciones de viaje (paradero inicial, final, bin30, día)
 - Por cada intención de viaje, ejecutar el predictor, y tomar el camino con mayor probabilidad de ser elegido . El motor de rutas ahora es el algoritmo A*, pues es mas eficiente para rutas punto a punto que Dijkstra.
-- Expandir el camino en etapas. 
+- Expandir el camino en etapas. En el caso del Metro, ADATRAP provee las tablas con viajes en metro sin contar las combinaciones, es decir, un usuario que se suba en San Pablo (L1 o L5) y se baje en Vicuña Mackenna (L4) solo mostrará un viaje en ADATRAP, no dos o tres. Por lo tanto, se expandió el camino en etapas separando estas etapas colapsadas en varios subcaminos del camino global. El camino se obtuvo con un algoritmo de ruteo teniendo en cuenta las velocidades y tiempos de espera del metro.
+- Expandir la tabla de etapas original, para poder comparar efectivamente ambas tablas de etapas.
 
-Con esta tabla de demandas sintética, se compararon con la tabla de etapas original prestando atención específicamente a: 
+Con esta tabla de demandas sintética, se compararó ésta última con la tabla de etapas original en los siguientes aspectos:
 
-- Servicios alimentadores a la L7.
-- Servicios que pierden demanda
-- Servicios que ganan demanda.
-- Cantidad de etapas promedio obtenida.
-
+- Servicios alimentadores a la L7. Se entiene como alimentador a servicios utilizados en la etapa *k-1* del viaje, siendo la etapa *k* la etapa en que se usó el servicio L7.
+- Servicios que ganan o pierden demanda. Se obtuvo comparando ambas tablas de etapas. 
+- Cantidad de etapas promedio obtenida. Se obtuvo contando las etapas de servicios clave, en ese caso, el metro. 
+- Carga del servicio. Se comparan la cantidad de veces que se recorren las aristas de un servicio, esto para denotar la carga que los usuarios imprimen en el servicio. 
 
 
 
