@@ -6,13 +6,12 @@ departamento: "Departamento de Ciencias de la Computación"
 memoria: "Ingeniero Civil en Computación"
 toc: true
 anho: 2025
-
 link-citations: true
 link-bibliography: true
 urlcolor: purple
 citecolor: purple
-
-
+agradecimientos: |
+    Quisiera agradecer a toda mi familia por su apoyo incondicional en mi odisea completando la carrera de Ingeniería en Computación, como también la Licenciatura en Astronomía, esperándome un par de años más. Extender mi mas sincera gratitud a mis amigos de mi infancia y mis nuevos amigos de la universidad, tanto los de Astronomía como los de Computación, por su increíble amistad y apoyo a lo largo de estos siete años. También agradecer a mi novia, por su paciencia, amor y comprensión en esta última etapa de mis estudios. Todos ellos forman parte de mí como persona y por lo tanto, directa o indirectamente, su granito de arena está plasmado en esta memoria.
 resumen: |
   Estimar el efecto de cambios de demanda en el transporte público de Santiago de Chile debido a cambios de oferta es un desafío complejo, pues estos cambios provocan efectos en cadena en toda la red. Es por ello que se propone una solución en base a modelos de decisión discreta y redes neuronales de grafos para simular estos datos de demanda, y así tomar decisiones con mejores datos.
 
