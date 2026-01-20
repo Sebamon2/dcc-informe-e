@@ -2,6 +2,9 @@
 titulo: "Modelamiento de cambios en la demanda de transporte público en Santiago de Chile usando modelos de decisión discreta y redes neuronales de grafos"
 nombre: "Sebastián Alejandro Monteiro Parada"
 guia: "Eduardo Graells-Garrido"
+comision: 
+    - "Claudio Gutiérrez"
+    - "Mauricio Palma"
 departamento: "Departamento de Ciencias de la Computación"
 memoria: "Ingeniero Civil en Computación"
 toc: true

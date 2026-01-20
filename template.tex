@@ -125,7 +125,7 @@ $if(coguia)$\coguia{$coguia$}$endif$
 
 %\cotutela{Nombre Institución} % incluir en caso de cotutela
 
-$if(comision)$\comision{$comision$}$endif$
+$if(comision)$\comision{$for(comision)$$comision$$sep$ \\ $endfor$}$endif$
 
 %\auspicio{Nombre Institución} % incluir en caso de recibir financiamiento
 
