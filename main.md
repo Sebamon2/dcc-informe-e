@@ -58,7 +58,7 @@ Es por ello, que el objetivo de esta memoria es: *Diseñar e implementar un mode
 
 2. (OE2) Diseñar, entrenar y evaluar modelos de elección discreta y de aprendizaje profundo, determinando la arquitectura más adecuada para simular la toma de decisiones de los usuarios, usando como datos la demanda histórica de viajes en transporte público de ADATRAP.
 
-3. (OE3) Evaluar el impacto eventos de reconfiguración de la red de transporte público mediante la generación de datos de demanda de viajes sintéticos.
+3. (OE3) Evaluar el impacto de eventos de reconfiguración de la red de transporte público mediante la generación de datos de demanda de viajes sintéticos.
 
 El cuerpo de la memoria comienza con el capítulo 2, en el que se hace una revisión de la literatura, datos, modelado de la red y modelos de predicción. En el capítulo 3 se presenta una metodología para construir una representación de los datos e implementación y entrenamiento del MNL/GNN para luego terminar con los experimentos. El capítulo 4 presenta los resultados y discusión inmediata de ellos. El capítulo 5 presenta la conclusión de la memoria.
 
@@ -79,7 +79,7 @@ Diversos trabajos se enfocan tanto en:
 
 1. Cantidad de personas en una parada en la ruta. Trabajos como el de Wei et al. [@wei2022nonlinear] usan enfoques no lineales para estimar la demanda en algunas estaciones de metro.
 2. Cantidad de personas en la ruta. El trabajo de Zhao [@zhao] utiliza Prophet para estimar las personas en la ruta 320 de Zhengzhou, China
-3. Cantidad de personas en un vehículo. Algunos trabajos lo predicen, como el de Wang et al.[@li2022deep] con un Support Vector Machine más un filtro de Kalman.
+3. Cantidad de personas en un vehículo. Algunos trabajos lo predicen, como el de Wang et al. [@li2022deep] con un Support Vector Machine más un filtro de Kalman.
 4. Cantidad de personas en un área. El trabajo de Wang et al. [@wang2021passenger] explora predicciones espacio temporales con un modelo llamado GALLAT (GrAphic preddiction with ALL ATtention), que modela la red como un grafo 
 
 Notar que cada enfoque u objeto requiere un set de datos distintos, por ejemplo, para saber cuanta gente hay en un momento dado en un vehículo, se deben usar cámaras o sensores, en cambio, para saber un estimado de gente en la ruta, se usan los datos de las validaciones de la tarjeta bip! en la ruta.
@@ -155,7 +155,7 @@ Asimismo, existen modelos de demanda agregada, como el desarrollado por Méndez 
 ## Origen y representación de los datos 
 
 
-Transformar los datos en una *estructura de datos* es un paso importante para que los algoritmos de ruteo entreguen características de cada alternativa del viaje. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu et al.[@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Otros enfoques, como el de Massobrio[@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. Para definir una estructura de datos conveniente para estos, se presenta primero un contexto sobre la red de transporte de Santiago.
+Transformar los datos en una *estructura de datos* es un paso importante para que los algoritmos de ruteo entreguen características de cada alternativa del viaje. GNNs requieren preprocesar los datos en matrices o grafos. Trabajos como los de Liu et al. [@liu2020physical] utilizan grafos representados por matrices del tipo (o,d), donde o es el origen y d es el destino de la persona. Otros enfoques, como el de Massobrio [@massobrio2020urban] modelan una red con nodos que representan las paradas de las rutas. Para definir una estructura de datos conveniente para estos, se presenta primero un contexto sobre la red de transporte de Santiago.
 
 ### Red Metropolitana de Movilidad 
 
@@ -384,7 +384,7 @@ Una red neuronal de grafos (GNN) son redes neuronales especializadas para recibi
 
 Una GNN aplicada al transporte público es una red neuronal capaz de aprender características espaciales. Se explora la solución de una GNN Heterogénea que aproveche la riqueza de los tipos del grafo bipartito entre los nodos y las aristas. 
 
-Una GNN tiene *embeddings* o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. Entre estos paraderos y servicios, se propagan mensajes que permiten capturar la correlación espacial. GraphConv, construído sobre el trabajo de Morris et al.[@morris2021weisfeilerlemanneuralhigherorder], es una capa de convolución de grafos que permite capturar la información local de los nodos y sus vecinos. Existen otros tipos de capas, como SageConv construído por Morris Hamilton et al.[@hamilton2018inductiverepresentationlearninglarge], el cual aplana los mensajes con promedios.
+Una GNN tiene *embeddings* o representaciones vectoriales, tanto en los nodos paradero como en los nodos servicio, que permite añadir riqueza y similitud entre paraderos. Entre estos paraderos y servicios, se propagan mensajes que permiten capturar la correlación espacial. GraphConv, construído sobre el trabajo de Morris et al. [@morris2021weisfeilerlemanneuralhigherorder], es una capa de convolución de grafos que permite capturar la información local de los nodos y sus vecinos. Existen otros tipos de capas, como SageConv construído por Morris Hamilton et al. [@hamilton2018inductiverepresentationlearninglarge], el cual aplana los mensajes con promedios.
 
 
 #### Ventajas
@@ -604,9 +604,9 @@ Por ejemplo, si un paradero $P$ tiene los servicios 507 y 512 que pasan por él,
 Los tipos de aristas que tuvo el grafo son: 
 
 
-**VIAJAR**
 
-Aristas que corren entre nodos *Servicio*. Representan la conexión dirigida entre dos paradas consecutivas de un servicio. Estas aristas tienen la siguiente información:
+
+Aristas **VIAJAR** que corren entre nodos *Servicio*. Representan la conexión dirigida entre dos paradas consecutivas de un servicio. Estas aristas tienen la siguiente información:
 
 - Nodo origen (Servicio en paradero P)
 - Nodo destino (Servicio en paradero Q)
@@ -621,9 +621,9 @@ Aristas que corren entre nodos *Servicio*. Representan la conexión dirigida ent
 Notar que las aristas VIAJAR tienen peso, el cual es el tiempo a bordo. Estas aristas son temporalmente dependientes.
 
 
-**CAMINAR**
 
-Aristas que corren entre nodos *Paradero*. Representan la conexión no dirigida entre dos paraderos cercanos. Estas aristas tienen la siguiente información:
+
+Aristas **CAMINAR** que corren entre nodos *Paradero*. Representan la conexión no dirigida entre dos paraderos cercanos. Estas aristas tienen la siguiente información:
 
 
 - Nodo origen (Paradero $P$)
@@ -633,9 +633,9 @@ Aristas que corren entre nodos *Paradero*. Representan la conexión no dirigida 
 
 
 
-**SUBIR** 
 
-Aristas que corren entre nodos *Paradero* y *Servicio*. Representan la acción de subirse a un servicio en un paradero. Estas aristas tienen la siguiente información:
+
+Aristas **SUBIR** que corren entre nodos *Paradero* y *Servicio*. Representan la acción de subirse a un servicio en un paradero. Estas aristas tienen la siguiente información:
 
 - Nodo origen (Paradero $P$)
 - Nodo destino (Servicio en paradero $P$)
@@ -645,9 +645,9 @@ Aristas que corren entre nodos *Paradero* y *Servicio*. Representan la acción d
 - Tiempo de espera (min) por bin y tipo de día (en un diccionario)
 - Tipo (BUS o Metro)
 
-**BAJAR**
 
-Aristas que corren entre nodos *Servicio* y *Paradero*. Representan la acción de bajarse de un servicio en un paradero. Estas aristas tienen la siguiente información:
+
+Aristas **BAJAR** que corren entre nodos *Servicio* y *Paradero*. Representan la acción de bajarse de un servicio en un paradero. Estas aristas tienen la siguiente información:
 
 - Nodo origen (Servicio en paradero $P$)
 - Nodo destino (Paradero $P$)
