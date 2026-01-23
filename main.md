@@ -108,28 +108,28 @@ Trabajos como los de Ye [@ye2022adaptive], Jian [@jiang2022gmm] y Li [@li2021for
 
 Los factores que afectan la demanda son diversos y pueden variar según el contexto. Algunos de los más relevantes son:
 
-1. **Tarifas**: El costo del transporte público puede influir en la demanda, especialmente en áreas donde existen alternativas de transporte privado.
+1. *Tarifas*: El costo del transporte público puede influir en la demanda, especialmente en áreas donde existen alternativas de transporte privado.
 
-2. **Frecuencia**: La cantidad de buses o trenes disponibles en una ruta puede afectar la demanda, ya que una mayor frecuencia puede atraer a más usuarios.
+2. *Frecuencia*: La cantidad de buses o trenes disponibles en una ruta puede afectar la demanda, ya que una mayor frecuencia puede atraer a más usuarios.
 
-3. **Tiempo de viaje**: La duración del trayecto es un factor clave en la decisión de utilizar el transporte público. Un tiempo de viaje más corto puede aumentar la demanda.
-
-
-4. **Comodidad**: La calidad del servicio, como la limpieza, el confort y la seguridad, puede influir en la decisión de utilizar el transporte público.
+3. *Tiempo de viaje*: La duración del trayecto es un factor clave en la decisión de utilizar el transporte público. Un tiempo de viaje más corto puede aumentar la demanda.
 
 
-5. **Accesibilidad**: La facilidad de acceso a las paradas o estaciones, así como la disponibilidad de servicios complementarios (como estacionamientos o bicicletas compartidas), puede afectar la demanda.
+4. *Comodidad*: La calidad del servicio, como la limpieza, el confort y la seguridad, puede influir en la decisión de utilizar el transporte público.
 
 
-6. **Condiciones climáticas**: Factores como la lluvia, el frío o el calor extremo pueden influir en la decisión de utilizar el transporte público.
+5. *Accesibilidad*: La facilidad de acceso a las paradas o estaciones, así como la disponibilidad de servicios complementarios (como estacionamientos o bicicletas compartidas), puede afectar la demanda.
 
 
-7. **Eventos especiales**: La realización de eventos masivos, como conciertos o ferias, puede generar picos de demanda en ciertas rutas.
+6. *Condiciones climáticas*: Factores como la lluvia, el frío o el calor extremo pueden influir en la decisión de utilizar el transporte público.
 
 
-8. **Fiestas y feriados**: La demanda de transporte público puede variar significativamente durante días festivos o feriados, lo que puede afectar la planificación de la oferta.
+7. *Eventos especiales*: La realización de eventos masivos, como conciertos o ferias, puede generar picos de demanda en ciertas rutas.
 
-9. **Búsqueda Web** Los turistas, generalmente, se informan de las rutas y horarios de los buses en la web, por lo que el tráfico web puede ser un buen indicador de la demanda. También aplicaciones móviles de mapas pueden sugerir rutas de transporte público, lo que puede influir en la demanda. 
+
+8. *Fiestas y feriados*: La demanda de transporte público puede variar significativamente durante días festivos o feriados, lo que puede afectar la planificación de la oferta.
+
+9. *Búsqueda Web* Los turistas, generalmente, se informan de las rutas y horarios de los buses en la web, por lo que el tráfico web puede ser un buen indicador de la demanda. También aplicaciones móviles de mapas pueden sugerir rutas de transporte público, lo que puede influir en la demanda. 
 
 
 
@@ -183,7 +183,7 @@ La tabla de viajes contiene la información de los viajes del usuario, registran
 
 #### Código TS y código usuario
 
-Los servicios y paraderos se encuentran codificados en formato TS, esto es, un código interno usado por DTPM para identificar a los recorridos. La mayoría de los recorridos tiene un código TS que coincide con el de usuario. Por ejemplo, el servicio **T507 OOI** codifica al servicio 507 de ida (servicio en sentido ENEA- AV GRECIA). En algunas ocasiones no coincide, esto ocurre mayoritariamente en servicios locales con prefijo alfabético, casos como el servicio con código de usuario **J01** en código TS es en **T521**. Esta es la razón por la cual algunos recorridos nuevos tienen códigos de usuario que no siguen el numerado del usuario, ya que si lo siguieran, habrían colisiones de nombres.
+Los servicios y paraderos se encuentran codificados en formato TS, esto es, un código interno usado por DTPM para identificar a los recorridos. La mayoría de los recorridos tiene un código TS que coincide con el de usuario. Por ejemplo, el servicio *T507 OOI* codifica al servicio 507 de ida (servicio en sentido ENEA- AV GRECIA). En algunas ocasiones no coincide, esto ocurre mayoritariamente en servicios locales con prefijo alfabético, casos como el servicio con código de usuario *J01* en código TS es en *T521*. Esta es la razón por la cual algunos recorridos nuevos tienen códigos de usuario que no siguen el numerado del usuario, ya que si lo siguieran, habrían colisiones de nombres.
 
 Por otro lado, los códigos de paradero también poseen esta distinción. Ningún código de paradero de usuario coincide con su versión en TS. En el set de datos de tabla de viajes y de etapas ambos códigos, tanto el de paraderos como el de servicios vienen en código TS.
 
@@ -424,13 +424,13 @@ La solución se basa en dos pilares fundamentales, el primero, la *representaci�
 
 El objetivo del MNL es modelar el proceso de decisión de un usuario al elegir entre N alternativas de viaje en la primera etapa del viaje, entendiendo las alternativas como los servicios que paran en el paradero de origen del usuario a la hora y día que se sube. Cada alternativa tendrá un set de atributos, los cuales definen el coste total del viaje si es que el usuario elige esa alternativa. Este set de atributos o características de cada alternativa son:
 
-- **Tiempo de espera** del servicio:  Obtenido desde el programa de operaciones de RED, es el tiempo promedio que un usuario espera para abordar el servicio, asumiendo que el usuario puede llegar en cualquier momento al paradero. Se toma una distribución uniforme de llegada, por lo que el tiempo de espera promedio es la mitad del *headway* (frecuencia) del servicio en ese paradero.
+- *Tiempo de espera* del servicio:  Obtenido desde el programa de operaciones de RED, es el tiempo promedio que un usuario espera para abordar el servicio, asumiendo que el usuario puede llegar en cualquier momento al paradero. Se toma una distribución uniforme de llegada, por lo que el tiempo de espera promedio es la mitad del *headway* (frecuencia) del servicio en ese paradero.
 
-- **Tiempo restante** de viaje desde el primer transbordo hasta el destino final: Obtenido usando un algoritmo de ruteo en el grafo bipartito. Este algoritmo debe encontrar el paradero óptimo en el que el usuario debe de bajarse dado que quiera ir al destino dado.
+- *Tiempo restante* de viaje desde el primer transbordo hasta el destino final: Obtenido usando un algoritmo de ruteo en el grafo bipartito. Este algoritmo debe encontrar el paradero óptimo en el que el usuario debe de bajarse dado que quiera ir al destino dado.
 
-- **Tiempo de viaje** en el servicio hasta el primer transbordo en el paradero óptimo.
+- *Tiempo de viaje* en el servicio hasta el primer transbordo en el paradero óptimo.
 
-Para los tres costes, es necesario tener una representación del programa de operaciones mas robusta y flexible que una tabla. Es por ello que se desarrolló un grafo bipartito. El grafo bipartito provee la información del tiempo de espera, tiempo de viaje y tiempo restante como los pesos de las aristas, en los que cada cambio de estado denota un coste que el usuario debe de pagar. Lógicamente el usuario no penaliza de igual manera pagar cinco minutos a bordo de un servicio que esperando el bus. Es por ello, que el MNL debe de ponderar estas características usando datos históricos, entrenando los coeficientes $\beta_i$ de cada característica de la alternativa. Notar que un algoritmo enrutador que encuentre la ruta mas corta en el grafo bipartito entregará el camino con menor coste total de tiempo, pero no pondera la importancia de cada coste en la decisión del usuario. Es decir, **la ruta mas corta en tiempo no es la ruta mas corta en utilidad.**
+Para los tres costes, es necesario tener una representación del programa de operaciones mas robusta y flexible que una tabla. Es por ello que se desarrolló un grafo bipartito. El grafo bipartito provee la información del tiempo de espera, tiempo de viaje y tiempo restante como los pesos de las aristas, en los que cada cambio de estado denota un coste que el usuario debe de pagar. Lógicamente el usuario no penaliza de igual manera pagar cinco minutos a bordo de un servicio que esperando el bus. Es por ello, que el MNL debe de ponderar estas características usando datos históricos, entrenando los coeficientes $\beta_i$ de cada característica de la alternativa. Notar que un algoritmo enrutador que encuentre la ruta mas corta en el grafo bipartito entregará el camino con menor coste total de tiempo, pero no pondera la importancia de cada coste en la decisión del usuario. Es decir, *la ruta mas corta en tiempo no es la ruta mas corta en utilidad.*
 
 Para entrenar al modelo, por cada intención de etapa de un viaje (es decir, un origen, destino, hora y día), se obtuvieron las N alternativas posibles en el paradero usando el grafo bipartito y se calcularon los atributos de cada una de ellas usando el algoritmo enrutador en el mismo grafo. Una de esas alternativas fue la elegida realmente (la demanda histórica), mientras que las otras no. Con ello, se entrenó al MNL, tomando como acierto del modelo elegir a la alternativa real tomada como la que tiene menor utilidad según la función lineal y se obtuvieron los coeficientes $\beta_i$ que ponderan la importancia de cada atributo en la decisión del usuario. Esto es, un modelo de elección discreto. 
 
@@ -440,7 +440,7 @@ A continuación se detallan los pasos seguidos para cumplir cada fase de la solu
 
 ## Representación de los datos
 
-Se usó el programa de operaciones de RED para crear los grafos necesarios para la *visualización* y el *entrenamiento* de los modelos. Estos son los grafos **agrupado** y **bipartito** respectivamente. El grafo agrupado tiene dos utilidades, primero, permite visualizar la red de transporte y segundo, permite ser una excelente base para desagrupar las aristas y crear el grafo bipartito.
+Se usó el programa de operaciones de RED para crear los grafos necesarios para la *visualización* y el *entrenamiento* de los modelos. Estos son los grafos *agrupado* y *bipartito* respectivamente. El grafo agrupado tiene dos utilidades, primero, permite visualizar la red de transporte y segundo, permite ser una excelente base para desagrupar las aristas y crear el grafo bipartito.
 
 ### Grafo Agrupado
 
@@ -518,27 +518,21 @@ Antes de definir el grafo bipartito, es necesario definir la notación y los dat
 
 De ahora en adelante, se usará la siguiente notación para definir los elementos del grafo bipartito:
 
-- **Paraderos**: $P,Q,\dots$
-- **Servicios**: $S$ (ej: 507), con **sentido** $d \in \{\text{Ida},\text{Ret}\}$.
-- **Tipo de día**: $D \in \{\text{LAB},\text{SAB},\text{DOM}\}$.
-- **Tiempo discreto**: 48 bins de media hora $b \in \{0,\ldots,47\}$.
-- **Frecuencia** (buses/h): $f_{S,d}(D,b)$.
-- **Headway** (min entre buses): $H_{S,d}(D,b)=\dfrac{60}{f_{S,d}(D,b)}$.
-- **Aristas VIAJAR**: tramo $(u\!\to\!v, S,d)$ con:
-  - **distancia** $L_e$ (m),
-  - **velocidad** $v_e(D,b)$ (km/h),
-  - **tiempo a bordo**:
+- *Paraderos*: $P,Q,\dots$
+- *Servicios*: $S$ (ej: 507), con *sentido* $d \in \{\text{Ida},\text{Ret}\}$.
+- *Tipo de día*: $D \in \{\text{LAB},\text{SAB},\text{DOM}\}$.
+- *Tiempo discreto*: 48 bins de media hora $b \in \{0,\ldots,47\}$.
+- *Frecuencia* (buses/h): $f_{S,d}(D,b)$.
+- *Headway* (min entre buses): $H_{S,d}(D,b)=\dfrac{60}{f_{S,d}(D,b)}$.
+- *Aristas VIAJAR*: tramo $(u\!\to\!v, S,d)$ con:
+  - *distancia* $L_e$ (m),
+  - *velocidad* $v_e(D,b)$ (km/h),
+  - *tiempo a bordo*:
     $$
     \tau_e(D,b) = \frac{L_e/1000}{v_e(D,b)} \cdot 60 \quad [\text{min}]
     $$
 
----
 
-
-
-
-
-Esto permite definir lo siguiente:
 
 
 
@@ -575,7 +569,7 @@ Ambas tablas (de frecuencias y velocidades) las provee RED en su plan de operaci
 Los tipos de nodos que tuvo el grafo son:
 
 
-**Paraderos**
+*Paraderos*
 
 Cada paradero es un nodo. Cada nodo tiene la siguiente información:
 
@@ -586,7 +580,7 @@ Cada paradero es un nodo. Cada nodo tiene la siguiente información:
 - Servicios que pasan por el paradero (lista) en cualquier bin b y día D.
 - Zona 777
 
-**Servicios** 
+*Servicios* 
 
 Cada paradero tiene un conjunto de servicios que pasan por él. Por lo tanto, se define un nodo servicio por cada paradero y servicio que pasa por él. Estos nodos permiten cerrar la transición entre estar en un paradero y subirse a un servicio. 
 
@@ -712,7 +706,7 @@ Los pasos para generar el *dataset* fueron los siguientes:
 2. Por cada fila se obtuvo el paradero de origen, el servicio tomado, el bin, el paradero de bajada observado, el tipo de día y el tipo de servicio.  Se agregó el destino final para cada etapa gracias a agrupar las etapas con el mismo ID.
 
 
-**Costo Restante** 
+*Costo Restante* 
 
 El costo restante es la medida en tiempo que el usuario le queda por pagar al bajarse en el paradero óptimo y los transbordos que le preceden. Tomar el siguiente ejemplo. Una persona que quiere ir desde PJ394 a PA433 (Beauchef) a las 10 de la mañana un día laboral.
 
@@ -722,7 +716,7 @@ El costo restante es la medida en tiempo que el usuario le queda por pagar al ba
 
 - Para los otros servicios, el costo restante es mayor que cero, ya que ninguno deja directamente en PA433. Entonces, se debe calcular el costo restante desde el paradero de bajada óptimo. 
 
-**Dijkstra Inverso para el coste restante y el paradero óptimo** 
+*Dijkstra Inverso para el coste restante y el paradero óptimo* 
 
 Para calcular el paradero óptimo y el costo restante al bajarse en ese paradero es importante la noción del Algoritmo de Dijkstra (AD).
 
@@ -800,7 +794,7 @@ Notar el último atributo, que indica si el usuario tuvo que caminar a otro para
 
 #### Nota sobre el coste restante
 
-El coste restante tiene una característica **determinista**, pues asume que después de la primera decisión las personas son deterministas y no eligen con distribución de probabilidad. Esto es intencional. Modelar todo el trayecto como una concatenación de decisiones probabilísticas complica el modelo. Una pequeña intuición que no se desarrollará en este trabajo indica que posiblemente el costo restante sería una distribución o variable aleatoria más que un valor fijo escalar. Esto tiene más sentido real. Una persona sabe que hacer transbordo aumenta su varianza en su tiempo de viaje debido a que debe de esperar otro servicio, que induce una incerteza temporal. Aunque en el coste restante está incluído el tiempo de espera, realmente el tiempo de espera *esperado* debería de ser un tiempo que tenga en cuenta todos los tiempos de espera del paradero que le puedan servir al usuario. Lo mismo con los tiempos de viaje del servicio que pueda tomar el usuario. Es inmediato notar como se complica el problema, pues ahora cada decisión subsecuente tiene una distribución. 
+El coste restante tiene una característica *determinista*, pues asume que después de la primera decisión las personas son deterministas y no eligen con distribución de probabilidad. Esto es intencional. Modelar todo el trayecto como una concatenación de decisiones probabilísticas complica el modelo. Una pequeña intuición que no se desarrollará en este trabajo indica que posiblemente el costo restante sería una distribución o variable aleatoria más que un valor fijo escalar. Esto tiene más sentido real. Una persona sabe que hacer transbordo aumenta su varianza en su tiempo de viaje debido a que debe de esperar otro servicio, que induce una incerteza temporal. Aunque en el coste restante está incluído el tiempo de espera, realmente el tiempo de espera *esperado* debería de ser un tiempo que tenga en cuenta todos los tiempos de espera del paradero que le puedan servir al usuario. Lo mismo con los tiempos de viaje del servicio que pueda tomar el usuario. Es inmediato notar como se complica el problema, pues ahora cada decisión subsecuente tiene una distribución. 
 
 
 ### Entrenamiento
@@ -862,7 +856,7 @@ Las aristas SUBIR, VIAJAR, BAJAR Y CAMINAR tienen tensores relacionados con los 
 - CAMINAR: "run_scalar" un tensor de rango 0 (un escalar) que denota el tiempo de caminata calculando distancia euclidiana dividido por la velocidad. 
 
 
-### **Embeddings** iniciales
+### *Embeddings* iniciales
 
 Los *embeddings* son atributos vectoriales aprendibles por la red locales a cada nodo. Hay *embeddings* para : 
 
@@ -1372,7 +1366,7 @@ Estos valores reflejan la importancia relativa de cada atributo en la elección 
 
 Se tiene un paradero $P$ y $Q$ conectados por un set de servicios ${S}$ para un bin b. En el *baseline* (la oferta real) se obtiene una distribución de probabilidad dada. Si se modifica la oferta de uno de los servicios, por ejemplo, aumentando el doble el tiempo de espera (disminuyendo la cantidad de buses que operan el servicio) se obtiene una comparación entre las distribuciones de probabilidades para antes y después del cambio de oferta. Se muestran dos ejemplos ilustrativos. 
 
-**Ejemplo 1: Ir desde PJ394 a PA300**
+*Ejemplo 1: Ir desde PJ394 a PA300*
 
 Ambos paraderos tienen de servicios disponibles que dejan directo en el destino, el 503 y el 517. Entonces, el costo restante o *cost_to_go* es 0, ya que dejan directamente en el destino del usuario. Ver Figura \ref{fig:exp1costs} que ilustra los tiempos de cada servicio del paradero. El experimento consiste en aumentar al doble el tiempo de espera del 517. 
 
@@ -1396,7 +1390,7 @@ Si se ejecuta el predictor, se obtiene una redistribución de probabilidades com
 
 Notar como el servicio 503 pierde probabilidad y el 517 la gana. Pero no es una transferencia directa. Los otros servicios igual ganan un poco de atractivo al perderlo el 503. 
 
-**Ejemplo 2: Ir desde PJ394 a PA433**
+*Ejemplo 2: Ir desde PJ394 a PA433*
 
 Este ejemplo es distinto. A diferencia del anterior, efectivamente solo un servicio llega directamente al destino, el 507. El resto entonces, tiene un costo restante mayor que cero. Ver Figura \ref{fig:exp2costs} que ilustra los tiempos de cada servicio del paradero.
 
@@ -1541,16 +1535,16 @@ Las figuras \ref{fig:exp2_l1_probs} y \ref{fig:exp2_l1_costs} muestran las proba
 
 Algo más interesante pasa cuando se quiere ir a una estación de L1 que no combine con L5, es decir, ambos servicios no compiten. Por ejemplo, ir de San Pablo a Tobalaba. 
 
-**Viaje en alternativa: L5**
+*Viaje en alternativa: L5*
 
-- **Inicio:** Paradero `METRO_SAN PABLO`
-    - Subir al servicio **L5** (sentido Metro) en `METRO_SAN PABLO`
+- *Inicio:* Paradero `METRO_SAN PABLO`
+    - Subir al servicio *L5* (sentido Metro) en `METRO_SAN PABLO`
     - Bajar en `METRO_BAQUEDANO`
     - Caminar desde `METRO_BAQUEDANO` hasta `E-20-53-PO-115`
-    - Subir al servicio **503** (sentido Ida) en `E-20-53-PO-115`
+    - Subir al servicio *503* (sentido Ida) en `E-20-53-PO-115`
     - Bajar en `E-14-170-NS-5`
     - Caminar desde `E-14-170-NS-5` hasta `METRO_TOBALABA`
-- **Fin del camino**
+- *Fin del camino*
 
 El algoritmo que se tiene, por construcción tomará el camino con el coste más bajo para ir desde Baquedano hacia Tobalaba si es que el Metro está desactivado. Se puede hacer este análisis corriendo el algoritmo del MNL desde el paradero E-20-53-PO-115 (el más cercano a Baquedano que tiene servicios que dejan cerca, según el enrutador). Las figuras \ref{fig:exp3costs} y \ref{fig:exp3probs} muestran los costes y probabilidades para cada alternativa. Notar como el servicio 503 es el más atractivo, ya que es el que tiene el menor coste total. Una suspensión de la L1 entre Baquedano y Tobalaba sugiere que todo el volumen de pasajeros que usualmente toma este tramo se redistribuirá en los servicios en superficie con las probabilidades de más abajo.
 
