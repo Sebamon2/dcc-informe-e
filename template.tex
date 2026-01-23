@@ -136,11 +136,47 @@ $if(anho)$\anho{$anho$}$endif$
 
 \frontmatter
 \maketitle
-
 $if(resumen)$
-\begin{resumen}
-$resumen$
-\end{resumen}
+\clearpage
+\thispagestyle{plain}
+\phantomsection
+
+% --- INICIO BLOQUE RESUMEN (Anexo B) ---
+% \hfill empuja la minipage hacia la derecha
+% {0.6\textwidth} define que el bloque ocupe el 60% del ancho de la página
+\noindent\hfill
+\begin{minipage}{0.6\textwidth}
+    \bfseries
+    \setlength{\parskip}{0.5em} % Un poco más de aire entre líneas del encabezado
+    \raggedright % Esto alinea el texto A LA IZQUIERDA dentro del bloque
+    
+    $if(memoria)$
+    RESUMEN DE LA MEMORIA PARA OPTAR\\ AL TÍTULO DE \MakeUppercase{$memoria$}
+    $else$
+    RESUMEN DE LA TESIS PARA OPTAR\\ AL GRADO DE \MakeUppercase{$tesis$}
+    $endif$
+    
+    POR: \MakeUppercase{$nombre$}
+    
+    FECHA: $anho$
+    
+    PROF. GUÍA: \MakeUppercase{$guia$}
+    
+    \vspace{1em}
+    
+\end{minipage}
+% --- FIN BLOQUE ---
+
+\vspace{2em}
+\begin{center}
+    \bfseries
+    \MakeUppercase{$titulo$}
+\end{center}
+
+\vspace{1cm}
+\noindent $resumen$
+
+\newpage
 $endif$
 
 % opcional: incluir para tesis en inglés;

@@ -42,7 +42,7 @@ El sistema de transporte público en Santiago de Chile es un componente esencial
 
 La planificación o intervenciones a la red de transporte enfrentan el desafío de predecir efectos colaterales en la red existente. Crear un modelo de decisión en base a alternativas ofrecidas al usuario para llegar a un destino dado, un origen y hora, para luego con ese mismo modelo, generar una demanda sintética de una red de transporte en base a cambios nuevos (una redistribución de la demanda) es el objetivo de esta memoria. 
 
-Históricamente se han usado soluciones discretas como las MNL (Multinomial Logit) y recientemente modelos como GNN (Redes Neuronales de Grafos) para la predicción de la demanda. Por el lado de la MNL, esta solución se enfoca en una ingeniería de características, la cual propone variables de interés en el proceso de decisión de un usuario, tales como el tiempo de espera, la velocidad o que tanto acerca al destino el servicio de transporte público. Por otro lado, es importante notar la correlación espacial de la red, sobre todo si ocurren cambios en ella. Debido a la naturaleza de Red o **set de puntos conectados**, usar Redes Neuronales de Grafos es un área de investigación llamativa, gracias a su versatilidad en la forma de los inputs, a diferencia de los Perceptrón Multi Capa (MLP) o las Redes Neuronales Convolucionales (CNN) las cuales reciben vectores o grillas (como las imágenes). 
+Históricamente se han usado soluciones discretas como las MNL (Multinomial Logit) y recientemente modelos como GNN (Redes Neuronales de Grafos) para la predicción de la demanda. Por el lado de la MNL, esta solución se enfoca en una ingeniería de características, la cual propone variables de interés en el proceso de decisión de un usuario, tales como el tiempo de espera, la velocidad o que tanto acerca al destino el servicio de transporte público. Por otro lado, es importante notar la correlación espacial de la red, sobre todo si ocurren cambios en ella. Debido a la naturaleza de Red o *set de puntos conectados*, usar Redes Neuronales de Grafos es un área de investigación llamativa, gracias a su versatilidad en la forma de los inputs, a diferencia de los Perceptrón Multi Capa (MLP) o las Redes Neuronales Convolucionales (CNN) las cuales reciben vectores o grillas (como las imágenes). 
 
 Actualmente, algunos de los estudios que abordan esta problemática desde Chile lo hacen desde enfoques estadísticos y/o a nivel macro. Estos suelen analizar el antes y el después de una intervención, sin capacidad real de abstracción. Otros modelos tienen una orientación más predictiva, pero se encuentran desactualizados y no reflejan adecuadamente las dinámicas actuales del transporte urbano. También existen enfoques centrados en el transporte privado, que estudian cómo factores como la infraestructura, las tarifas o las políticas públicas afectan la movilidad general. Sin embargo, estos trabajos no se enfocan en cambios estructurales de la red de transporte público, sino que operan sobre la oferta ya existente. Por otro lado, existe el sistema ADATRAP [@adatrap2025], desarrollado por la Universidad de Chile y el Instituto Sistemas Complejos de Ingeniería. ADATRAP es un software que analiza datos y permite planificar y crear estrategias para la priorización en la asignación de servicios públicos de transporte. El software toma en cuenta la distribución de la oferta para los usuarios del servicio en la Región Metropolitana. ADATRAP será una fuente de datos importante para la predicción de la demanda.
 
@@ -606,7 +606,7 @@ Los tipos de aristas que tuvo el grafo son:
 
 
 
-Aristas **VIAJAR** que corren entre nodos *Servicio*. Representan la conexión dirigida entre dos paradas consecutivas de un servicio. Estas aristas tienen la siguiente información:
+Aristas *VIAJAR* que corren entre nodos *Servicio*. Representan la conexión dirigida entre dos paradas consecutivas de un servicio. Estas aristas tienen la siguiente información:
 
 - Nodo origen (Servicio en paradero P)
 - Nodo destino (Servicio en paradero Q)
@@ -623,7 +623,7 @@ Notar que las aristas VIAJAR tienen peso, el cual es el tiempo a bordo. Estas ar
 
 
 
-Aristas **CAMINAR** que corren entre nodos *Paradero*. Representan la conexión no dirigida entre dos paraderos cercanos. Estas aristas tienen la siguiente información:
+Aristas *CAMINAR* que corren entre nodos *Paradero*. Representan la conexión no dirigida entre dos paraderos cercanos. Estas aristas tienen la siguiente información:
 
 
 - Nodo origen (Paradero $P$)
@@ -635,7 +635,7 @@ Aristas **CAMINAR** que corren entre nodos *Paradero*. Representan la conexión 
 
 
 
-Aristas **SUBIR** que corren entre nodos *Paradero* y *Servicio*. Representan la acción de subirse a un servicio en un paradero. Estas aristas tienen la siguiente información:
+Aristas *SUBIR* que corren entre nodos *Paradero* y *Servicio*. Representan la acción de subirse a un servicio en un paradero. Estas aristas tienen la siguiente información:
 
 - Nodo origen (Paradero $P$)
 - Nodo destino (Servicio en paradero $P$)
@@ -647,7 +647,7 @@ Aristas **SUBIR** que corren entre nodos *Paradero* y *Servicio*. Representan la
 
 
 
-Aristas **BAJAR** que corren entre nodos *Servicio* y *Paradero*. Representan la acción de bajarse de un servicio en un paradero. Estas aristas tienen la siguiente información:
+Aristas *BAJAR* que corren entre nodos *Servicio* y *Paradero*. Representan la acción de bajarse de un servicio en un paradero. Estas aristas tienen la siguiente información:
 
 - Nodo origen (Servicio en paradero $P$)
 - Nodo destino (Paradero $P$)
